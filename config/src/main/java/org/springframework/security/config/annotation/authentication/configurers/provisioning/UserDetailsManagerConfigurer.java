@@ -41,15 +41,26 @@ import org.springframework.security.provisioning.UserDetailsManager;
 public class UserDetailsManagerConfigurer<B extends ProviderManagerBuilder<B>, C extends UserDetailsManagerConfigurer<B, C>>
 		extends UserDetailsServiceConfigurer<B, C, UserDetailsManager> {
 
+	/**
+	 * 用于初始化 UserDetailsManager 的 UserDetailsBuilder
+	 */
 	private final List<UserDetailsBuilder> userBuilders = new ArrayList<>();
 
+	/**
+	 * 用于初始化 UserDetailsManager 的 UserDetails
+	 */
 	private final List<UserDetails> users = new ArrayList<>();
 
+	/**
+	 * 构造函数，使用外部指定的 UserDetailsManager
+	 */
 	protected UserDetailsManagerConfigurer(UserDetailsManager userDetailsManager) {
 		super(userDetailsManager);
 	}
 
 	/**
+	 * 初始化 UserDetailsService， 使用外部指定的用户账号详情: users,userBuilders
+	 * 
 	 * Populates the users that have been added.
 	 *
 	 * @throws Exception

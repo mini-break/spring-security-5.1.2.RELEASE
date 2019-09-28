@@ -160,6 +160,9 @@ public class FilterChainProxy extends GenericFilterBean {
 	public FilterChainProxy() {
 	}
 
+	/**
+	 * 构造函数 ：基于一组过滤器链 SecurityFilterChain 构造一个 FilterChainProxy 对象
+	 */
 	public FilterChainProxy(SecurityFilterChain chain) {
 		this(Arrays.asList(chain));
 	}
@@ -168,6 +171,10 @@ public class FilterChainProxy extends GenericFilterBean {
 		this.filterChains = filterChains;
 	}
 
+	/**
+	 * InitializingBean 接口定义的当前 bean 的初始化方法
+	 * 使用 filterChainValidator 验证当前对象
+	 */
 	@Override
 	public void afterPropertiesSet() {
 		filterChainValidator.validate(this);
@@ -179,10 +186,12 @@ public class FilterChainProxy extends GenericFilterBean {
 		boolean clearContext = request.getAttribute(FILTER_APPLIED) == null;
 		if (clearContext) {
 			try {
+				// 标记对该请求该过滤器已经应用
 				request.setAttribute(FILTER_APPLIED, Boolean.TRUE);
 				doFilterInternal(request, response, chain);
 			}
 			finally {
+				// 当前请求已经被处理完，清除安全上下文
 				SecurityContextHolder.clearContext();
 				request.removeAttribute(FILTER_APPLIED);
 			}
@@ -195,11 +204,18 @@ public class FilterChainProxy extends GenericFilterBean {
 	private void doFilterInternal(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
+		/**
+		 * 这里 firewall 缺省就是一个 StrictHttpFirewall 实例，
+		 * FilterChainProxy 允许外部设置使用指定的 firewall 实例
+		 * 这里对请求/响应对象进行防火墙增强，如果请求被检测到可疑会被拒绝,
+		 * 响应对象会被增加输出头部/cookie/redirect location值时的安全检查
+		 */
 		FirewalledRequest fwRequest = firewall
 				.getFirewalledRequest((HttpServletRequest) request);
 		HttpServletResponse fwResponse = firewall
 				.getFirewalledResponse((HttpServletResponse) response);
 
+		// 获取跟该请求匹配的所有安全过滤器
 		List<Filter> filters = getFilters(fwRequest);
 
 		if (filters == null || filters.size() == 0) {
@@ -211,16 +227,20 @@ public class FilterChainProxy extends GenericFilterBean {
 
 			fwRequest.reset();
 
+			// 如果针对当前请求没有匹配的安全过滤器，则继续执行过滤器链  chain
 			chain.doFilter(fwRequest, fwResponse);
 
 			return;
 		}
 
+		// 构造并调用安全过滤器链
 		VirtualFilterChain vfc = new VirtualFilterChain(fwRequest, chain, filters);
 		vfc.doFilter(fwRequest, fwResponse);
 	}
 
 	/**
+	 * 返回匹配指定请求的过滤器链中的过滤器，如果没有匹配的过滤器链则返回null
+	 * 
 	 * Returns the first filter chain matching the supplied URL.
 	 *
 	 * @param request the request to match
@@ -292,6 +312,8 @@ public class FilterChainProxy extends GenericFilterBean {
 	// ==================================================================================================
 
 	/**
+	 * 一个内部类实现，用于将一组内部管理的过滤器应用到指定请求 firewalledRequest 上，应用完
+	 * 这组过滤器之后，继续执行传入的过滤器链 chain
 	 * Internal {@code FilterChain} implementation that is used to pass a request through
 	 * the additional internal list of filters which match the request.
 	 */

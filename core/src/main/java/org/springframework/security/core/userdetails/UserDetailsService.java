@@ -17,6 +17,8 @@
 package org.springframework.security.core.userdetails;
 
 /**
+ * UserDetailsService是Spring Security提供的一个概念模型接口，用于抽象建模系统提供这样一种服务能力(管理用户详情)
+ * 
  * Core interface which loads user-specific data.
  * <p>
  * It is used throughout the framework as a user DAO and is the strategy used by the

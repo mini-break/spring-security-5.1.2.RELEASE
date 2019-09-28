@@ -94,16 +94,36 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 认证事件发布器，这里缺省初始化为 NullEventPublisher,表示不做认证事件的发布
+	 */
 	private AuthenticationEventPublisher eventPublisher = new NullEventPublisher();
+	/**
+	 * 用于记录所要使用的各个 AuthenticationProvider， 当前 ProviderManager 的认证
+	 * 任务最终委托给这组 AuthenticationProvider 完成
+	 */
 	private List<AuthenticationProvider> providers = Collections.emptyList();
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
+	/**
+	 * 双亲认证管理器，可以设置，也可以不设置，设置的话会在当前认证管理器 ProviderManager
+	 * 不能认证某个用户时再尝试使用该双亲认证管理器认证用户
+	 */
 	private AuthenticationManager parent;
+	/**
+	 * 认证成功时是否擦除认证令牌对象中的凭证信息(比如密码)，缺省值为 true
+	 */
 	private boolean eraseCredentialsAfterAuthentication = true;
 
+	/**
+	 * 构造函数，指定一组要使用的 AuthenticationProvider，并且双亲认证管理器设置为 null
+	 */
 	public ProviderManager(List<AuthenticationProvider> providers) {
 		this(providers, null);
 	}
 
+	/**
+	 * 构造函数，指定一组要使用的 AuthenticationProvider，并且双亲认证管理器设置为指定值
+	 */
 	public ProviderManager(List<AuthenticationProvider> providers,
 			AuthenticationManager parent) {
 		Assert.notNull(providers, "providers list cannot be null");
@@ -115,6 +135,11 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 	// ~ Methods
 	// ========================================================================================================
 
+	/**
+	 * InitializingBean 接口定义的bean初始化方法，会在该bean创建过程中初始化阶段被调用，
+	 * 这里的实现仅仅检查必要的工作组件是否被设置，如果没有被设置，则抛出异常
+	 */
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		checkState();
 	}
@@ -128,6 +153,27 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 	}
 
 	/**
+	 * 尝试对认证请求对象，也就是认证令牌对象参数 authentication 进行认证
+	 * 该方法的逻辑会遍历所有支持该认证令牌对象参数 authentication （基于类型进行匹配）
+	 * 的 AuthenticationProvider，找到第一个能成功认证的并返回填充更多信息的
+	 * authentication 对象：
+	 * 1. 如果某个 AuthenticationProvider 宣称可以认证该 authentication，
+	 * 但是认证过程抛出异常 AuthenticationException，则整个认证过程不会停止,
+	 * 而是尝试使用下一个 AuthenticationProvider 继续；
+	 * 2. 如果某个 AuthenticationProvider 宣称可以认证该 authentication，
+	 * 但是认证过程抛出异常 AccountStatusException/InternalAuthenticationServiceException，
+	 * 则异常会被继续抛出，整个认证过程停止；
+	 * 3. 如果某个 AuthenticationProvider 宣称可以认证该 authentication，并且成功认证
+	 * 该 authentication，则认证过程停止，该结果会被采用。
+	 * 如果所有的 AuthenticationProvider 尝试完之后也未能认证该 authentication,
+	 * 并且双亲认证管理器被设置，则该方法会继续尝试使用双亲认证管理器认证该 authentication。
+	 * 如果所有的 AuthenticationProvider 都尝试过，并且双亲认证管理器也未能认证
+	 * 该 authentication，则会抛出异常  ProviderNotFoundException
+	 * 认证成功时，如果设置了标志需要擦除认证中的凭证信息，则该方法会擦除认证中的
+	 * 凭证信息。
+	 * 认证成功时，该方法也会调用 eventPublisher 发布认证成功事件。
+	 * 认证异常时，该方法回调用 eventPublisher 发布相应的认证异常事件。
+	 *
 	 * Attempts to authenticate the passed {@link Authentication} object.
 	 * <p>
 	 * The list of {@link AuthenticationProvider}s will be successively tried until an
@@ -267,6 +313,9 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 		this.messages = new MessageSourceAccessor(messageSource);
 	}
 
+	/**
+	 * 指定事件发布器，用于覆盖缺省的 NullEventPublisher
+	 */
 	public void setAuthenticationEventPublisher(
 			AuthenticationEventPublisher eventPublisher) {
 		Assert.notNull(eventPublisher, "AuthenticationEventPublisher cannot be null");
@@ -290,6 +339,10 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 		return eraseCredentialsAfterAuthentication;
 	}
 
+	/**
+	 * 这是一个缺省使用的认证事件发布器实现类，实际上并不发布任何认证事件，只是为了避免
+	 * ProviderManager 的属性 eventPublisher 为 null
+	 */
 	private static final class NullEventPublisher implements AuthenticationEventPublisher {
 		public void publishAuthenticationFailure(AuthenticationException exception,
 				Authentication authentication) {

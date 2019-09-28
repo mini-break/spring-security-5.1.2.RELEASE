@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 /**
+ * Spring Security中AuthenticationProvider接口抽象建模了认证提供者这一概念，某个认证提供者能认证符合某种特征的认证令牌Authentication
+ * 
  * Indicates a class can process a specific
  * {@link org.springframework.security.core.Authentication} implementation.
  *
@@ -30,6 +32,10 @@ public interface AuthenticationProvider {
 	// ========================================================================================================
 
 	/**
+	 * 对提供的认证令牌对象 authentication 执行认证逻辑。如果认证成功，返回信息填充完整的
+	 * 的认证令牌对象 authentication。 无法完成认证的话返回 null。此时调用者，通常是 ProviderManager
+	 * 使用其他的认证提供者继续尝试认证该认证令牌对象
+	 *
 	 * Performs authentication with the same contract as
 	 * {@link org.springframework.security.authentication.AuthenticationManager#authenticate(Authentication)}
 	 * .
@@ -48,6 +54,11 @@ public interface AuthenticationProvider {
 			throws AuthenticationException;
 
 	/**
+	 * 返回 true 表示当前 AuthenticationProvider 能够支持对该 Authentication 对象的
+	 * 认证。 不过返回 true 并不表示当前 AuthenticationProvider 能成功认证该 Authentication对象。
+	 *
+	 * 该方法通常被 ProviderManager 用作判断当前 AuthenticationProvider是否可以用于对某个 Authentication 执行认证的逻辑
+	 *
 	 * Returns <code>true</code> if this <Code>AuthenticationProvider</code> supports the
 	 * indicated <Code>Authentication</code> object.
 	 * <p>

@@ -117,12 +117,14 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 			UsernamePasswordAuthenticationToken authentication)
 			throws AuthenticationException;
 
+	@Override
 	public final void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.userCache, "A user cache must be set");
 		Assert.notNull(this.messages, "A message source must be set");
 		doAfterPropertiesSet();
 	}
 
+	@Override
 	public Authentication authenticate(Authentication authentication)
 			throws AuthenticationException {
 		Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication,
@@ -141,6 +143,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 			cacheWasUsed = false;
 
 			try {
+				// 子类根据自身情况从指定的地方加载认证需要的用户信息
 				user = retrieveUser(username,
 						(UsernamePasswordAuthenticationToken) authentication);
 			}
@@ -162,7 +165,9 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 		}
 
 		try {
+			// 前置检查，一般是检查账号状态，如是否锁定之类
 			preAuthenticationChecks.check(user);
+			// 进行一般逻辑认证，如 DaoAuthenticationProvider 实现中的密码验证就是在这里完成的
 			additionalAuthenticationChecks(user,
 					(UsernamePasswordAuthenticationToken) authentication);
 		}
@@ -182,6 +187,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 			}
 		}
 
+		// 后置检查，如可以检查密码是否过期之类
 		postAuthenticationChecks.check(user);
 
 		if (!cacheWasUsed) {
@@ -194,6 +200,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 			principalToReturn = user.getUsername();
 		}
 
+		// 验证成功之后返回包含完整认证信息的 Authentication 对象
 		return createSuccessAuthentication(principalToReturn, authentication, user);
 	}
 
@@ -316,6 +323,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 		this.userCache = userCache;
 	}
 
+	@Override
 	public boolean supports(Class<?> authentication) {
 		return (UsernamePasswordAuthenticationToken.class
 				.isAssignableFrom(authentication));

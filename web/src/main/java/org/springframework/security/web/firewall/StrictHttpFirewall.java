@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * StrictHttpFirewall也是Spring Security Web在安全过滤器代理FilterChainProxy内置缺省使用的HTTP防火墙机制
+ *
  * <p>
  * A strict implementation of {@link HttpFirewall} that rejects any suspicious requests
  * with a {@link RequestRejectedException}.
@@ -119,6 +121,7 @@ public class StrictHttpFirewall implements HttpFirewall {
 	}
 
 	/**
+	 * 通过本方法设置允许访问的http method
 	 * <p>
 	 * Determines which HTTP methods should be allowed. The default is to allow "DELETE", "GET", "HEAD", "OPTIONS",
 	 * "PATCH", "POST", and "PUT".
@@ -311,6 +314,7 @@ public class StrictHttpFirewall implements HttpFirewall {
 		if (this.allowedHttpMethods == ALLOW_ANY_HTTP_METHOD) {
 			return;
 		}
+		// 不在HTTP method许可清单的请求会被拒绝
 		if (!this.allowedHttpMethods.contains(request.getMethod())) {
 			throw new RequestRejectedException("The request was rejected because the HTTP method \"" +
 					request.getMethod() +
@@ -337,6 +341,9 @@ public class StrictHttpFirewall implements HttpFirewall {
 		return new FirewalledResponse(response);
 	}
 
+	/**
+	 * 缺省被允许的HTTP method有 [DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT]
+	 */
 	private static Set<String> createDefaultAllowedHttpMethods() {
 		Set<String> result = new HashSet<>();
 		result.add(HttpMethod.DELETE.name());
@@ -382,6 +389,10 @@ public class StrictHttpFirewall implements HttpFirewall {
 		return false;
 	}
 
+	/**
+	 * 如果请求URL 中包含不可打印ASCII字符则该请求会被拒绝
+	 * 
+	 */
 	private static boolean containsOnlyPrintableAsciiCharacters(String uri) {
 		int length = uri.length();
 		for (int i = 0; i < length; i++) {
@@ -399,6 +410,21 @@ public class StrictHttpFirewall implements HttpFirewall {
 	}
 
 	/**
+	 * 如果请求URL 不是标准化(normalize)的URL则该请求会被拒绝，以避免安全限制被绕过
+	 * 标准化的URL必须符合以下条件 :
+	 * 在其requestURI/contextPath/servletPath/pathInfo中，必须不能包含以下字符串序列之一 :
+	 * ["//","./","/…/","/."]
+	 *
+	 * 检测一个路径参数path是否是一个标准化了的路径 :
+	 * 1. 如果路径中包含连续两个反斜杠 "//" 则会被认为是非标准化的
+	 * 2. 如果路径中包含 "./" , "/../" , 或者 "/." , 则会被认为是非标准化的
+	 *
+	 * 有关知识点 :
+	 * 1.requestURI : URL中去除协议,主机名,端口之后其余的部分,
+	 * 2.contextPath : requestURI中对应webapp的部分,
+	 * 3.servletPath ： requestURI中对应识别Servlet的部分
+	 * 4.pathInfo : requestURI中去掉contextPath,servletPath剩下的部分
+	 *
 	 * Checks whether a path is normalized (doesn't contain path traversal
 	 * sequences like "./", "/../" or "/.")
 	 *

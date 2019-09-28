@@ -67,6 +67,9 @@ import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
 /**
+ * WebSecurityConfigurerAdapter是Spring Security Config内置提供的一个WebSecurityConfigurer抽象实现类。
+ * WebSecurityConfigurerAdapter存在的目的是提供一个方便开发人员配置WebSecurity的基类。它提供了一组全方位配置WebSecurity的缺省方法实现
+ *
  * Provides a convenient base class for creating a {@link WebSecurityConfigurer}
  * instance. The implementation allows customization by overriding methods.
  *
@@ -98,6 +101,11 @@ public abstract class WebSecurityConfigurerAdapter implements
 
 	private ContentNegotiationStrategy contentNegotiationStrategy = new HeaderContentNegotiationStrategy();
 
+	/**
+	 * 在每个安全对象创建之后需要执行后置动作的 后置动作处理器，这里的缺省值
+	 * 其实只是抛出异常声明IoC容器中必须存在一个ObjectPostProcessor bean：
+	 * 参考 @EnableWebSecurity => @EnableGlobalAuthentication=> AuthenticationConfiguration => ObjectPostProcessorConfiguration
+	 */
 	private ObjectPostProcessor<Object> objectPostProcessor = new ObjectPostProcessor<Object>() {
 		public <T> T postProcess(T object) {
 			throw new IllegalStateException(
@@ -106,17 +114,63 @@ public abstract class WebSecurityConfigurerAdapter implements
 		}
 	};
 
+	/**
+	 * 配置 WebSecurity 需要使用到的认证配置，可以认为是全局认证配置，会通过 set 方法被自动注入,
+	 * 该属性会用于从IoC容器获取目标 WebSecurity/HttpSecurity 所要直接使用的 AuthenticationManager 的双亲
+	 * AuthenticationManager 。 该方式可能用得上，也可能用不上，要看开发人员是配置使用
+	 * localConfigureAuthenticationBldr 还是使用该属性用于构建目标 WebSecurity/HttpSecurity 所要直接使用的
+	 * AuthenticationManager 的双亲 AuthenticationManager。
+	 */
 	private AuthenticationConfiguration authenticationConfiguration;
+	/**
+	 * AuthenticationManager 构建器，缺省使用 : DefaultPasswordEncoderAuthenticationManagerBuilder
+	 * 所有构建的 AuthenticationManager 会是目标 WebSecurity/HttpSecurity 所要直接使用的 AuthenticationManager
+	 */
 	private AuthenticationManagerBuilder authenticationBuilder;
+	/**
+	 * AuthenticationManager 构建器，缺省使用 : DefaultPasswordEncoderAuthenticationManagerBuilder
+	 * 所要构建的 AuthenticationManagerBuilder 会是目标 WebSecurity/HttpSecurity 所要直接使用的
+	 * AuthenticationManager 的双亲 AuthenticationManager。 不过缺省情况下，也就是开发人员不在子类
+	 * 中覆盖实现 void configure(AuthenticationManagerBuilder auth) 的情况下, 该 localConfigureAuthenticationBldr
+	 * 不会被用于构建目标 WebSecurity/HttpSecurity 所要直接使用的 AuthenticationManager 的双亲
+	 * AuthenticationManager, 这种情况下的双亲 AuthenticationManager 会来自 authenticationConfiguration
+	 */
 	private AuthenticationManagerBuilder localConfigureAuthenticationBldr;
+	/**
+	 * 是否禁用 localConfigureAuthenticationBldr, 缺省情况下，也就是开发人员不在子类中覆盖实现
+	 * void configure(AuthenticationManagerBuilder auth) 的情况下,  当前 WebSecurityConfigurerAdapter
+	 * 缺省提供的 void configure(AuthenticationManagerBuilder auth)  方法实现会将该标志设置为 true,
+	 * 也就是不使用 localConfigureAuthenticationBldr 构建目标 WebSecurity/HttpSecurity 所要直接使用的
+	 * AuthenticationManager 的双亲 AuthenticationManager, 而是使用 authenticationConfiguration
+	 * 提供的 AuthenticationManager 作为 双亲 AuthenticationManager
+	 */
 	private boolean disableLocalConfigureAuthenticationBldr;
+	/**
+	 * 标志属性 : 目标 WebSecurity/HttpSecurity 所要直接使用的AuthenticationManager的双亲 authenticationManager
+	 * 是否已经初始化
+	 */
 	private boolean authenticationManagerInitialized;
+	/**
+	 * 目标 WebSecurity/HttpSecurity 所要直接使用的AuthenticationManager的双亲 authenticationManager
+	 */
 	private AuthenticationManager authenticationManager;
+	/**
+	 * 根据传入的 Authentication 的类型判断一个 Authentication 是否可被信任,
+	 * 缺省使用实现机制 AuthenticationTrustResolverImpl 可被设置
+	 */
 	private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
+	/**
+	 * HTTP 安全构建器，用于配置匹配特定URL模式的控制器方法的安全，构建产物是 DefaultSecurityFilterChain
+	 */
 	private HttpSecurity http;
+	/**
+	 * 是否禁用缺省配置,缺省为 false，可以通过当前类构造函数设置为true
+	 */
 	private boolean disableDefaults;
 
 	/**
+	 * 缺省构造函数， 缺省配置机制启用 : disableDefaults == false
+	 * 
 	 * Creates an instance with the default configuration enabled.
 	 */
 	protected WebSecurityConfigurerAdapter() {
@@ -136,6 +190,15 @@ public abstract class WebSecurityConfigurerAdapter implements
 	}
 
 	/**
+	 * 开发人员可以覆盖该方法用于配置指定的 AuthenticationManagerBuilder auth,
+	 * 如果开发人员这么做了，那么这里所被配置的 auth , 其实就是当前配置器的属性
+	 * localConfigureAuthenticationBldr 会被用于构建 WebSecurity/HttpSecurity
+	 * 所要使用的 AuthenticationManager 的双亲 AuthenticationManager。
+	 * 如果开发人员不覆盖实现此方法，此缺省实现其实只是设置一个禁用标志，禁用
+	 * localConfigureAuthenticationBldr, 此时 WebSecurity/HttpSecurity 所要使
+	 * 用的 AuthenticationManager 的双亲 AuthenticationManager 将会来自
+	 * authenticationConfiguration.getAuthenticationManager()
+	 *
 	 * Used by the default implementation of {@link #authenticationManager()} to attempt
 	 * to obtain an {@link AuthenticationManager}. If overridden, the
 	 * {@link AuthenticationManagerBuilder} should be used to specify the
@@ -183,7 +246,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 	}
 
 	/**
-	 * 其中 getHttp() 用于获取HttpSecurity实例, 它长这个样子
+	 * 用于获取HttpSecurity实例
 	 * 我们继承这个类, 重写了 configure(http) 方法的时候, 会在 httpSecurity.configurers 里加入 filter
 	 * http.csrf() 会将 CsrfConfigurer<HttpSecurity> 存入 HttpSecurity.configurers 中
 	 * http.csrf().disable() 从 HttpSecurity.configurers 中移除 CsrfConfigurer
@@ -210,7 +273,11 @@ public abstract class WebSecurityConfigurerAdapter implements
 		 * 会调用 configure(AuthenticationManagerBuilder auth)
  		 */
 		AuthenticationManager authenticationManager = authenticationManager();
-		// 设置在父级里面, 此变量也是在 setObjectPostProcessor() 方法里被赋值
+		/**
+		 * 设置在父级里面, 此变量也是在 setObjectPostProcessor() 方法里被赋值
+		 * authenticationBuilder 所要构建的目标 AuthenticationManager 才是
+		 * 当前配置器所配置的 WebSecurity/HttpSecurity 所要直接使用的  AuthenticationManager
+		 */
 		authenticationBuilder.parentAuthenticationManager(authenticationManager);
 		authenticationBuilder.authenticationEventPublisher(eventPublisher);
 		// 创建共享对象
@@ -222,19 +289,22 @@ public abstract class WebSecurityConfigurerAdapter implements
 		// 这就是默认被配置的过滤器链, 配置的顺序在别的地方有排序
 		if (!disableDefaults) {
 			// @formatter:off
-			//  headers()等方法将configure apply()到了http的属性configurers中，这里默认会注入10个configurer
+			/**
+			 * HttpSecurity http 的缺省配置
+			 * headers()等方法将configure apply()到了http的属性configurers中，这里默认会注入10个configurer
+ 			 */
 			http
-				.csrf().and()
-				.addFilter(new WebAsyncManagerIntegrationFilter())
-				.exceptionHandling().and()
-				.headers().and()
-				.sessionManagement().and()
-				.securityContext().and()
-				.requestCache().and()
-				.anonymous().and()
-				.servletApi().and()
-				.apply(new DefaultLoginPageConfigurer<>()).and()
-				.logout();
+				.csrf().and() // 应用 CsrfConfigurer
+				.addFilter(new WebAsyncManagerIntegrationFilter()) // 添加过滤器 WebAsyncManagerIntegrationFilter
+				.exceptionHandling().and() // 应用 ExceptionHandlingConfigurer
+				.headers().and() // 应用 HeadersConfigurer
+				.sessionManagement().and() // 应用 SessionManagementConfigurer
+				.securityContext().and() // 应用 SecurityContextConfigurer
+				.requestCache().and() // 应用 RequestCacheConfigurer
+				.anonymous().and() // 应用 AnonymousConfigurer
+				.servletApi().and() // 应用 ServletApiConfigurer
+				.apply(new DefaultLoginPageConfigurer<>()).and() // 应用 DefaultLoginPageConfigurer
+				.logout(); // 应用 LogoutConfigurer
 			// @formatter:on
 			ClassLoader classLoader = this.context.getClassLoader();
 			/**
@@ -275,6 +345,16 @@ public abstract class WebSecurityConfigurerAdapter implements
 	}
 
 	/**
+	 * 获取构建 WebSecurity/HttpSecurity所要使用的 AuthenticationManager 的
+	 * 双亲 AuthenticationManager，这里的策略是 :
+	 * 1. 如果开发人员覆盖实现了 #configure(AuthenticationManagerBuilder) ,
+	 * 则会使用开发人员覆盖实现了的 AuthenticationManagerBuilder , 其实也就是
+	 * 当前配置器的 localConfigureAuthenticationBldr 构建一个 AuthenticationManager
+	 * 并返回和使用;
+	 * 2. 如果开发人员没有覆盖实现 #configure(AuthenticationManagerBuilder) ,
+	 * 则会使用  authenticationConfiguration#getAuthenticationManager() 提供的
+	 * AuthenticationManager, 这是从IoC容器中根据类型查找得到的一个 AuthenticationManager
+	 * 
 	 * Gets the {@link AuthenticationManager} to use. The default strategy is if
 	 * {@link #configure(AuthenticationManagerBuilder)} method is overridden to use the
 	 * {@link AuthenticationManagerBuilder} that was passed in. Otherwise, autowire the
@@ -285,14 +365,32 @@ public abstract class WebSecurityConfigurerAdapter implements
 	 */
 	protected AuthenticationManager authenticationManager() throws Exception {
 		if (!authenticationManagerInitialized) {
+			/**
+			 * authenticationManager 尚未初始化的情况，在这里进行初始化
+			 * 调用 configure(AuthenticationManagerBuilder auth) 用于配置  localConfigureAuthenticationBldr,
+			 * 该方法有可能被开发人员覆盖实现（覆盖方法可以为接下来的AuthenticationManagerBuilder.build()方法提供SecurityConfigurer配置）
+			 */
 			configure(localConfigureAuthenticationBldr);
 			if (disableLocalConfigureAuthenticationBldr) {
+				/**
+				 * 如果开发人员没有覆盖实现 configure(AuthenticationManagerBuilder auth)
+				 * 方法， 则该方法的缺省实现会设置 disableLocalConfigureAuthenticationBldr=true,
+				 * 这种情况下会使用 authenticationConfiguration 获取IoC容器中配置的 AuthenticationManager
+				 * 作为目标WebSecurity/HttpSecurity 所要直接使用的 AuthenticationManager 的双亲
+				 */
 				authenticationManager = authenticationConfiguration
 						.getAuthenticationManager();
 			}
 			else {
+				/**
+				 * 如果开发人员覆盖实现了 configure(AuthenticationManagerBuilder auth)
+				 * 方法，则 localConfigureAuthenticationBldr 会被用于构建一个 AuthenticationManager,
+				 * 该 AuthenticationManager 会充当目标WebSecurity/HttpSecurity 所要直接使用的
+				 * AuthenticationManager 的双亲
+				 */
 				authenticationManager = localConfigureAuthenticationBldr.build();
 			}
+			// authenticationManager 初始化完成的情况，设置相应标志
 			authenticationManagerInitialized = true;
 		}
 		return authenticationManager;
@@ -365,6 +463,8 @@ public abstract class WebSecurityConfigurerAdapter implements
 	}
 
 	/**
+	 * 覆盖实现此方法来自定义配置 HttpSecurity, 这里的实现是一个缺省实现
+	 *
 	 * Override this method to configure the {@link HttpSecurity}. Typically subclasses
 	 * should not invoke this method by calling super as it may override their
 	 * configuration. The default configuration is:
@@ -402,9 +502,16 @@ public abstract class WebSecurityConfigurerAdapter implements
 		this.context = context;
 
 		ObjectPostProcessor<Object> objectPostProcessor = context.getBean(ObjectPostProcessor.class);
+		
+		// 密码加密器，口令加密器，使用当前  WebSecurityConfigurerAdapter 的内部嵌套类 LazyPasswordEncoder
 		LazyPasswordEncoder passwordEncoder = new LazyPasswordEncoder(context);
 
+		// 目标 WebSecurity/HttpSecurity 所要直接使用的  AuthenticationManager 的构建器
 		authenticationBuilder = new DefaultPasswordEncoderAuthenticationManagerBuilder(objectPostProcessor, passwordEncoder);
+		/**
+		 * 目标 WebSecurity/HttpSecurity 所要直接使用的  AuthenticationManager  的双亲  AuthenticationManager
+		 * 的构建器, 可能被用的上，也可能用不上，要看开发人员是否决定使用这个 localConfigureAuthenticationBldr
+		 */
 		localConfigureAuthenticationBldr = new DefaultPasswordEncoderAuthenticationManagerBuilder(objectPostProcessor, passwordEncoder) {
 			@Override
 			public AuthenticationManagerBuilder eraseCredentials(boolean eraseCredentials) {
@@ -415,11 +522,19 @@ public abstract class WebSecurityConfigurerAdapter implements
 		};
 	}
 
+	/**
+	 * 依赖注入 AuthenticationTrustResolver ， 如果容器中有 AuthenticationTrustResolver bean
+	 * 则使用，否则则使用缺省值 : AuthenticationTrustResolverImpl
+	 */
 	@Autowired(required = false)
 	public void setTrustResolver(AuthenticationTrustResolver trustResolver) {
 		this.trustResolver = trustResolver;
 	}
 
+	/**
+	 * 依赖注入 ContentNegotiationStrategy ， 如果容器中有 ContentNegotiationStrategy bean
+	 * 则使用，否则则使用缺省值 : HeaderContentNegotiationStrategy
+	 */
 	@Autowired(required = false)
 	public void setContentNegotationStrategy(
 			ContentNegotiationStrategy contentNegotiationStrategy) {
@@ -500,6 +615,11 @@ public abstract class WebSecurityConfigurerAdapter implements
 	}
 
 	/**
+	 * 内部嵌套类，该类的目的是包装一个 AuthenticationManager ， 该被包装的
+	 * AuthenticationManager 会由该 AuthenticationManagerDelegator 的构造函数
+	 * 参数对象 delegateBuilder 在目标 AuthenticationManager 首次被使用时构建。
+	 * 这么做的目的是确保 AuthenticationManager 被调用时，它已经被完全配置。
+	 *
 	 * Delays the use of the {@link AuthenticationManager} build from the
 	 * {@link AuthenticationManagerBuilder} to ensure that it has been fully configured.
 	 *
@@ -528,19 +648,27 @@ public abstract class WebSecurityConfigurerAdapter implements
 		public Authentication authenticate(Authentication authentication)
 				throws AuthenticationException {
 			if (delegate != null) {
+				// 如果被代理的 AuthenticationManager delegate 已经被构建则直接使用它进行认证
 				return delegate.authenticate(authentication);
 			}
 
 			synchronized (delegateMonitor) {
 				if (delegate == null) {
+					/**
+					 * 如果被代理的 AuthenticationManager delegate 尚未被构建，则在本次认证调用
+					 * 中先对其进行构建，构建成功后忘掉所用的delegateBuilder
+					 * 该模式中，这次认证也是对被代理的目标 AuthenticationManager 的首次认证调用
+					 */
 					delegate = this.delegateBuilder.getObject();
 					this.delegateBuilder = null;
 				}
 			}
 
+			// 对目标 AuthenticationManager 的首次认证调用
 			return delegate.authenticate(authentication);
 		}
 
+		// 从指定应用上下文及其祖先上下文中查找类型为  AuthenticationManager 的 bean 的名称，可能有多个
 		private static Set<String> getAuthenticationManagerBeanNames(
 				ApplicationContext applicationContext) {
 			String[] beanNamesForType = BeanFactoryUtils
@@ -549,6 +677,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 			return new HashSet<>(Arrays.asList(beanNamesForType));
 		}
 
+		// 确保没有循环依赖
 		private static void validateBeanCycle(Object auth, Set<String> beanNames) {
 			if (auth != null && !beanNames.isEmpty()) {
 				if (auth instanceof Advised) {
@@ -567,6 +696,9 @@ public abstract class WebSecurityConfigurerAdapter implements
 		}
 	}
 
+	/**
+	 * AuthenticationManagerBuilder默认实现
+	 */
 	static class DefaultPasswordEncoderAuthenticationManagerBuilder extends AuthenticationManagerBuilder {
 		private PasswordEncoder defaultPasswordEncoder;
 
@@ -603,6 +735,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 		}
 	}
 
+	// 内部嵌套类，延迟口令/密码加密器，将对口令/密码加密器对象的获取延迟到对其进行首次调用时
 	static class LazyPasswordEncoder implements PasswordEncoder {
 		private ApplicationContext applicationContext;
 		private PasswordEncoder passwordEncoder;

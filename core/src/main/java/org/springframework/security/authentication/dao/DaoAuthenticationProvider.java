@@ -96,10 +96,12 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 		}
 	}
 
+	@Override
 	protected void doAfterPropertiesSet() throws Exception {
 		Assert.notNull(this.userDetailsService, "A UserDetailsService must be set");
 	}
 
+	@Override
 	protected final UserDetails retrieveUser(String username,
 			UsernamePasswordAuthenticationToken authentication)
 			throws AuthenticationException {

@@ -39,6 +39,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.Assert;
 
 /**
+ * 认证管理器构建器
+ * AuthenticationManagerBuilder是一个SecurityBuilder,其目的是根据所设置的属性构建一个AuthenticationManager(实现类使用ProviderManager)
+ * 
  * {@link SecurityBuilder} used to create an {@link AuthenticationManager}. Allows for
  * easily building in memory authentication, LDAP authentication, JDBC based
  * authentication, adding {@link UserDetailsService}, and adding
@@ -53,10 +56,19 @@ public class AuthenticationManagerBuilder
 		implements ProviderManagerBuilder<AuthenticationManagerBuilder> {
 	private final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 双亲AuthenticationManager
+	 */
 	private AuthenticationManager parentAuthenticationManager;
 	private List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
 	private UserDetailsService defaultUserDetailsService;
+	/**
+	 * 是否认证后从认证对象中擦除密码信息
+	 */
 	private Boolean eraseCredentials;
+	/**
+	 * 认证事件发布器
+	 */
 	private AuthenticationEventPublisher eventPublisher;
 
 	/**
@@ -68,6 +80,8 @@ public class AuthenticationManagerBuilder
 	}
 
 	/**
+	 * 设置双亲AuthenticationManager
+	 * 
 	 * Allows providing a parent {@link AuthenticationManager} that will be tried if this
 	 * {@link AuthenticationManager} was unable to attempt to authenticate the provided
 	 * {@link Authentication}.
@@ -89,6 +103,8 @@ public class AuthenticationManagerBuilder
 	}
 
 	/**
+	 * 设置认证事件发布器
+	 * 
 	 * Sets the {@link AuthenticationEventPublisher}
 	 *
 	 * @param eventPublisher the {@link AuthenticationEventPublisher} to use
@@ -102,7 +118,7 @@ public class AuthenticationManagerBuilder
 	}
 
 	/**
-	 *
+	 * 设置是否认证后从认证对象中擦除密码信息
 	 *
 	 * @param eraseCredentials true if {@link AuthenticationManager} should clear the
 	 * credentials from the {@link Authentication} object after authenticating
@@ -114,6 +130,11 @@ public class AuthenticationManagerBuilder
 	}
 
 	/**
+	 *
+	 * 将内存身份验证添加到AuthenticationManagerBuilder并返回InMemoryUserDetailsManagerConfigurer以允许自定义内存中身份验证。
+	 * 此方法还确保UserDetailsService可用于getDefaultUserDetailsService()方法。
+	 * 请注意，其他UserDetailsService可能会覆盖此UserDetailsService作为默认值。
+	 *
 	 * Add in memory authentication to the {@link AuthenticationManagerBuilder} and return
 	 * a {@link InMemoryUserDetailsManagerConfigurer} to allow customization of the in
 	 * memory authentication.
@@ -135,6 +156,11 @@ public class AuthenticationManagerBuilder
 	}
 
 	/**
+	 * 将JDBC身份验证添加到AuthenticationManagerBuilder并返回JdbcUserDetailsManagerConfigurer以允许自定义JDBC身份验证。
+	 * 当使用持久性数据存储时，最好使用Flyway或Liquibase之类的东西添加配置外部的用户来创建模式并添加用户以确保这些步骤仅执行一次并且使用最佳SQL。
+	 * 此方法还确保UserDetailsService可用于getDefaultUserDetailsService（）方法。
+	 * 请注意，其他UserDetailsService可能会覆盖此UserDetailsService作为默认值
+	 *
 	 * Add JDBC authentication to the {@link AuthenticationManagerBuilder} and return a
 	 * {@link JdbcUserDetailsManagerConfigurer} to allow customization of the JDBC
 	 * authentication.
@@ -189,6 +215,9 @@ public class AuthenticationManagerBuilder
 	}
 
 	/**
+	 * 将LDAP身份验证添加到AuthenticationManagerBuilder并返回LdapAuthenticationProviderConfigurer以允许自定义LDAP身份验证。
+	 * 此方法不确保UserDetailsService可用于getDefaultUserDetailsService()方法。
+	 *
 	 * Add LDAP authentication to the {@link AuthenticationManagerBuilder} and return a
 	 * {@link LdapAuthenticationProviderConfigurer} to allow customization of the LDAP
 	 * authentication.
@@ -221,6 +250,7 @@ public class AuthenticationManagerBuilder
 	 * @return a {@link AuthenticationManagerBuilder} to allow further authentication to
 	 * be provided to the {@link AuthenticationManagerBuilder}
 	 */
+	@Override
 	public AuthenticationManagerBuilder authenticationProvider(
 			AuthenticationProvider authenticationProvider) {
 		this.authenticationProviders.add(authenticationProvider);
@@ -233,6 +263,7 @@ public class AuthenticationManagerBuilder
 			logger.debug("No authenticationProviders and no parentAuthenticationManager defined. Returning null.");
 			return null;
 		}
+		// 将多个认证提供者加入认证管理器
 		ProviderManager providerManager = new ProviderManager(authenticationProviders,
 				parentAuthenticationManager);
 		if (eraseCredentials != null) {

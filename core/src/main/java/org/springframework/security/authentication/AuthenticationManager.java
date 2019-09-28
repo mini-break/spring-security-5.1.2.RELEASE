@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 /**
+ * Spring Security中，接口AuthenticationManager用于抽象建模认证管理器，用于处理一个认证请求，也就是Spring Security中的Authentication认证令牌
+ * 
  * Processes an {@link Authentication} request.
  *
  * @author Ben Alex

@@ -121,8 +121,8 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 		/**
 		 * WebSecurity#build()会返回一个过滤器链
 		 * 根据配置 webSecurityConfigurers或者缺省 WebSecurityConfigurerAdapter 构建
-		 *  Filter FilterChainProxy 并返回，这是最终加入到Servlet容器的Filter chain
-		 *  中的一个 Filter, 但实际上，它的内部也维护了一个自己的安全相关的 Filter chain
+		 * Filter FilterChainProxy 并返回，这是最终加入到Servlet容器的Filter chain
+		 * 中的一个 Filter, 但实际上，它的内部也维护了一个自己的安全相关的 Filter chain
 		 */
 		return webSecurity.build();
 	}
@@ -166,7 +166,10 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 			ObjectPostProcessor<Object> objectPostProcessor,
 			@Value("#{@autowiredWebSecurityConfigurersIgnoreParents.getWebSecurityConfigurers()}") List<SecurityConfigurer<Filter, WebSecurity>> webSecurityConfigurers)
 			throws Exception {
-		// 创建并初始化 webSecurity 
+		/**
+		 * 创建并初始化 webSecurity
+		 * 将WebSecurity交由IOC容器管理
+ 		 */
 		webSecurity = objectPostProcessor
 				.postProcess(new WebSecurity(objectPostProcessor));
 		if (debugEnabled != null) {
@@ -178,6 +181,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 
 		Integer previousOrder = null;
 		Object previousConfig = null;
+		// 校验SecurityConfigurer
 		for (SecurityConfigurer<Filter, WebSecurity> config : webSecurityConfigurers) {
 			Integer order = AnnotationAwareOrderComparator.lookupOrder(config);
 			// 校验Order

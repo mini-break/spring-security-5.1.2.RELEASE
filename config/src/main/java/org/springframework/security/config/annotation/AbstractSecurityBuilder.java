@@ -32,6 +32,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  */
 public abstract class AbstractSecurityBuilder<O> implements SecurityBuilder<O> {
+	/**
+	 * 原子变量,相当于值为false的原子变量
+	 * AtomicBoolean building = new AtomicBoolean(false)
+	 */
 	private AtomicBoolean building = new AtomicBoolean();
 
 	private O object;
@@ -43,6 +47,7 @@ public abstract class AbstractSecurityBuilder<O> implements SecurityBuilder<O> {
 	 */
 	@Override
 	public final O build() throws Exception {
+		// AtomicBoolean值为false时执行，同时更新AtomicBoolean值为true
 		if (this.building.compareAndSet(false, true)) {
 			this.object = doBuild();
 			return this.object;

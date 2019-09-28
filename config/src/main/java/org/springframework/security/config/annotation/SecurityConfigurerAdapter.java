@@ -23,6 +23,10 @@ import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 /**
+ * SecurityConfigurerAdapter是Spring Security Config对概念模型接口SecurityConfigurer所提供的缺省实现。
+ * 它作为一个基类存在，开发人员想实现一个SecurityConfigurer时，可以继承自SecurityConfigurerAdapter,
+ * 然后仅仅覆盖实现其中感兴趣的方法
+ *
  * A base class for {@link SecurityConfigurer} that allows subclasses to only implement
  * the methods they are interested in. It also provides a mechanism for using the
  * {@link SecurityConfigurer} and when done gaining access to the {@link SecurityBuilder}
@@ -39,15 +43,29 @@ public abstract class SecurityConfigurerAdapter<O, B extends SecurityBuilder<O>>
 		implements SecurityConfigurer<O, B> {
 	private B securityBuilder;
 
+	/**
+	 * 配置过程中新建的安全对象的后置处理器，该对象是多个ObjectPostProcessor的组合
+	 * 缺省情况下该后置处理器中不包含任何 ObjectPostProcessor
+	 */
 	private CompositeObjectPostProcessor objectPostProcessor = new CompositeObjectPostProcessor();
 
+	/**
+	 * 空方法，留给子类实现
+	 */
+	@Override
 	public void init(B builder) throws Exception {
 	}
 
+	/**
+	 * 空方法，留给子类实现
+	 */
+	@Override
 	public void configure(B builder) throws Exception {
 	}
 
 	/**
+	 * 用于支持链式构建，返回目标构建器
+	 * 
 	 * Return the {@link SecurityBuilder} when done using the {@link SecurityConfigurer}.
 	 * This is useful for method chaining.
 	 *
@@ -58,6 +76,8 @@ public abstract class SecurityConfigurerAdapter<O, B extends SecurityBuilder<O>>
 	}
 
 	/**
+	 * 获取所要被配置的安全构建器
+	 *
 	 * Gets the {@link SecurityBuilder}. Cannot be null.
 	 *
 	 * @return the {@link SecurityBuilder}
@@ -94,6 +114,8 @@ public abstract class SecurityConfigurerAdapter<O, B extends SecurityBuilder<O>>
 	}
 
 	/**
+	 * 设置所要被配置的安全构建器
+	 *
 	 * Sets the {@link SecurityBuilder} to be used. This is automatically set when using
 	 * {@link AbstractConfiguredSecurityBuilder#apply(SecurityConfigurerAdapter)}
 	 *
@@ -104,6 +126,10 @@ public abstract class SecurityConfigurerAdapter<O, B extends SecurityBuilder<O>>
 	}
 
 	/**
+	 * 嵌套类，使用组合模式实现了接口 ObjectPostProcessor，用于组合多个 ObjectPostProcessor，
+	 * 当使用该组合对象对目标对象进行后置处理时，其实是使用所组合的每个 ObjectPostProcessor 依次
+	 * 对目标对象进行后置处理
+	 * 
 	 * An {@link ObjectPostProcessor} that delegates work to numerous
 	 * {@link ObjectPostProcessor} implementations.
 	 *

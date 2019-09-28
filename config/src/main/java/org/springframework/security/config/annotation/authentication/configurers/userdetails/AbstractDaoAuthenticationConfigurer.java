@@ -24,6 +24,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 
 /**
+ * 除了来自基类和所实现接口定义的能力，AbstractDaoAuthenticationConfigurer自身又为一个安全配置器进行了如下定义:
+ * 1.所要创建的AuthenticationProvider是一个DaoAuthenticationProvider;
+ * 2.提供使用者设定目标DaoAuthenticationProvider属性userDetailsService/userDetailsPasswordService的功能;
+ * 3.提供使用者设定目标DaoAuthenticationProvider属性passwordEncoder的功能;
+ * 4.提供使用者设定配置过程中安全对象后置处理器的功能;
+ *
  * Allows configuring a {@link DaoAuthenticationProvider}
  *
  * @author Rob Winch
@@ -36,16 +42,27 @@ import org.springframework.security.core.userdetails.UserDetailsPasswordService;
  */
 abstract class AbstractDaoAuthenticationConfigurer<B extends ProviderManagerBuilder<B>, C extends AbstractDaoAuthenticationConfigurer<B, C, U>, U extends UserDetailsService>
 		extends UserDetailsAwareConfigurer<B, U> {
+
+	/**
+	 * 将要配置到目标安全构建器的 AuthenticationProvider， 是一个 DaoAuthenticationProvider
+	 */
 	private DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+	/**
+	 * 将要设置到 provider 的 UserDetailsService ，可以是 UserDetailsService 的子类，将会由使用者提供
+	 */
 	private final U userDetailsService;
 
 	/**
+	 * 构造函数，使用指定的 UserDetailsService 或者 UserDetailsPasswordService
+	 * 
 	 * Creates a new instance
 	 *
 	 * @param userDetailsService
 	 */
 	protected AbstractDaoAuthenticationConfigurer(U userDetailsService) {
+		// 记录使用者提供的 UserDetailsService
 		this.userDetailsService = userDetailsService;
+		// 设置 userDetailsService 到 provider
 		provider.setUserDetailsService(userDetailsService);
 		if (userDetailsService instanceof UserDetailsPasswordService) {
 			this.provider.setUserDetailsPasswordService((UserDetailsPasswordService) userDetailsService);
@@ -65,6 +82,8 @@ abstract class AbstractDaoAuthenticationConfigurer<B extends ProviderManagerBuil
 	}
 
 	/**
+	 * 设置所要配置到安全构建器上的provider的密码加密器
+	 * 
 	 * Allows specifying the {@link PasswordEncoder} to use with the
 	 * {@link DaoAuthenticationProvider}. The default is to use plain text.
 	 *
@@ -82,6 +101,11 @@ abstract class AbstractDaoAuthenticationConfigurer<B extends ProviderManagerBuil
 		return (C) this;
 	}
 
+	/**
+	 * SecurityConfigurer 接口定义的配置方法：对目标安全配置器builder进行配置
+	 * 1. 对 provider 进行后置处理;
+	 * 2. 将 provider 设置到 builder 上
+	 */
 	@Override
 	public void configure(B builder) throws Exception {
 		provider = postProcess(provider);
@@ -95,6 +119,7 @@ abstract class AbstractDaoAuthenticationConfigurer<B extends ProviderManagerBuil
 	 * @return the {@link UserDetailsService} that is used with the
 	 * {@link DaoAuthenticationProvider}
 	 */
+	@Override
 	public U getUserDetailsService() {
 		return userDetailsService;
 	}

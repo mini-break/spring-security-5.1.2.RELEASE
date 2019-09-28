@@ -83,6 +83,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 	/**
 	 * 生命周期状态定义
+	 * 初始值为0
 	 */
 	private BuildState buildState = BuildState.UNBUILT;
 
@@ -354,6 +355,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	 */
 	@Override
 	protected final O doBuild() throws Exception {
+		// configurers是通过apply方法添加的
 		synchronized (configurers) {
 			buildState = BuildState.INITIALIZING;
 
