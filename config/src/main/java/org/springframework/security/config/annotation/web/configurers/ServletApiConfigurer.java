@@ -32,6 +32,8 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 
 /**
+ * 配置过滤器SecurityContextHolderAwareRequestFilter
+ * 
  * Implements select methods from the {@link HttpServletRequest} using the
  * {@link SecurityContext} from the {@link SecurityContextHolder}.
  *

@@ -39,6 +39,7 @@ public interface UserDetailsService {
 	// ========================================================================================================
 
 	/**
+	 * 根据用户名获取用户信息
 	 * Locates the user based on the username. In the actual implementation, the search
 	 * may possibly be case sensitive, or case insensitive depending on how the
 	 * implementation instance is configured. In this case, the <code>UserDetails</code>

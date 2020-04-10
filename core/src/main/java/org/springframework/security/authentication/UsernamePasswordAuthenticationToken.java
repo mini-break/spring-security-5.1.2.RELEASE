@@ -22,6 +22,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 
 /**
+ * 封装了身份验证请求数据中的数据对象
+ * 
  * An {@link org.springframework.security.core.Authentication} implementation that is
  * designed for simple presentation of a username and password.
  * <p>

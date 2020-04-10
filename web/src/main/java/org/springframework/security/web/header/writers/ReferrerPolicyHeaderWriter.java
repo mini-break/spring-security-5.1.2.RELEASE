@@ -26,6 +26,21 @@ import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.util.Assert;
 
 /**
+ * 什么是referrer?
+ * 当一个用户点击当前页面中的一个链接，然后跳转到目标页面时，目标页面会收到一个信息，即用户是从哪个源链接跳转过来的。
+ * 也就是说，当你发起一个http请求，请求头中的referrer字段就说明了你是从哪个页面发起该请求的。
+ *
+ * 使用场景
+ * 有时候我们需要控制这个referrer字段的值，即是否让其显示在请求头中，或者是否显示完整路径等。尤其是在以下两个使用场景：
+ * 隐私
+ * 在社交网站的个人中心页面，也许会存在一些外链，这时候社交网站肯定不希望用户在点击这些链接跳转到其他第三方网站时会将自己个人中心
+ * 的URL信息显示在referrer字段中传过去，尤其是个人中心页面的URL往往会带着用户数据和一些敏感信息。
+ * 这时候可以选择不显示来源页面URL信息或者只显示一个网站根地址hostname。
+ * 安全
+ * 有些使用了https的网站，可能在URL中使用一个参数（sid）来作为用户身份凭证，而又需要引入其他https网站的资源，这种情况，
+ * 网站肯定不希望泄露用户的身份凭证信息。当https网站需要引入不安全的http网站的资源或者有链接要跳转到http网站时，
+ * 这时候将https源网站的URL信息传过去也是不太安全的。
+ *
  * <p>
  * Provides support for <a href="https://www.w3.org/TR/referrer-policy/">Referrer Policy</a>.
  * </p>

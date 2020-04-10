@@ -23,11 +23,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.util.Assert;
 
 /**
+ * 响应头部定义
  * Represents a Header to be added to the {@link HttpServletResponse}
  */
 public final class Header {
 
+	/**
+	 * 头部名称
+	 */
 	private final String headerName;
+	/**
+	 * 加入到头部的值,允许多个
+	 */
 	private final List<String> headerValues;
 
 	/**

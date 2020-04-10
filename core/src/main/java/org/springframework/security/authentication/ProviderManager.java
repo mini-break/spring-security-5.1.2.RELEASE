@@ -110,7 +110,7 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 	 */
 	private AuthenticationManager parent;
 	/**
-	 * 认证成功时是否擦除认证令牌对象中的凭证信息(比如密码)，缺省值为 true
+	 * 认证成功后是否擦除认证令牌对象中的凭证信息(比如密码)，缺省值为 true
 	 */
 	private boolean eraseCredentialsAfterAuthentication = true;
 
@@ -206,6 +206,7 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 		Authentication parentResult = null;
 		boolean debug = logger.isDebugEnabled();
 
+		// 遍历认证提供者，如果有一个认证成功则返回
 		for (AuthenticationProvider provider : getProviders()) {
 			if (!provider.supports(toTest)) {
 				continue;

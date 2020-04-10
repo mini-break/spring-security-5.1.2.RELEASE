@@ -16,6 +16,8 @@
 package org.springframework.security.crypto.password;
 
 /**
+ * 密码加密器
+ * 
  * Service interface for encoding passwords.
  *
  * The preferred implementation is {@code BCryptPasswordEncoder}.

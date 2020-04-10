@@ -25,6 +25,7 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 方法调用前投票器
  * Voter which performs the actions using a PreInvocationAuthorizationAdvice
  * implementation generated from @PreFilter and @PreAuthorize annotations.
  * <p>
@@ -62,6 +63,7 @@ public class PreInvocationAuthorizationAdviceVoter implements
 		// if both null, abstain
 		// else call advice with them
 
+		// 获取PreInvocationAttribute类型权限配置
 		PreInvocationAttribute preAttr = findPreInvocationAttribute(attributes);
 
 		if (preAttr == null) {
@@ -77,6 +79,7 @@ public class PreInvocationAuthorizationAdviceVoter implements
 	private PreInvocationAttribute findPreInvocationAttribute(
 			Collection<ConfigAttribute> config) {
 		for (ConfigAttribute attribute : config) {
+			// 权限配置需要为PreInvocationAttribute类型
 			if (attribute instanceof PreInvocationAttribute) {
 				return (PreInvocationAttribute) attribute;
 			}

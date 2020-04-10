@@ -18,6 +18,8 @@ package org.springframework.security.web.util.matcher;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * 请求匹配器
+ * 
  * Simple strategy to match an <tt>HttpServletRequest</tt>.
  *
  * @author Luke Taylor
@@ -26,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 public interface RequestMatcher {
 
 	/**
+	 * 如果参数request和当前RequestMatcher实例匹配则返回true,从而达到判断是否某个请求是否匹配的目的
+	 * 
 	 * Decides whether the rule implemented by the strategy matches the supplied request.
 	 *
 	 * @param request the request to check for a match

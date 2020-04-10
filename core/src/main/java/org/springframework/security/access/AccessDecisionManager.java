@@ -22,6 +22,9 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import org.springframework.security.core.Authentication;
 
 /**
+ * 访问决策管理
+ * AccessDecisionManager是由AbstractSecurityInterceptor调用的，它负责鉴定用户是否有访问对应资源（方法或URL）的权限
+ * 
  * Makes a final access control (authorization) decision.
  *
  * @author Ben Alex
@@ -31,11 +34,16 @@ public interface AccessDecisionManager {
 	// ========================================================================================================
 
 	/**
+	 * 通过传递的参数来决定用户是否有访问对应受保护对象的权限
+	 * 
 	 * Resolves an access control decision for the passed parameters.
 	 *
 	 * @param authentication the caller invoking the method (not null)
+	 *        代表访问者当事人,是访问者的认证令牌,包含了访问者的权限
 	 * @param object the secured object being called
+	 *        object 受保护对象，其可以是一个MethodInvocation、JoinPoint或FilterInvocation
 	 * @param configAttributes the configuration attributes associated with the secured
+	 *        configAttributes 表示访问目标安全对象所需要的权限
 	 * object being invoked
 	 *
 	 * @throws AccessDeniedException if access is denied as the authentication does not
@@ -48,6 +56,8 @@ public interface AccessDecisionManager {
 			InsufficientAuthenticationException;
 
 	/**
+	 * 检测ConfigAttribute attribute是否是当前AccessDecisionManager支持的ConfigAttribute类型
+	 * 
 	 * Indicates whether this <code>AccessDecisionManager</code> is able to process
 	 * authorization requests presented with the passed <code>ConfigAttribute</code>.
 	 * <p>
@@ -66,6 +76,8 @@ public interface AccessDecisionManager {
 	boolean supports(ConfigAttribute attribute);
 
 	/**
+	 * 检测Class clazz是否是当前AccessDecisionManager支持的secureObject
+	 * 
 	 * Indicates whether the <code>AccessDecisionManager</code> implementation is able to
 	 * provide access control decisions for the indicated secured object type.
 	 *

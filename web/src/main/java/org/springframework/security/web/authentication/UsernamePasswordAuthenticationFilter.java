@@ -27,6 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 该过滤器会拦截用户请求，看它是否是一个来自用户名/密码表单登录页面提交的用户登录认证请求，缺省使用的匹配模式是:POST /login。
+ * 缺省情况下，如果是用户登录认证请求，该请求就不会在整个filter chain中继续传递了，而是会被当前过滤器处理并进入响应用户阶段
+ *
  * Processes an authentication form submission. Called
  * {@code AuthenticationProcessingFilter} prior to Spring Security 3.0.
  * <p>
@@ -60,7 +63,7 @@ public class UsernamePasswordAuthenticationFilter extends
 
 	public UsernamePasswordAuthenticationFilter() {
 		/**
-		 * 绑定了 POST 类型的 /login 请求
+		 * 绑定了 POST 类型的 /login 请求,设置请求匹配器
 		 * 使用 POST 类型的 /login URL进行登录的时候就会被这个过滤器拦截
  		 */
 		super(new AntPathRequestMatcher("/login", "POST"));
@@ -69,6 +72,7 @@ public class UsernamePasswordAuthenticationFilter extends
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
 			HttpServletResponse response) throws AuthenticationException {
 		if (postOnly && !request.getMethod().equals("POST")) {
@@ -94,6 +98,7 @@ public class UsernamePasswordAuthenticationFilter extends
 		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
 				username, password);
 
+		// 将扩展的用户信息设置进来
 		// Allow subclasses to set the "details" property
 		setDetails(request, authRequest);
 

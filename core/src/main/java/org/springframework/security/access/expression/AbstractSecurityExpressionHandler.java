@@ -29,6 +29,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
 
 /**
+ * Spring Security安全表达式求值实现的通用逻辑基类，同具体某种底层安全表达式实现,比如Web安全,隔离开来。
+ * 
  * Base implementation of the facade which isolates Spring Security's requirements for
  * evaluating security expressions from the implementation of the underlying expression
  * objects.
@@ -38,11 +40,19 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractSecurityExpressionHandler<T> implements
 		SecurityExpressionHandler<T>, ApplicationContextAware {
+	/**
+	 * 缺省使用 SpelExpressionParser
+	 * 接口ExpressionParser用来解析一个字符串表达式
+	 */
 	private ExpressionParser expressionParser = new SpelExpressionParser();
 	private BeanResolver br;
 	private RoleHierarchy roleHierarchy;
+	/**
+	 * 缺省使用 denyAll 评估器
+	 */
 	private PermissionEvaluator permissionEvaluator = new DenyAllPermissionEvaluator();
 
+	@Override
 	public final ExpressionParser getExpressionParser() {
 		return expressionParser;
 	}
@@ -53,6 +63,8 @@ public abstract class AbstractSecurityExpressionHandler<T> implements
 	}
 
 	/**
+	 * 创建基于SecurityExpressionOperations为根对象的上下文
+	 *
 	 * Invokes the internal template methods to create {@code StandardEvaluationContext}
 	 * and {@code SecurityExpressionRoot} objects.
 	 *
@@ -61,19 +73,33 @@ public abstract class AbstractSecurityExpressionHandler<T> implements
 	 * @return the context object for use in evaluating the expression, populated with a
 	 * suitable root object.
 	 */
+	@Override
 	public final EvaluationContext createEvaluationContext(Authentication authentication,
 			T invocation) {
+		/**
+		 * createSecurityExpressionRoot 由子类提供具体实现，根据自己所服务的安全环境创建相应的
+		 * SecurityExpressionOperations 对象
+		 */
 		SecurityExpressionOperations root = createSecurityExpressionRoot(authentication,
 				invocation);
+		/**
+		 * 解析表达式需要的上下文，解析时有一个默认的上下文
+		 * 创建	EvaluationContext， 实现类使用标准实现 	StandardEvaluationContext
+		 */
 		StandardEvaluationContext ctx = createEvaluationContextInternal(authentication,
 				invocation);
+		// 表达式求值可能需要用到bean，这里指定bean解析器，通常指向整个Spring bean容器
 		ctx.setBeanResolver(br);
+		// 设置 EvaluationContext 的根对象为上面创建的 SecurityExpressionOperations root
 		ctx.setRootObject(root);
 
 		return ctx;
 	}
 
 	/**
+	 * 一个StandardEvaluationContext或者其子类，缺省是一个StandardEvaluationContext ， 子类可以覆盖该方法提供一个自定义的
+	 * StandardEvaluationContext子类实例
+	 *
 	 * Override to create a custom instance of {@code StandardEvaluationContext}.
 	 * <p>
 	 * The returned object will have a {@code SecurityExpressionRootPropertyAccessor}

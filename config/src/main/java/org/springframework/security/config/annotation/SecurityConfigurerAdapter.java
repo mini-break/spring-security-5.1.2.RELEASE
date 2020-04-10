@@ -57,7 +57,7 @@ public abstract class SecurityConfigurerAdapter<O, B extends SecurityBuilder<O>>
 	}
 
 	/**
-	 * 空方法，留给子类实现
+	 * 空方法，留给子类实现(AbstractDaoAuthenticationConfigurer重写了该方法)
 	 */
 	@Override
 	public void configure(B builder) throws Exception {

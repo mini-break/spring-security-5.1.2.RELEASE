@@ -23,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 在方法调用之前,基于表达式的计算结果来限制对方法的访问
  * Annotation for specifying a method access-control expression which will be evaluated to
  * decide whether a method invocation is allowed or not.
  *

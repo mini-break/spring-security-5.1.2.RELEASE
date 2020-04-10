@@ -39,6 +39,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  */
 public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends
 		AbstractRequestMatcherRegistry<C> {
+	/**
+	 * <URL pattern,所需权限>映射信息
+	 */
 	private List<UrlMapping> urlMappings = new ArrayList<>();
 	private List<RequestMatcher> unmappedMatchers;
 
@@ -73,6 +76,7 @@ public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends
 	 * @return the chained Object for the subclass which allows association of something
 	 * else to the {@link RequestMatcher}
 	 */
+	@Override
 	protected final C chainRequestMatchers(List<RequestMatcher> requestMatchers) {
 		this.unmappedMatchers = requestMatchers;
 		return chainRequestMatchersInternal(requestMatchers);
@@ -100,6 +104,8 @@ public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends
 	}
 
 	/**
+	 * 将List<UrlMapping>转换成Map
+	 * 
 	 * Creates the mapping of {@link RequestMatcher} to {@link Collection} of
 	 * {@link ConfigAttribute} instances
 	 *
@@ -116,6 +122,7 @@ public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends
 
 		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = new LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>>();
 		for (UrlMapping mapping : getUrlMappings()) {
+			// 请求匹配器
 			RequestMatcher matcher = mapping.getRequestMatcher();
 			Collection<ConfigAttribute> configAttrs = mapping.getConfigAttrs();
 			requestMap.put(matcher, configAttrs);
@@ -124,6 +131,7 @@ public abstract class AbstractConfigAttributeRequestMatcherRegistry<C> extends
 	}
 
 	/**
+	 * 静态内部类保存请求匹配器和权限
 	 * A mapping of {@link RequestMatcher} to {@link Collection} of
 	 * {@link ConfigAttribute} instances
 	 */

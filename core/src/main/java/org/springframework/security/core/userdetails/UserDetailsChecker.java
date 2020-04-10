@@ -16,6 +16,8 @@
 package org.springframework.security.core.userdetails;
 
 /**
+ * UserDetails 校验
+ * 
  * Called by classes which make use of a {@link UserDetailsService} to check the status of
  * the loaded <tt>UserDetails</tt> object. Typically this will involve examining the
  * various flags associated with the account and raising an exception if the information

@@ -39,6 +39,7 @@ public abstract class AbstractMethodSecurityMetadataSource implements
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public final Collection<ConfigAttribute> getAttributes(Object object) {
 		if (object instanceof MethodInvocation) {
 			MethodInvocation mi = (MethodInvocation) object;
@@ -46,6 +47,7 @@ public abstract class AbstractMethodSecurityMetadataSource implements
 			Class<?> targetClass = null;
 
 			if (target != null) {
+				// 获取目标类的Class
 				targetClass = target instanceof Class<?> ? (Class<?>) target
 						: AopProxyUtils.ultimateTargetClass(target);
 			}
@@ -53,15 +55,18 @@ public abstract class AbstractMethodSecurityMetadataSource implements
 			if (attrs != null && !attrs.isEmpty()) {
 				return attrs;
 			}
+			// 获取代理对象权限配置
 			if (target != null && !(target instanceof Class<?>)) {
 				attrs = getAttributes(mi.getMethod(), target.getClass());
 			}
 			return attrs;
 		}
 
+		// 非方法调用抛出异常
 		throw new IllegalArgumentException("Object must be a non-null MethodInvocation");
 	}
 
+	@Override
 	public final boolean supports(Class<?> clazz) {
 		return (MethodInvocation.class.isAssignableFrom(clazz));
 	}

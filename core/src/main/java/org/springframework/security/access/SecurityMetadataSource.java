@@ -22,6 +22,10 @@ import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 
 /**
+ * 用于表示对受权限保护的"安全对象"的权限设置信息。一个该类对象可以被理解成一个映射表，映射表中的每一项包含如下信息
+ * 1.安全对象
+ * 2.安全对象所需权限信息
+ * 
  * Implemented by classes that store and can identify the {@link ConfigAttribute}s that
  * applies to a given secure object invocation.
  *
@@ -32,6 +36,11 @@ public interface SecurityMetadataSource extends AopInfrastructureBean {
 	// ========================================================================================================
 
 	/**
+	 * 获取某个受保护的安全对象object的所需要的权限信息,是一组ConfigAttribute对象的集合，
+	 * 如果该安全对象object不被当前SecurityMetadataSource对象支持,则抛出异常IllegalArgumentException。
+	 * 该方法通常配合boolean supports(Class<?> clazz)一起使用，
+	 * 先使用boolean supports(Class<?> clazz)确保安全对象能被当前SecurityMetadataSource支持，然后再调用该方法。
+	 *
 	 * Accesses the {@code ConfigAttribute}s that apply to a given secure object.
 	 *
 	 * @param object the object being secured
@@ -46,6 +55,9 @@ public interface SecurityMetadataSource extends AopInfrastructureBean {
 			throws IllegalArgumentException;
 
 	/**
+	 * 获取该SecurityMetadataSource对象中保存的针对所有安全对象的权限信息的集合。
+	 * 该方法的主要目的是被AbstractSecurityInterceptor用于启动时校验每个ConfigAttribute对象
+	 *
 	 * If available, returns all of the {@code ConfigAttribute}s defined by the
 	 * implementing class.
 	 * <p>
@@ -57,6 +69,9 @@ public interface SecurityMetadataSource extends AopInfrastructureBean {
 	Collection<ConfigAttribute> getAllConfigAttributes();
 
 	/**
+	 * 这里clazz表示安全对象的类型，该方法用于告知调用者当前SecurityMetadataSource是否支持此类安全对象，
+	 * 只有支持的时候，才能对这类安全对象调用getAttributes方法
+	 *
 	 * Indicates whether the {@code SecurityMetadataSource} implementation is able to
 	 * provide {@code ConfigAttribute}s for the indicated secure object type.
 	 *

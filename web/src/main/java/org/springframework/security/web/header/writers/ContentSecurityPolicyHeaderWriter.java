@@ -22,6 +22,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * Content Security Policy内容安全策略（CSP），其核心思想十分简单：网站通过发送一个 CSP 头部，
+ * 来告诉浏览器什么是被授权执行的与什么是需要被禁止的。其被誉为专门为解决XSS攻击而生的神器
+ *
+ * 作用：
+ * 1.限制资源获取
+ * 2.报告资源获取越权
+ * 限制方式：
+ * 1.default-scr限制全局
+ * 2.指定资源类型
+ * 资源类型：
+ * 1.connect-src
+ * 2.img-src
+ * 3.mainfest-src
+ * 4.font-src
+ * 5.style-src
+ * 6.media-src
+ * 7.frame-src
+ * 8.script-src
+ *
  * <p>
  * Provides support for <a href="https://www.w3.org/TR/CSP2/">Content Security Policy (CSP) Level 2</a>.
  * </p>
@@ -76,8 +95,14 @@ import javax.servlet.http.HttpServletResponse;
  * @since 4.1
  */
 public final class ContentSecurityPolicyHeaderWriter implements HeaderWriter {
+	/**
+	 * 配置好并启用后，不符合 CSP 的外部资源就会被阻止加载
+	 */
 	private static final String CONTENT_SECURITY_POLICY_HEADER = "Content-Security-Policy";
 
+	/**
+	 * 表示不执行限制选项，只是记录违反限制的行为。它必须与report-uri选项配合使用
+	 */
 	private static final String CONTENT_SECURITY_POLICY_REPORT_ONLY_HEADER = "Content-Security-Policy-Report-Only";
 
 	private String policyDirectives;

@@ -68,12 +68,22 @@ import java.util.function.Function;
 public final class DefaultLoginPageConfigurer<H extends HttpSecurityBuilder<H>> extends
 		AbstractHttpConfigurer<DefaultLoginPageConfigurer<H>, H> {
 
+	/**
+	 * 仅在没有通过FormLoginConfigurer指定一个登录页面时应用
+	 * 安全过滤器，用于生成缺省的登录页面
+	 */
 	private DefaultLoginPageGeneratingFilter loginPageGeneratingFilter = new DefaultLoginPageGeneratingFilter();
-
+	/**
+	 * 安全过滤器，用于生成缺省的退出页面
+	 */
 	private DefaultLogoutPageGeneratingFilter logoutPageGeneratingFilter = new DefaultLogoutPageGeneratingFilter();
 
 	@Override
 	public void init(H http) throws Exception {
+		/**
+		 * 对loginPageGeneratingFilter, logoutPageGeneratingFilter 进行属性设置
+		 * 箭头函数，用于从请求中检测  CsrfToken
+		 */
 		Function<HttpServletRequest, Map<String, String>> hiddenInputs = request -> {
 			CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 			if (token == null) {
@@ -83,6 +93,7 @@ public final class DefaultLoginPageConfigurer<H extends HttpSecurityBuilder<H>> 
 		};
 		this.loginPageGeneratingFilter.setResolveHiddenInputs(hiddenInputs);
 		this.logoutPageGeneratingFilter.setResolveHiddenInputs(hiddenInputs);
+		// 设置共享对象 DefaultLoginPageGeneratingFilter
 		http.setSharedObject(DefaultLoginPageGeneratingFilter.class,
 				loginPageGeneratingFilter);
 	}
@@ -90,6 +101,7 @@ public final class DefaultLoginPageConfigurer<H extends HttpSecurityBuilder<H>> 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void configure(H http) throws Exception {
+		// 从ExceptionHandlingConfigurer 中检测 AuthenticationEntryPoint 是否设置
 		AuthenticationEntryPoint authenticationEntryPoint = null;
 		ExceptionHandlingConfigurer<?> exceptionConf = http
 				.getConfigurer(ExceptionHandlingConfigurer.class);
@@ -97,6 +109,17 @@ public final class DefaultLoginPageConfigurer<H extends HttpSecurityBuilder<H>> 
 			authenticationEntryPoint = exceptionConf.getAuthenticationEntryPoint();
 		}
 
+		/**
+		 * 如果loginPageGeneratingFilter 被启用 并且  authenticationEntryPoint 未被设置，
+		 * 则将 loginPageGeneratingFilter,logoutPageGeneratingFilter 双双添加到
+		 * HttpSecurity http
+		 * loginPageGeneratingFilter 是否被启用的判断是有其他配置器设置的，可以
+		 * 参考 DefaultLoginPageGeneratingFilter 源代码，具体来讲，如果
+		 * 启用了 表单登录认证， OpenID登录认证 或者 OAuth2 登录认证，
+		 * 则认为 DefaultLoginPageGeneratingFilter 被启用
+		 *
+		 * loginPageGeneratingFilter.isEnabled():是否启用默认登录页面
+		 */
 		if (loginPageGeneratingFilter.isEnabled() && authenticationEntryPoint == null) {
 			loginPageGeneratingFilter = postProcess(loginPageGeneratingFilter);
 			http.addFilter(loginPageGeneratingFilter);

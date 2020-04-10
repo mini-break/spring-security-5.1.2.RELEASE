@@ -26,6 +26,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
 
 /**
+ * 1.AuthenticatedVoter也是Spring Security内置的一个AccessDecisionVoter实现。
+ *   其主要用来区分匿名用户、通过Remember-Me认证的用户和完全认证的用户。完全认证的用户是指由系统提供的登录入口进行成功登录认证的用户。
+ * 2.AuthenticatedVoter可以处理的ConfigAttribute有IS_AUTHENTICATED_FULLY、IS_AUTHENTICATED_REMEMBERED和IS_AUTHENTICATED_ANONYMOUSLY。
+ *   如果ConfigAttribute不在这三者范围之内，则AuthenticatedVoter将弃权。否则将视ConfigAttribute而定，
+ *   如果ConfigAttribute为IS_AUTHENTICATED_ANONYMOUSLY，则不管用户是匿名的还是已经认证的都将投赞成票；
+ *   如果是IS_AUTHENTICATED_REMEMBERED则仅当用户是由Remember-Me自动登录，或者是通过登录入口进行登录认证时才会投赞成票，否则将投反对票；
+ *   而当ConfigAttribute为IS_AUTHENTICATED_FULLY时仅当用户是通过登录入口进行登录的才会投赞成票，否则将投反对票。
+ * 3.AuthenticatedVoter是通过AuthenticationTrustResolver的isAnonymous()方法和isRememberMe()方法来判断
+ *   SecurityContextHolder持有的Authentication是否为AnonymousAuthenticationToken或RememberMeAuthenticationToken的，
+ *   即是否为IS_AUTHENTICATED_ANONYMOUSLY和IS_AUTHENTICATED_REMEMBERED。
+ *
  * Votes if a {@link ConfigAttribute#getAttribute()} of
  * <code>IS_AUTHENTICATED_FULLY</code> or <code>IS_AUTHENTICATED_REMEMBERED</code> or
  * <code>IS_AUTHENTICATED_ANONYMOUSLY</code> is present. This list is in order of most
@@ -50,8 +61,17 @@ public class AuthenticatedVoter implements AccessDecisionVoter<Object> {
 	// ~ Static fields/initializers
 	// =====================================================================================
 
+	/**
+	 * 完全认证的用户
+	 */
 	public static final String IS_AUTHENTICATED_FULLY = "IS_AUTHENTICATED_FULLY";
+	/**
+	 * 通过记住我登录的用户
+	 */
 	public static final String IS_AUTHENTICATED_REMEMBERED = "IS_AUTHENTICATED_REMEMBERED";
+	/**
+	 * 匿名登录用户
+	 */
 	public static final String IS_AUTHENTICATED_ANONYMOUSLY = "IS_AUTHENTICATED_ANONYMOUSLY";
 	// ~ Instance fields
 	// ================================================================================================
@@ -61,6 +81,9 @@ public class AuthenticatedVoter implements AccessDecisionVoter<Object> {
 	// ~ Methods
 	// ========================================================================================================
 
+	/**
+	 * 是否完全认证
+	 */
 	private boolean isFullyAuthenticated(Authentication authentication) {
 		return (!authenticationTrustResolver.isAnonymous(authentication) && !authenticationTrustResolver
 				.isRememberMe(authentication));
@@ -73,6 +96,7 @@ public class AuthenticatedVoter implements AccessDecisionVoter<Object> {
 		this.authenticationTrustResolver = authenticationTrustResolver;
 	}
 
+	@Override
 	public boolean supports(ConfigAttribute attribute) {
 		if ((attribute.getAttribute() != null)
 				&& (IS_AUTHENTICATED_FULLY.equals(attribute.getAttribute())
@@ -93,10 +117,12 @@ public class AuthenticatedVoter implements AccessDecisionVoter<Object> {
 	 *
 	 * @return always {@code true}
 	 */
+	@Override
 	public boolean supports(Class<?> clazz) {
 		return true;
 	}
 
+	@Override
 	public int vote(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) {
 		int result = ACCESS_ABSTAIN;
@@ -105,12 +131,15 @@ public class AuthenticatedVoter implements AccessDecisionVoter<Object> {
 			if (this.supports(attribute)) {
 				result = ACCESS_DENIED;
 
+				// 资源配置为需要登录访问
 				if (IS_AUTHENTICATED_FULLY.equals(attribute.getAttribute())) {
+					// 如果为完全认证，则通过
 					if (isFullyAuthenticated(authentication)) {
 						return ACCESS_GRANTED;
 					}
 				}
 
+				// 资源配置为记住我
 				if (IS_AUTHENTICATED_REMEMBERED.equals(attribute.getAttribute())) {
 					if (authenticationTrustResolver.isRememberMe(authentication)
 							|| isFullyAuthenticated(authentication)) {
@@ -118,6 +147,7 @@ public class AuthenticatedVoter implements AccessDecisionVoter<Object> {
 					}
 				}
 
+				// 资源配置为匿名访问
 				if (IS_AUTHENTICATED_ANONYMOUSLY.equals(attribute.getAttribute())) {
 					if (authenticationTrustResolver.isAnonymous(authentication)
 							|| isFullyAuthenticated(authentication)

@@ -29,6 +29,8 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
 /**
+ * 配置AnonymousAuthenticationFilter
+ *
  * Configures Anonymous authentication (i.e. populate an {@link Authentication} that
  * represents an anonymous user instead of having a null value) for an
  * {@link HttpSecurity}. Specifically this will configure an
@@ -160,9 +162,13 @@ public final class AnonymousConfigurer<H extends HttpSecurityBuilder<H>> extends
 	@Override
 	public void configure(H http) throws Exception {
 		authenticationFilter.afterPropertiesSet();
+		// 将AnonymousAuthenticationFilter加入HttpSecurity
 		http.addFilter(authenticationFilter);
 	}
 
+	/**
+	 * 使用 UUID 机制随机生成的 key
+	 */
 	private String getKey() {
 		if (key == null) {
 			key = UUID.randomUUID().toString();

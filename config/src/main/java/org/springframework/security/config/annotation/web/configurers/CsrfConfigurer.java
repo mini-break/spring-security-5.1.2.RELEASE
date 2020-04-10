@@ -47,6 +47,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 
 /**
+ * 作为一个配置HttpSecurity的SecurityConfigurer
+ * 
  * Adds
  * <a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)" >CSRF</a>
  * protection for the methods as specified by
@@ -77,9 +79,18 @@ import org.springframework.util.Assert;
  */
 public final class CsrfConfigurer<H extends HttpSecurityBuilder<H>>
 		extends AbstractHttpConfigurer<CsrfConfigurer<H>, H> {
+	/**
+	 * csrf token 存储库，缺省使用基于 http session 的 存储库
+	 */
 	private CsrfTokenRepository csrfTokenRepository = new LazyCsrfTokenRepository(
 			new HttpSessionCsrfTokenRepository());
+	/**
+	 * 应用 csrf 保护的 请求匹配器  , 缺省为 : GET, HEAD, TRACE, OPTIONS  之外所有的请求
+	 */
 	private RequestMatcher requireCsrfProtectionMatcher = CsrfFilter.DEFAULT_CSRF_MATCHER;
+	/**
+	 * 不应用 csrf 保护的 请求匹配器
+	 */
 	private List<RequestMatcher> ignoredCsrfProtectionMatchers = new ArrayList<>();
 	private final ApplicationContext context;
 
@@ -182,7 +193,13 @@ public final class CsrfConfigurer<H extends HttpSecurityBuilder<H>>
 	@SuppressWarnings("unchecked")
 	@Override
 	public void configure(H http) throws Exception {
+		// 创建 CsrfFilter 并设置 csrf 存储库
 		CsrfFilter filter = new CsrfFilter(this.csrfTokenRepository);
+		/**
+		 * 构建 csrf 保护要应用的  RequestMatcher 并设置 :
+		 * 1. 哪些 URL 明确要求 csrf 保护;
+		 * 2. 哪些 URL 明确要求不要 csrf 保护；
+		 */
 		RequestMatcher requireCsrfProtectionMatcher = getRequireCsrfProtectionMatcher();
 		if (requireCsrfProtectionMatcher != null) {
 			filter.setRequireCsrfProtectionMatcher(requireCsrfProtectionMatcher);
@@ -203,6 +220,7 @@ public final class CsrfConfigurer<H extends HttpSecurityBuilder<H>>
 					new CsrfAuthenticationStrategy(this.csrfTokenRepository));
 		}
 		filter = postProcess(filter);
+		// 将CsrfFilter添加到httpSecurity过滤器链中
 		http.addFilter(filter);
 	}
 

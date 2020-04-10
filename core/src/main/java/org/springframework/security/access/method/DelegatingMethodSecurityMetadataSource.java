@@ -29,6 +29,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * DelegatingMethodSecurityMetadataSource是PrePostAnnotationSecurityMetadataSource、
+ * SecuredAnnotationSecurityMetadataSource、Jsr250MethodSecurityMetadataSource的组合。
+ * 这个bean是为MethodSecurityInterceptor提供ConfigAttribute的
+ * 
  * Automatically tries a series of method definition sources, relying on the first source
  * of metadata that provides a non-null/non-empty response. Provides automatic caching of
  * the retrieved metadata.
@@ -57,6 +61,7 @@ public final class DelegatingMethodSecurityMetadataSource extends
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public Collection<ConfigAttribute> getAttributes(Method method, Class<?> targetClass) {
 		DefaultCacheKey cacheKey = new DefaultCacheKey(method, targetClass);
 		synchronized (attributeCache) {

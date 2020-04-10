@@ -21,6 +21,8 @@ import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.context.support.MessageSourceAccessor;
 
 /**
+ * 账号状态校验
+ * 
  * @author Luke Taylor
  */
 public class AccountStatusUserDetailsChecker implements UserDetailsChecker {

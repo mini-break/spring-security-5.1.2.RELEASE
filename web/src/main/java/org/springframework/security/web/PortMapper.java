@@ -17,6 +17,8 @@
 package org.springframework.security.web;
 
 /**
+ * 端口映射器
+ * 
  * <code>PortMapper</code> implementations provide callers with information about which
  * HTTP ports are associated with which HTTPS ports on the system, and vice versa.
  *

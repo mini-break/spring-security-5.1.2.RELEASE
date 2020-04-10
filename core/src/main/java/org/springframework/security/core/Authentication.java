@@ -24,6 +24,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
+ * 使用接口Authentication抽象建模这样一个概念：认证令牌token,它要么代表一个认证之前的认证请求，要么代表一个认证之后的被认证了的主体，
+ * 这里所提到的"认证"，指的是方法调用AuthenticationManager#authenticate(Authentication)
+ * 
  * Represents the token for an authentication request or for an authenticated principal
  * once the request has been processed by the
  * {@link AuthenticationManager#authenticate(Authentication)} method.
@@ -48,11 +51,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
  *
  * @author Ben Alex
  */
+// 继承自Java 的 Principal, Principal 表示访问者主体，比如用户个人，作为访问者的公司
 public interface Authentication extends Principal, Serializable {
 	// ~ Methods
 	// ========================================================================================================
 
 	/**
+	 * 表示授予访问主体的访问权限，总是不能返回 null ，可以是空集合
+	 * 如果尚未认证，这里也不能是 null ，要是空集合
+	 *
 	 * Set by an <code>AuthenticationManager</code> to indicate the authorities that the
 	 * principal has been granted. Note that classes should not rely on this value as
 	 * being valid unless it has been set by a trusted <code>AuthenticationManager</code>.
@@ -68,6 +75,9 @@ public interface Authentication extends Principal, Serializable {
 	Collection<? extends GrantedAuthority> getAuthorities();
 
 	/**
+	 * 用于证明主体身份的凭证信息，通常是密码，当然也可以是其他信息，具体来讲，
+	 * 是什么要跟使用的 AuthenticationManager 认证管理器有关
+	 *
 	 * The credentials that prove the principal is correct. This is usually a password,
 	 * but could be anything relevant to the <code>AuthenticationManager</code>. Callers
 	 * are expected to populate the credentials.
@@ -77,6 +87,9 @@ public interface Authentication extends Principal, Serializable {
 	Object getCredentials();
 
 	/**
+	 * 附加保存管理认证请求的额外详情信息。可能是IP地址，也可能是证书序列号之类。
+	 * 如果不使用，返回 null
+	 *
 	 * Stores additional details about the authentication request. These might be an IP
 	 * address, certificate serial number etc.
 	 *
@@ -86,6 +99,10 @@ public interface Authentication extends Principal, Serializable {
 	Object getDetails();
 
 	/**
+	 * 获取被认证主体自身的标识。在用户名/密码认证机制下，认证之前,这里就是用户名字符串。
+	 * 认证之后，从 AuthenticationManager 返回的该认证令牌对象 Authentication 的该属性会
+	 * 包含被认证主体的更多信息，此时该属性值不再是用户名字符串，而是变成了包含更多用户信息的对象UserDetails
+	 *
 	 * The identity of the principal being authenticated. In the case of an authentication
 	 * request with username and password, this would be the username. Callers are
 	 * expected to populate the principal for an authentication request.
@@ -101,6 +118,11 @@ public interface Authentication extends Principal, Serializable {
 	Object getPrincipal();
 
 	/**
+	 * 返回当前认证令牌对象是否已经经过认证
+	 * 该属性用于告诉 AbstractSecurityInterceptor 是否要将该认证令牌对象交给 AuthenticationManager进行认证：
+	 * true -- 不再需要该认证令牌对象交给 AuthenticationManager进行认证
+	 * false -- 需要该认证令牌对象交给 AuthenticationManager进行认证
+	 *    
 	 * Used to indicate to {@code AbstractSecurityInterceptor} whether it should present
 	 * the authentication token to the <code>AuthenticationManager</code>. Typically an
 	 * <code>AuthenticationManager</code> (or, more often, one of its
@@ -122,6 +144,11 @@ public interface Authentication extends Principal, Serializable {
 	boolean isAuthenticated();
 
 	/**
+	 * 将该认证令牌对象设置为 false : 不再可信 或者 true : 经过认证(可信)
+	 * 实现类要总是能使该方法接收 false 以确保各种使用者可以将该认证令牌对象设置为不再可信；
+	 * 如果该方法接收到了参数 true，而实现类不想接收 true(因为这样可能存在潜在安全风险),
+	 * 那么可以抛出 IllegalArgumentException 异常
+	 *
 	 * See {@link #isAuthenticated()} for a full description.
 	 * <p>
 	 * Implementations should <b>always</b> allow this method to be called with a

@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.web.util.UrlUtils;
 
 /**
+ * request,response和FilterChain对象保存起来，供FilterSecurityInterceptor的处理代码调用
+ *
  * Holds objects associated with a HTTP filter.
  * <P>
  * Guarantees the request and response are instances of <code>HttpServletRequest</code>
@@ -49,6 +51,7 @@ public class FilterInvocation {
 	// ~ Static fields
 	// ==================================================================================================
 	static final FilterChain DUMMY_CHAIN = new FilterChain() {
+		@Override
 		public void doFilter(ServletRequest req, ServletResponse res)
 				throws IOException, ServletException {
 			throw new UnsupportedOperationException("Dummy filter chain");

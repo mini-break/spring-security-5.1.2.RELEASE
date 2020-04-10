@@ -20,6 +20,8 @@ import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.web.FilterInvocation;
 
 /**
+ * 用于表示安全对象,是Web请求(FilterInvocation)的安全元数据源
+ * 
  * Marker interface for <code>SecurityMetadataSource</code> implementations that are
  * designed to perform lookups keyed on {@link FilterInvocation}s.
  *

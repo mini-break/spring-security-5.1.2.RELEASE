@@ -211,6 +211,7 @@ public final class WebSecurity extends
 	}
 
 	/**
+	 * 将HttpSecurity加入安全过滤链中
 	 * <p>
 	 * Adds builders to create {@link SecurityFilterChain} instances.
 	 * </p>
@@ -336,6 +337,9 @@ public final class WebSecurity extends
 		 * 这里每个 securityFilterChainBuilders 元素实际上是一个 HttpSecurity
 		 */
 		for (SecurityBuilder<? extends SecurityFilterChain> securityFilterChainBuilder : securityFilterChainBuilders) {
+			/**
+			 * 通过securityFilterChainBuilder.build()方法(httpSecurity build()方法)加载Filter (通过httpSecurity配置的10个 SecurityConfigurer获取)
+			 */
 			securityFilterChains.add(securityFilterChainBuilder.build());
 		}
 		/**

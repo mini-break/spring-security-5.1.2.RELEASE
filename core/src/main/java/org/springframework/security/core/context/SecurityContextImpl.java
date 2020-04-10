@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 
 /**
+ * 安全上下文实现类
+ *
  * Base implementation of {@link SecurityContext}.
  * <p>
  * Used by default by {@link SecurityContextHolder} strategies.

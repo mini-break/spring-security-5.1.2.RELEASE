@@ -24,6 +24,9 @@ import org.springframework.security.web.PortMapper;
 import org.springframework.security.web.PortMapperImpl;
 
 /**
+ * 并不做任何配置,只是创建一个共享对象 : PortMapper。缺省使用的PortMapper实现类是PortMapperImpl,
+ * 用于在HTTP和HTTPS两种协议的端口之间做跳转 : 80–> 443, 8080 --> 8443
+ *
  * Allows configuring a shared {@link PortMapper} instance used to determine the ports
  * when redirecting between HTTP and HTTPS. The {@link PortMapper} can be obtained from
  * {@link HttpSecurity#getSharedObject(Class)}.

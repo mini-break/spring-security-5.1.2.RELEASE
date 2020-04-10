@@ -95,12 +95,14 @@ public class DefaultFilterInvocationSecurityMetadataSourceTests {
 				"a=/test", null);
 
 		Collection<ConfigAttribute> response = this.fids.getAttributes(fi);
+//		assertThat(response).isEqualTo(this.def);
 		assertThat(response); // see SEC-161 (it should truncate after ?
 								// sign).isEqualTo(def)
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void unknownHttpMethodIsRejected() {
+		// 未定义的httpMethod，则会报错
 		createFids("/someAdminPage.html**", "UNKNOWN");
 	}
 
@@ -172,6 +174,7 @@ public class DefaultFilterInvocationSecurityMetadataSourceTests {
 		request.setRequestURI(null);
 		request.setMethod(method);
 		request.setServletPath(servletPath);
+		// 返回请求URL中的额外路径信息。额外路径信息是请求URL中的位于Servlet的路径之后和查询参数之前的内容，它以"/"开头
 		request.setPathInfo(pathInfo);
 		request.setQueryString(queryString);
 

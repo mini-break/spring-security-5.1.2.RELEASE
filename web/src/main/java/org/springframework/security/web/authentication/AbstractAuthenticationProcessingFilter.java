@@ -122,6 +122,9 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 	private RememberMeServices rememberMeServices = new NullRememberMeServices();
 
+	/**
+	 * 请求匹配器
+	 */
 	private RequestMatcher requiresAuthenticationRequestMatcher;
 
 	private boolean continueChainBeforeSuccessfulAuthentication = false;
@@ -130,20 +133,30 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 
 	private boolean allowSessionCreation = true;
 
+	/**
+	 * 授权成功处理类
+	 */
 	private AuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+	/**
+	 * 授权失败处理类
+	 */
 	private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 
 	// ~ Constructors
 	// ===================================================================================================
 
 	/**
+	 * 根据输入的字符串创建一个实例
 	 * @param defaultFilterProcessesUrl the default value for <tt>filterProcessesUrl</tt>.
 	 */
 	protected AbstractAuthenticationProcessingFilter(String defaultFilterProcessesUrl) {
+		// 设置默认过滤器处理URL
 		setFilterProcessesUrl(defaultFilterProcessesUrl);
 	}
 
 	/**
+	 * 根据输入的RequestMatcher对象创建一个实例,
+	 * 这里为默认请求匹配器,可以通过 setRequiresAuthenticationRequestMatcher 方法重新设置
 	 * Creates a new instance
 	 *
 	 * @param requiresAuthenticationRequestMatcher the {@link RequestMatcher} used to
@@ -159,12 +172,18 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 	// ~ Methods
 	// ========================================================================================================
 
+	/**
+	 * 实例初始化的时候会被调用该方法
+	 */
 	@Override
 	public void afterPropertiesSet() {
+		// 断言authenticationManager不为空
 		Assert.notNull(authenticationManager, "authenticationManager must be specified");
 	}
 
 	/**
+	 * 主要是用于决定请求是否需要被该过滤器拦截，并且进行认证处理
+	 * 
 	 * Invokes the
 	 * {@link #requiresAuthentication(HttpServletRequest, HttpServletResponse)
 	 * requiresAuthentication} method to determine whether the request is for
@@ -197,7 +216,9 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 
+		// 是否需要身份认证
 		if (!requiresAuthentication(request, response)) {
+			// 不需要身份认证，传递到 FilterChain 继续过滤
 			chain.doFilter(request, response);
 
 			return;
@@ -210,38 +231,46 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 		Authentication authResult;
 
 		try {
+			// 进行身份认证，该方法需要子类重写
 			authResult = attemptAuthentication(request, response);
 			if (authResult == null) {
 				// return immediately as subclass has indicated that it hasn't completed
 				// authentication
 				return;
 			}
+			// 身份认证成功，保存 session
 			sessionStrategy.onAuthentication(authResult, request, response);
 		}
-		catch (InternalAuthenticationServiceException failed) {
+		catch (InternalAuthenticationServiceException failed) { // 身份认证代码出错
 			logger.error(
 					"An internal error occurred while trying to authenticate the user.",
 					failed);
+			// 身份认证失败一系列事物处理，包括调用 RememberMeServices 等
 			unsuccessfulAuthentication(request, response, failed);
 
 			return;
 		}
-		catch (AuthenticationException failed) {
+		catch (AuthenticationException failed) { // 身份认证失败异常
 			// Authentication failed
+			// 身份认证失败一系列事物处理，包括调用 RememberMeServices 等
 			unsuccessfulAuthentication(request, response, failed);
 
 			return;
 		}
 
 		// Authentication success
+		// 身份认证成功之后是否需要继续后面的过滤器链
 		if (continueChainBeforeSuccessfulAuthentication) {
 			chain.doFilter(request, response);
 		}
 
+		// 身份认证成功一系列事物处理，包括调用 RememberMeServices 等
 		successfulAuthentication(request, response, chain, authResult);
 	}
 
 	/**
+	 * 判断request是否需要进行认证
+	 * 
 	 * Indicates whether this filter should attempt to process a login request for the
 	 * current invocation.
 	 * <p>
@@ -260,6 +289,8 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 	}
 
 	/**
+	 * 尝试进行认证，抽象方法，留给子类实现
+	 *
 	 * Performs actual authentication.
 	 * <p>
 	 * The implementation should do one of the following:
@@ -285,6 +316,8 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 			ServletException;
 
 	/**
+	 * 认证成功后的默认操作
+	 * 
 	 * Default behaviour for successful authentication.
 	 * <ol>
 	 * <li>Sets the successful <tt>Authentication</tt> object on the
@@ -314,20 +347,25 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 					+ authResult);
 		}
 
+		// 认证成功设置身份认证信息
 		SecurityContextHolder.getContext().setAuthentication(authResult);
 
 		rememberMeServices.loginSuccess(request, response, authResult);
 
+		// 认证成功发送事件
 		// Fire event
 		if (this.eventPublisher != null) {
 			eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(
 					authResult, this.getClass()));
 		}
 
+		// 认证成功处理器
 		successHandler.onAuthenticationSuccess(request, response, authResult);
 	}
 
 	/**
+	 * 认证失败后的默认操作
+	 * 
 	 * Default behaviour for unsuccessful authentication.
 	 * <ol>
 	 * <li>Clears the {@link SecurityContextHolder}</li>
@@ -353,15 +391,23 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 		failureHandler.onAuthenticationFailure(request, response, failed);
 	}
 
+	/**
+	 * 获取认证管理服务
+	 */
 	protected AuthenticationManager getAuthenticationManager() {
 		return authenticationManager;
 	}
 
+	/**
+	 * 设置认证管理服务
+	 */
 	public void setAuthenticationManager(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
 	}
 
 	/**
+	 * 设置URL用来判断请求是否需要认证
+	 * 
 	 * Sets the URL that determines if authentication is required
 	 *
 	 * @param filterProcessesUrl
@@ -371,16 +417,25 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 				filterProcessesUrl));
 	}
 
+	/**
+	 * 设置请求匹配器
+	 */
 	public final void setRequiresAuthenticationRequestMatcher(
 			RequestMatcher requestMatcher) {
 		Assert.notNull(requestMatcher, "requestMatcher cannot be null");
 		this.requiresAuthenticationRequestMatcher = requestMatcher;
 	}
 
+	/**
+	 * 获取rememberMeServices服务,默认是NullRememberMeServices
+	 */
 	public RememberMeServices getRememberMeServices() {
 		return rememberMeServices;
 	}
 
+	/**
+	 * 设置rememberMeServices
+	 */
 	public void setRememberMeServices(RememberMeServices rememberMeServices) {
 		Assert.notNull(rememberMeServices, "rememberMeServices cannot be null");
 		this.rememberMeServices = rememberMeServices;

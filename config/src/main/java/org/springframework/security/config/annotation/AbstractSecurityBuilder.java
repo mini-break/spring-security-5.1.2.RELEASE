@@ -52,6 +52,7 @@ public abstract class AbstractSecurityBuilder<O> implements SecurityBuilder<O> {
 			this.object = doBuild();
 			return this.object;
 		}
+		// 构建多次会报错
 		throw new AlreadyBuiltException("This object has already been built");
 	}
 

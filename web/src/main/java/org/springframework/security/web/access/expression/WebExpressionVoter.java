@@ -33,22 +33,26 @@ import org.springframework.security.web.FilterInvocation;
 public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation> {
 	private SecurityExpressionHandler<FilterInvocation> expressionHandler = new DefaultWebSecurityExpressionHandler();
 
+	@Override
 	public int vote(Authentication authentication, FilterInvocation fi,
 			Collection<ConfigAttribute> attributes) {
 		assert authentication != null;
 		assert fi != null;
 		assert attributes != null;
 
+		// attributes中查找WebExpressionConfigAttribute类型
 		WebExpressionConfigAttribute weca = findConfigAttribute(attributes);
 
 		if (weca == null) {
 			return ACCESS_ABSTAIN;
 		}
 
+		// 获取评估上下文
 		EvaluationContext ctx = expressionHandler.createEvaluationContext(authentication,
 				fi);
 		ctx = weca.postProcess(ctx, fi);
 
+		// 根据权限表达式获取值
 		return ExpressionUtils.evaluateAsBoolean(weca.getAuthorizeExpression(), ctx) ? ACCESS_GRANTED
 				: ACCESS_DENIED;
 	}
@@ -56,6 +60,7 @@ public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation>
 	private WebExpressionConfigAttribute findConfigAttribute(
 			Collection<ConfigAttribute> attributes) {
 		for (ConfigAttribute attribute : attributes) {
+			// 权限配置为WebExpressionConfigAttribute类型
 			if (attribute instanceof WebExpressionConfigAttribute) {
 				return (WebExpressionConfigAttribute) attribute;
 			}
@@ -63,10 +68,12 @@ public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation>
 		return null;
 	}
 
+	@Override
 	public boolean supports(ConfigAttribute attribute) {
 		return attribute instanceof WebExpressionConfigAttribute;
 	}
 
+	@Override
 	public boolean supports(Class<?> clazz) {
 		return FilterInvocation.class.isAssignableFrom(clazz);
 	}

@@ -33,6 +33,8 @@ import org.springframework.security.web.util.matcher.RequestMatcherEditor;
 import org.springframework.util.Assert;
 
 /**
+ * 这是一个代理，将认证任务委托给所代理的多个AuthenticationEntryPoint对象，其中一个被标记为缺省AuthenticationEntryPoint
+ * 
  * An {@code AuthenticationEntryPoint} which selects a concrete
  * {@code AuthenticationEntryPoint} based on a {@link RequestMatcher} evaluation.
  *
@@ -70,6 +72,7 @@ public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPo
 		this.entryPoints = entryPoints;
 	}
 
+	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 

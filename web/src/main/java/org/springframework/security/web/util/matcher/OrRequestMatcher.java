@@ -60,6 +60,7 @@ public final class OrRequestMatcher implements RequestMatcher {
 	}
 
 	public boolean matches(HttpServletRequest request) {
+		// 遍历多个请求匹配器
 		for (RequestMatcher matcher : requestMatchers) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Trying to match using " + matcher);

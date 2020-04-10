@@ -24,6 +24,8 @@ import org.springframework.security.access.intercept.aopalliance.MethodSecurityM
 import org.springframework.util.MultiValueMap;
 
 /**
+ * 这个类会向Spring容器注册一个MethodSecurityMetadataSourceAdvisor
+ * 
  * Creates Spring Security's MethodSecurityMetadataSourceAdvisor only when
  * using proxy based method security (i.e. do not do it when using ASPECTJ).
  * The conditional logic is controlled through {@link GlobalMethodSecuritySelector}.
@@ -40,16 +42,22 @@ class MethodSecurityMetadataSourceAdvisorRegistrar implements
 	 * of the @{@link EnableGlobalMethodSecurity#proxyTargetClass()} attribute on the
 	 * importing {@code @Configuration} class.
 	 */
+	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
 			BeanDefinitionRegistry registry) {
 
 		BeanDefinitionBuilder advisor = BeanDefinitionBuilder
 				.rootBeanDefinition(MethodSecurityMetadataSourceAdvisor.class);
 		advisor.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		// 定义3个构建函数参数
 		advisor.addConstructorArgValue("methodSecurityInterceptor");
 		advisor.addConstructorArgReference("methodSecurityMetadataSource");
 		advisor.addConstructorArgValue("methodSecurityMetadataSource");
 
+		/**
+		 * 获取@EnableGlobalMethodSecurity注解中的所属值
+		 * importingClassMetadata为含有@EnableGlobalMethodSecurity注解的类
+		 */
 		MultiValueMap<String, Object> attributes = importingClassMetadata.getAllAnnotationAttributes(EnableGlobalMethodSecurity.class.getName());
 		Integer order = (Integer) attributes.getFirst("order");
 		if (order != null) {

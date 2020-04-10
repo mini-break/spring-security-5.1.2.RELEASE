@@ -42,6 +42,7 @@ class MutableUser implements MutableUserDetails {
 		return password;
 	}
 
+	@Override
 	public void setPassword(String password) {
 		this.password = password;
 	}

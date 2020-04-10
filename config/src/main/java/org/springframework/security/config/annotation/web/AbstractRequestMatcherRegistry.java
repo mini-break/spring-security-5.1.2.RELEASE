@@ -45,6 +45,9 @@ import java.util.List;
 public abstract class AbstractRequestMatcherRegistry<C> {
 	private static final String HANDLER_MAPPING_INTROSPECTOR_BEAN_NAME = "mvcHandlerMappingIntrospector";
 
+	/**
+	 * 任何请求都匹配
+	 */
 	private static final RequestMatcher ANY_REQUEST = AnyRequestMatcher.INSTANCE;
 
 	private ApplicationContext context;
@@ -63,6 +66,7 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 	}
 
 	/**
+	 * 任何请求都可访问
 	 * Maps any request.
 	 *
 	 * @return the object that is chained after creating the {@link RequestMatcher}
@@ -86,6 +90,8 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 	}
 
 	/**
+	 * 根据http method和请求的ant风格表达式 生成 AntRequestMatcher 集合
+	 *
 	 * Maps a {@link List} of
 	 * {@link org.springframework.security.web.util.matcher.AntPathRequestMatcher}
 	 * instances.
@@ -185,6 +191,7 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 	}
 
 	/**
+	 * 根据http method和请求的正则表达式 生成 RegexRequestMatcher 集合
 	 * Maps a {@link List} of
 	 * {@link org.springframework.security.web.util.matcher.RegexRequestMatcher}
 	 * instances.
@@ -201,6 +208,7 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 	}
 
 	/**
+	 * 根据请求的正则表达式 生成 RegexRequestMatcher 集合
 	 * Create a {@link List} of
 	 * {@link org.springframework.security.web.util.matcher.RegexRequestMatcher} instances
 	 * that do not specify an {@link HttpMethod}.
@@ -227,6 +235,8 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 	}
 
 	/**
+	 * 生成RequestMatcher链，由子类实现
+	 * 
 	 * Subclasses should implement this method for returning the object that is chained to
 	 * the creation of the {@link RequestMatcher} instances.
 	 *
@@ -237,6 +247,8 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 	protected abstract C chainRequestMatchers(List<RequestMatcher> requestMatchers);
 
 	/**
+	 * 将请求表达式（Ant或Regex）转换成RequestMatcher对象
+	 * 
 	 * Utilities for creating {@link RequestMatcher} instances.
 	 *
 	 * @author Rob Winch
@@ -256,6 +268,7 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 		 */
 		public static List<RequestMatcher> antMatchers(HttpMethod httpMethod,
 				String... antPatterns) {
+			// 请求方式
 			String method = httpMethod == null ? null : httpMethod.toString();
 			List<RequestMatcher> matchers = new ArrayList<>();
 			for (String pattern : antPatterns) {
@@ -289,6 +302,7 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 		 */
 		public static List<RequestMatcher> regexMatchers(HttpMethod httpMethod,
 				String... regexPatterns) {
+			// 获取http method(GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE)
 			String method = httpMethod == null ? null : httpMethod.toString();
 			List<RequestMatcher> matchers = new ArrayList<>();
 			for (String pattern : regexPatterns) {

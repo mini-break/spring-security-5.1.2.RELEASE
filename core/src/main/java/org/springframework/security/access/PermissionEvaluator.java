@@ -21,6 +21,8 @@ import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 权限评估器
+ * 
  * Strategy used in expression evaluation to determine whether a user has a permission or
  * permissions for a given domain object.
  *

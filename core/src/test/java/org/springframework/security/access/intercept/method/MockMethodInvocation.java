@@ -22,7 +22,13 @@ import org.aopalliance.intercept.MethodInvocation;
 
 @SuppressWarnings("unchecked")
 public class MockMethodInvocation implements MethodInvocation {
+	/**
+	 * 接口方法
+	 */
 	private Method method;
+	/**
+	 * 实现类
+	 */
 	private Object targetObject;
 
 	public MockMethodInvocation(Object targetObject, Class clazz, String methodName,

@@ -39,6 +39,8 @@ import org.springframework.security.acls.model.SidRetrievalStrategy;
 import org.springframework.security.core.Authentication;
 
 /**
+ * Acl的全称是Access Control List，俗称访问控制列表，是用以控制对象的访问权限的
+ * 
  * Used by Spring Security's expression-based access control implementation to evaluate
  * permissions for a particular object using the ACL module. Similar in behaviour to
  * {@link org.springframework.security.acls.AclEntryVoter AclEntryVoter}.
@@ -65,6 +67,7 @@ public class AclPermissionEvaluator implements PermissionEvaluator {
 	 * the ACL configuration. If the domain object is null, returns false (this can always
 	 * be overridden using a null check in the expression itself).
 	 */
+	@Override
 	public boolean hasPermission(Authentication authentication, Object domainObject,
 			Object permission) {
 		if (domainObject == null) {
@@ -77,6 +80,7 @@ public class AclPermissionEvaluator implements PermissionEvaluator {
 		return checkPermission(authentication, objectIdentity, permission);
 	}
 
+	@Override
 	public boolean hasPermission(Authentication authentication, Serializable targetId,
 			String targetType, Object permission) {
 		ObjectIdentity objectIdentity = objectIdentityGenerator.createObjectIdentity(

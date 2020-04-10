@@ -28,6 +28,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 
 /**
+ * 销毁session和SecurityContextHolder内容
+ * 
  * Performs a logout by modifying the
  * {@link org.springframework.security.core.context.SecurityContextHolder}.
  * <p>
@@ -43,7 +45,13 @@ import org.springframework.util.Assert;
 public class SecurityContextLogoutHandler implements LogoutHandler {
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
+	/**
+	 * 使HttpSession失效
+	 */
 	private boolean invalidateHttpSession = true;
+	/**
+	 * 清除认证信息
+	 */
 	private boolean clearAuthentication = true;
 
 	// ~ Methods
@@ -63,12 +71,14 @@ public class SecurityContextLogoutHandler implements LogoutHandler {
 			HttpSession session = request.getSession(false);
 			if (session != null) {
 				logger.debug("Invalidating session: " + session.getId());
+				// HttpSession失效
 				session.invalidate();
 			}
 		}
 
 		if (clearAuthentication) {
 			SecurityContext context = SecurityContextHolder.getContext();
+			// 安全上下文置空
 			context.setAuthentication(null);
 		}
 

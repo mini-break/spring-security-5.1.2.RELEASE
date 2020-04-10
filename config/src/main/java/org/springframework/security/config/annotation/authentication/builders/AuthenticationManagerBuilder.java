@@ -15,9 +15,6 @@
  */
 package org.springframework.security.config.annotation.authentication.builders;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
@@ -37,6 +34,9 @@ import org.springframework.security.config.annotation.authentication.configurers
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 认证管理器构建器
@@ -61,6 +61,9 @@ public class AuthenticationManagerBuilder
 	 */
 	private AuthenticationManager parentAuthenticationManager;
 	private List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
+	/**
+	 * 用户详情信息服务
+	 */
 	private UserDetailsService defaultUserDetailsService;
 	/**
 	 * 是否认证后从认证对象中擦除密码信息
@@ -191,6 +194,8 @@ public class AuthenticationManagerBuilder
 	}
 
 	/**
+	 * 设置自定义UserDetailsService
+	 *
 	 * Add authentication based upon the custom {@link UserDetailsService} that is passed
 	 * in. It then returns a {@link DaoAuthenticationConfigurer} to allow customization of
 	 * the authentication.
@@ -210,6 +215,7 @@ public class AuthenticationManagerBuilder
 	public <T extends UserDetailsService> DaoAuthenticationConfigurer<AuthenticationManagerBuilder, T> userDetailsService(
 			T userDetailsService) throws Exception {
 		this.defaultUserDetailsService = userDetailsService;
+		// 向AbstractConfiguredSecurityBuilder中增加SecurityConfigurer(DaoAuthenticationConfigurer)
 		return apply(new DaoAuthenticationConfigurer<>(
 				userDetailsService));
 	}
@@ -253,12 +259,14 @@ public class AuthenticationManagerBuilder
 	@Override
 	public AuthenticationManagerBuilder authenticationProvider(
 			AuthenticationProvider authenticationProvider) {
+		// 将认证提供者加入集合
 		this.authenticationProviders.add(authenticationProvider);
 		return this;
 	}
 
 	@Override
 	protected ProviderManager performBuild() throws Exception {
+		// 是否配置了AuthenticationProvider
 		if (!isConfigured()) {
 			logger.debug("No authenticationProviders and no parentAuthenticationManager defined. Returning null.");
 			return null;
@@ -267,6 +275,7 @@ public class AuthenticationManagerBuilder
 		ProviderManager providerManager = new ProviderManager(authenticationProviders,
 				parentAuthenticationManager);
 		if (eraseCredentials != null) {
+			// 设置认证后是否需要擦除密码信息
 			providerManager.setEraseCredentialsAfterAuthentication(eraseCredentials);
 		}
 		if (eventPublisher != null) {

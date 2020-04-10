@@ -34,7 +34,13 @@ public class ObjectIdentityImpl implements ObjectIdentity {
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 类型
+	 */
 	private final String type;
+	/**
+	 * 标识
+	 */
 	private Serializable identifier;
 
 	// ~ Constructors

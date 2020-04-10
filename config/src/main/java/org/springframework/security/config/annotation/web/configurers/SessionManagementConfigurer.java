@@ -55,6 +55,8 @@ import org.springframework.security.web.session.SimpleRedirectSessionInformation
 import org.springframework.util.Assert;
 
 /**
+ * 配置过滤器 SessionManagementFilter
+ * 
  * Allows configuring session management.
  *
  * <h2>Security Filters</h2>
@@ -426,6 +428,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 				if (trustResolver != null) {
 					httpSecurityRepository.setTrustResolver(trustResolver);
 				}
+				// HttpSessionSecurityContextRepository加入共享对象
 				http.setSharedObject(SecurityContextRepository.class,
 						httpSecurityRepository);
 			}
@@ -437,8 +440,10 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 				http.setSharedObject(RequestCache.class, new NullRequestCache());
 			}
 		}
+		// CompositeSessionAuthenticationStrategy 加入共享对象
 		http.setSharedObject(SessionAuthenticationStrategy.class,
 				getSessionAuthenticationStrategy(http));
+		// InvalidSessionStrategy 加入共享对象
 		http.setSharedObject(InvalidSessionStrategy.class, getInvalidSessionStrategy());
 	}
 

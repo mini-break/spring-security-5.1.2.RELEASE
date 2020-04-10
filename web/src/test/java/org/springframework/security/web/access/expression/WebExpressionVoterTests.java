@@ -55,6 +55,9 @@ public class WebExpressionVoterTests {
 
 	}
 
+	/**
+	 * attributes中未找到WebExpressionConfigAttribute类型，投票为弃权
+	 */
 	@Test
 	public void abstainsIfNoAttributeFound() {
 		WebExpressionVoter voter = new WebExpressionVoter();

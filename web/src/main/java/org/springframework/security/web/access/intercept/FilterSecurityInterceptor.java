@@ -31,6 +31,11 @@ import org.springframework.security.access.intercept.InterceptorStatusToken;
 import org.springframework.security.web.FilterInvocation;
 
 /**
+ * 此过滤器FilterSecurityInterceptor是一个请求处理过程中安全机制过滤器链中最后一个filter,它执行真正的HTTP资源安全控制
+ * FilterSecurityInterceptor主要是将请求上下文包装成一个FilterInvocation然后对它进行操作。
+ * FilterSecurityInterceptor仅仅包含调用FilterInvocation的主要流程。
+ * 具体的安全控制细节，在其基类AbstractSecurityInterceptor中实现
+ *
  * Performs security handling of HTTP resources via a filter implementation.
  * <p>
  * The <code>SecurityMetadataSource</code> required by this security interceptor is of
@@ -52,6 +57,9 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 安全认证元数据(权限)信息
+	 */
 	private FilterInvocationSecurityMetadataSource securityMetadataSource;
 	private boolean observeOncePerRequest = true;
 
@@ -65,12 +73,14 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 	 *
 	 * @throws ServletException never thrown
 	 */
+	@Override
 	public void init(FilterConfig arg0) throws ServletException {
 	}
 
 	/**
 	 * Not used (we rely on IoC container lifecycle services instead)
 	 */
+	@Override
 	public void destroy() {
 	}
 
@@ -85,8 +95,10 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 	 * @throws IOException if the filter chain fails
 	 * @throws ServletException if the filter chain fails
 	 */
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
+		// 封装请求上下文为一个FilterInvocation,然后调用该FilterInvocation执行安全认证
 		FilterInvocation fi = new FilterInvocation(request, response, chain);
 		invoke(fi);
 	}
@@ -95,6 +107,7 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 		return this.securityMetadataSource;
 	}
 
+	@Override
 	public SecurityMetadataSource obtainSecurityMetadataSource() {
 		return this.securityMetadataSource;
 	}
@@ -103,11 +116,13 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 		this.securityMetadataSource = newSource;
 	}
 
+	@Override
 	public Class<?> getSecureObjectClass() {
 		return FilterInvocation.class;
 	}
 
 	public void invoke(FilterInvocation fi) throws IOException, ServletException {
+		// 如果应用过该过滤器直接跳过执行下一个过滤器
 		if ((fi.getRequest() != null)
 				&& (fi.getRequest().getAttribute(FILTER_APPLIED) != null)
 				&& observeOncePerRequest) {
@@ -121,9 +136,11 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 				fi.getRequest().setAttribute(FILTER_APPLIED, Boolean.TRUE);
 			}
 
+			// 调用之前
 			InterceptorStatusToken token = super.beforeInvocation(fi);
 
 			try {
+				// 调用
 				fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
 			}
 			finally {

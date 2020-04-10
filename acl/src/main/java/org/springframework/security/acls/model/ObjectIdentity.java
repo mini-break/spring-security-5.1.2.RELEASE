@@ -18,6 +18,8 @@ package org.springframework.security.acls.model;
 import java.io.Serializable;
 
 /**
+ * ObjectIdentity表示Spring Security Acl中一个域对象，其默认实现类是ObjectIdentityImpl
+ * 
  * Represents the identity of an individual domain object instance.
  *
  * <p>

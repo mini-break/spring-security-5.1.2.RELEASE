@@ -23,6 +23,7 @@ public final class ExpressionUtils {
 
 	public static boolean evaluateAsBoolean(Expression expr, EvaluationContext ctx) {
 		try {
+			// spring 表达式获取boolean值
 			return ((Boolean) expr.getValue(ctx, Boolean.class)).booleanValue();
 		}
 		catch (EvaluationException e) {

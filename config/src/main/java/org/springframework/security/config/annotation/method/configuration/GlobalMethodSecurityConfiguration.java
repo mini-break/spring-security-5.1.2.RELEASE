@@ -94,6 +94,9 @@ public class GlobalMethodSecurityConfiguration
 					+ EnableGlobalMethodSecurity.class.getName());
 		}
 	};
+	/**
+	 * 默认的表达式处理器
+	 */
 	private DefaultMethodSecurityExpressionHandler defaultMethodExpressionHandler = new DefaultMethodSecurityExpressionHandler();
 	private AuthenticationManager authenticationManager;
 	private AuthenticationManagerBuilder auth;
@@ -125,10 +128,12 @@ public class GlobalMethodSecurityConfiguration
 	 */
 	@Bean
 	public MethodInterceptor methodSecurityInterceptor() throws Exception {
+		// JDK代理 or AspectJ代理
 		this.methodSecurityInterceptor = isAspectJ()
 				? new AspectJMethodSecurityInterceptor()
 				: new MethodSecurityInterceptor();
 		methodSecurityInterceptor.setAccessDecisionManager(accessDecisionManager());
+		// 调用方法后处理
 		methodSecurityInterceptor.setAfterInvocationManager(afterInvocationManager());
 		methodSecurityInterceptor
 				.setSecurityMetadataSource(methodSecurityMetadataSource());
@@ -145,10 +150,14 @@ public class GlobalMethodSecurityConfiguration
 	 *
 	 * @see org.springframework.beans.factory.SmartInitializingSingleton#
 	 * afterSingletonsInstantiated()
+	 *
+	 * 实现SmartInitializingSingleton接口后，当所有单例 bean 都初始化完成以后，
+	 * 容器会回调该接口的方法 afterSingletonsInstantiated
 	 */
 	@Override
 	public void afterSingletonsInstantiated() {
 		try {
+			// 初始化方法拦截器
 			initializeMethodSecurityInterceptor();
 		}
 		catch (Exception e) {
@@ -245,10 +254,14 @@ public class GlobalMethodSecurityConfiguration
 	 * @return the {@link AccessDecisionManager} to use
 	 */
 	protected AccessDecisionManager accessDecisionManager() {
+		// 投票器列表
 		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<AccessDecisionVoter<? extends Object>>();
+		// 真正处理权限校验逻辑
 		ExpressionBasedPreInvocationAdvice expressionAdvice = new ExpressionBasedPreInvocationAdvice();
 		expressionAdvice.setExpressionHandler(getExpressionHandler());
+		// 开启Spring方法级安全(@EnableGlobalMethodSecurity(prePostEnabled = true))
 		if (prePostEnabled()) {
+			// 加入投票器
 			decisionVoters
 					.add(new PreInvocationAuthorizationAdviceVoter(expressionAdvice));
 		}
@@ -316,6 +329,7 @@ public class GlobalMethodSecurityConfiguration
 					.postProcess(new DefaultAuthenticationEventPublisher());
 			auth = new AuthenticationManagerBuilder(objectPostProcessor);
 			auth.authenticationEventPublisher(eventPublisher);
+			// 留给子类覆盖
 			configure(auth);
 			if (disableAuthenticationRegistry) {
 				authenticationManager = getAuthenticationConfiguration()
@@ -342,6 +356,8 @@ public class GlobalMethodSecurityConfiguration
 	}
 
 	/**
+	 * 构建方法认证权限数据
+	 * 
 	 * Provides the default {@link MethodSecurityMetadataSource} that will be used. It
 	 * creates a {@link DelegatingMethodSecurityMetadataSource} based upon
 	 * {@link #customMethodSecurityMetadataSource()} and the attributes on
@@ -352,8 +368,10 @@ public class GlobalMethodSecurityConfiguration
 	@Bean
 	public MethodSecurityMetadataSource methodSecurityMetadataSource() {
 		List<MethodSecurityMetadataSource> sources = new ArrayList<>();
+		// 创建基于注解的权限工厂
 		ExpressionBasedAnnotationAttributeFactory attributeFactory = new ExpressionBasedAnnotationAttributeFactory(
 				getExpressionHandler());
+		// 提供给用户扩展
 		MethodSecurityMetadataSource customMethodSecurityMetadataSource = customMethodSecurityMetadataSource();
 		if (customMethodSecurityMetadataSource != null) {
 			sources.add(customMethodSecurityMetadataSource);
@@ -364,6 +382,10 @@ public class GlobalMethodSecurityConfiguration
 		boolean isSecuredEnabled = securedEnabled();
 		boolean isJsr250Enabled = jsr250Enabled();
 
+		/**
+		 * 如果配置了@EnableGlobalMethodSecurity,则至少需要配置prePostEnabled或securedEnabled
+		 * 或jsr250Enabled中一个为true或配置了customMethodSecurityMetadataSource
+		 */
 		if (!isPrePostEnabled && !isSecuredEnabled && !isJsr250Enabled && !hasCustom) {
 			throw new IllegalStateException("In the composition of all global method configuration, " +
 					"no annotation support was actually activated");
@@ -402,10 +424,13 @@ public class GlobalMethodSecurityConfiguration
 	}
 
 	/**
+	 * 由ConfigurationClassPostProcessor内部类ImportAwareBeanPostProcessor的方法postProcessBeforeInitialization调用
+	 * 
 	 * Obtains the attributes from {@link EnableGlobalMethodSecurity} if this class was
 	 * imported using the {@link EnableGlobalMethodSecurity} annotation.
 	 */
 	public final void setImportMetadata(AnnotationMetadata importMetadata) {
+		// 获取@EnableGlobalMethodSecurity注解 的属性及值
 		Map<String, Object> annotationAttributes = importMetadata
 				.getAnnotationAttributes(EnableGlobalMethodSecurity.class.getName());
 		enableMethodSecurity = AnnotationAttributes.fromMap(annotationAttributes);

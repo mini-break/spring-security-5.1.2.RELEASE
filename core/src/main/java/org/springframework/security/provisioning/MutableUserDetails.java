@@ -18,7 +18,7 @@ package org.springframework.security.provisioning;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- *
+ * 可变的用户信息接口
  * @author Luke Taylor
  * @since 3.1
  */

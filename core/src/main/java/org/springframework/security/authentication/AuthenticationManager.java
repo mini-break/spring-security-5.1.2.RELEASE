@@ -31,6 +31,7 @@ public interface AuthenticationManager {
 	// ========================================================================================================
 
 	/**
+	 * 执行认证
 	 * Attempts to authenticate the passed {@link Authentication} object, returning a
 	 * fully populated <code>Authentication</code> object (including granted authorities)
 	 * if successful.

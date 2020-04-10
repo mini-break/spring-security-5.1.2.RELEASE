@@ -40,6 +40,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
 /**
+ * 通过UserDetailsService获取到得用户信息
+ * 
  * Models core user information retrieved by a {@link UserDetailsService}.
  * <p>
  * Developers may use this class directly, subclass it, or write their own
@@ -67,18 +69,40 @@ public class User implements UserDetails, CredentialsContainer {
 
 	// ~ Instance fields
 	// ================================================================================================
+	/**
+	 * 登录密码
+	 */
 	private String password;
+	/**
+	 * 登录用户名
+	 */
 	private final String username;
+	/**
+	 * 权限列表
+	 */
 	private final Set<GrantedAuthority> authorities;
+	/**
+	 * 账号未过期
+	 */
 	private final boolean accountNonExpired;
+	/**
+	 * 账号未锁定
+	 */
 	private final boolean accountNonLocked;
+	/**
+	 * 凭证（密码）未过期
+	 */
 	private final boolean credentialsNonExpired;
+	/**
+	 * 用户是否可用
+	 */
 	private final boolean enabled;
 
 	// ~ Constructors
 	// ===================================================================================================
 
 	/**
+	 * 根据用户名,密码,权限列表构建用户信息
 	 * Calls the more complex constructor with all boolean arguments set to {@code true}.
 	 */
 	public User(String username, String password,
@@ -126,30 +150,37 @@ public class User implements UserDetails, CredentialsContainer {
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
 		return authorities;
 	}
 
+	@Override
 	public String getPassword() {
 		return password;
 	}
 
+	@Override
 	public String getUsername() {
 		return username;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
+	@Override
 	public boolean isAccountNonExpired() {
 		return accountNonExpired;
 	}
 
+	@Override
 	public boolean isAccountNonLocked() {
 		return accountNonLocked;
 	}
 
+	@Override
 	public boolean isCredentialsNonExpired() {
 		return credentialsNonExpired;
 	}
@@ -158,6 +189,9 @@ public class User implements UserDetails, CredentialsContainer {
 		password = null;
 	}
 
+	/**
+	 * 对权限进行排序
+	 */
 	private static SortedSet<GrantedAuthority> sortAuthorities(
 			Collection<? extends GrantedAuthority> authorities) {
 		Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");

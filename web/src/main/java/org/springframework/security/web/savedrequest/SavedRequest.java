@@ -23,6 +23,8 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 
 /**
+ * 缓存请求的封装
+ * 
  * Encapsulates the functionality required of a cached request for both an authentication
  * mechanism (typically form-based login) to redirect to the original URL and for a
  * <tt>RequestCache</tt> to build a wrapped request, reproducing the original request

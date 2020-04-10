@@ -76,7 +76,9 @@ public final class FormLoginConfigurer<H extends HttpSecurityBuilder<H>> extends
 	 */
 	public FormLoginConfigurer() {
 		super(new UsernamePasswordAuthenticationFilter(), null);
+		// 默认表单用户名字段
 		usernameParameter("username");
+		// 默认表单用户密码字段
 		passwordParameter("password");
 	}
 
@@ -177,6 +179,8 @@ public final class FormLoginConfigurer<H extends HttpSecurityBuilder<H>> extends
 	 * @param loginPage the login page to redirect to if authentication is required (i.e.
 	 * "/login")
 	 * @return the {@link FormLoginConfigurer} for additional customization
+	 *
+	 * 通过本方法设置用户自定义登录Url
 	 */
 	@Override
 	public FormLoginConfigurer<H> loginPage(String loginPage) {
@@ -233,11 +237,13 @@ public final class FormLoginConfigurer<H extends HttpSecurityBuilder<H>> extends
 
 	@Override
 	public void init(H http) throws Exception {
+		// 调用父类init
 		super.init(http);
 		initDefaultLoginFilter(http);
 	}
 
 	/*
+	 * 创建登录请求处理匹配器
 	 * (non-Javadoc)
 	 *
 	 * @see org.springframework.security.config.annotation.web.configurers.
@@ -274,9 +280,14 @@ public final class FormLoginConfigurer<H extends HttpSecurityBuilder<H>> extends
 	 * @param http the {@link HttpSecurityBuilder} to use
 	 */
 	private void initDefaultLoginFilter(H http) {
+		// 获取生成默认登录页面过滤器
 		DefaultLoginPageGeneratingFilter loginPageGeneratingFilter = http
 				.getSharedObject(DefaultLoginPageGeneratingFilter.class);
+		/**
+		 * isCustomLoginPage:是否用户自定义登录页面,通过loginPage(String loginPage)进行设置
+		 */
 		if (loginPageGeneratingFilter != null && !isCustomLoginPage()) {
+			// 如果不是用户自定义登录页面，则设置为默认登录页面
 			loginPageGeneratingFilter.setFormLoginEnabled(true);
 			loginPageGeneratingFilter.setUsernameParameter(getUsernameParameter());
 			loginPageGeneratingFilter.setPasswordParameter(getPasswordParameter());

@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContext;
 
 /**
+ * 用于在请求之间持久化的策略
+ * 
  * Strategy used for persisting a {@link SecurityContext} between requests.
  * <p>
  * Used by {@link SecurityContextPersistenceFilter} to obtain the context which should be

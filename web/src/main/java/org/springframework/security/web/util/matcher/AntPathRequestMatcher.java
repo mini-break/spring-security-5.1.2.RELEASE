@@ -30,6 +30,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
+ * Ant路径风格请求匹配器
+ * 
  * Matcher which compares a pre-defined ant-style pattern against the URL (
  * {@code servletPath + pathInfo}) of an {@code HttpServletRequest}. The query string of
  * the URL is ignored and matching is case-insensitive or case-sensitive depending on the
@@ -56,11 +58,25 @@ import org.springframework.web.util.UrlPathHelper;
 public final class AntPathRequestMatcher
 		implements RequestMatcher, RequestVariablesExtractor {
 	private static final Log logger = LogFactory.getLog(AntPathRequestMatcher.class);
+	/**
+	 * 匹配所有路径
+	 */
 	private static final String MATCH_ALL = "/**";
-
+	/**
+	 * 路径匹配器，内部类
+	 */
 	private final Matcher matcher;
+	/**
+	 * Ant请求表达式
+	 */
 	private final String pattern;
+	/**
+	 * http请求方式
+	 */
 	private final HttpMethod httpMethod;
+	/**
+	 * 是否大小写敏感
+	 */
 	private final boolean caseSensitive;
 
 	private final UrlPathHelper urlPathHelper;
@@ -76,6 +92,7 @@ public final class AntPathRequestMatcher
 	}
 
 	/**
+	 * 区分大小写(大小写敏感)
 	 * Creates a matcher with the supplied pattern and HTTP method in a case insensitive
 	 * manner.
 	 *
@@ -114,8 +131,10 @@ public final class AntPathRequestMatcher
 	public AntPathRequestMatcher(String pattern, String httpMethod,
 			boolean caseSensitive, UrlPathHelper urlPathHelper) {
 		Assert.hasText(pattern, "Pattern cannot be null or empty");
+		// 是否大小写敏感
 		this.caseSensitive = caseSensitive;
 
+		// **表示任意多层的目录结构
 		if (pattern.equals(MATCH_ALL) || pattern.equals("**")) {
 			pattern = MATCH_ALL;
 			this.matcher = null;
@@ -123,10 +142,12 @@ public final class AntPathRequestMatcher
 		else {
 			// If the pattern ends with {@code /**} and has no other wildcards or path
 			// variables, then optimize to a sub-path match
+			// Ant表达式以"/**"结尾 && (Ant表达式中不存在 '?' && 不存在 '{' && 不存在 '}') && Ant表达式首次出现'*'的位置为倒数第二个字符（也即以"/**"结尾，且表达式只能有一个"/**"）
 			if (pattern.endsWith(MATCH_ALL)
 					&& (pattern.indexOf('?') == -1 && pattern.indexOf('{') == -1
 							&& pattern.indexOf('}') == -1)
 					&& pattern.indexOf("*") == pattern.length() - 2) {
+				// 去掉Ant表达式中的"/**" 构建SubpathMatcher
 				this.matcher = new SubpathMatcher(
 						pattern.substring(0, pattern.length() - 3), caseSensitive);
 			}
@@ -136,6 +157,10 @@ public final class AntPathRequestMatcher
 		}
 
 		this.pattern = pattern;
+		/**
+		 * http method允许为null
+		 * 如果httpMethod为非枚举定义的方法，则会报错
+		 */
 		this.httpMethod = StringUtils.hasText(httpMethod) ? HttpMethod.valueOf(httpMethod)
 				: null;
 		this.urlPathHelper = urlPathHelper;
@@ -150,6 +175,7 @@ public final class AntPathRequestMatcher
 	 */
 	@Override
 	public boolean matches(HttpServletRequest request) {
+		// 如果预设的请求方式与实际请求的方式不匹配，则直接返回false
 		if (this.httpMethod != null && StringUtils.hasText(request.getMethod())
 				&& this.httpMethod != valueOf(request.getMethod())) {
 			if (logger.isDebugEnabled()) {
@@ -170,6 +196,7 @@ public final class AntPathRequestMatcher
 			return true;
 		}
 
+		// 获取请求地址
 		String url = getRequestPath(request);
 
 		if (logger.isDebugEnabled()) {
@@ -195,6 +222,9 @@ public final class AntPathRequestMatcher
 		}
 		String url = request.getServletPath();
 
+		/**
+		 * 返回请求URL中的额外路径信息。额外路径信息是请求URL中的位于Servlet的路径之后和查询参数之前的内容，它以"/"开头
+		 */
 		String pathInfo = request.getPathInfo();
 		if (pathInfo != null) {
 			url = StringUtils.hasLength(url) ? url + pathInfo : pathInfo;
@@ -259,15 +289,30 @@ public final class AntPathRequestMatcher
 		return null;
 	}
 
+	/**
+	 * 内部接口，定义一个匹配器
+	 */
 	private static interface Matcher {
+		/**
+		 * 路径是否匹配
+		 */
 		boolean matches(String path);
 
+		/**
+		 * 抽取path中的模板变量
+		 */
 		Map<String, String> extractUriTemplateVariables(String path);
 	}
 
 	private static class SpringAntMatcher implements Matcher {
+		/**
+		 * Spring Ant表达式路径匹配器
+		 */
 		private final AntPathMatcher antMatcher;
 
+		/**
+		 * 路径表达式
+		 */
 		private final String pattern;
 
 		private SpringAntMatcher(String pattern, boolean caseSensitive) {
@@ -285,6 +330,9 @@ public final class AntPathRequestMatcher
 			return this.antMatcher.extractUriTemplateVariables(this.pattern, path);
 		}
 
+		/**
+		 * 构建AntPathMatcher
+		 */
 		private static AntPathMatcher createMatcher(boolean caseSensitive) {
 			AntPathMatcher matcher = new AntPathMatcher();
 			matcher.setTrimTokens(false);
@@ -294,14 +342,26 @@ public final class AntPathRequestMatcher
 	}
 
 	/**
+	 * 尾随通配符的优化匹配器
+	 * 
 	 * Optimized matcher for trailing wildcards
 	 */
 	private static class SubpathMatcher implements Matcher {
+		/**
+		 * 子路径
+		 */
 		private final String subpath;
+		/**
+		 * 子路径长度
+		 */
 		private final int length;
+		/**
+		 * 是否大小写敏感
+		 */
 		private final boolean caseSensitive;
 
 		private SubpathMatcher(String subpath, boolean caseSensitive) {
+			// 子路径不能包含'*'
 			assert!subpath.contains("*");
 			this.subpath = caseSensitive ? subpath : subpath.toLowerCase();
 			this.length = subpath.length();
@@ -313,10 +373,14 @@ public final class AntPathRequestMatcher
 			if (!this.caseSensitive) {
 				path = path.toLowerCase();
 			}
+			// /xxx 或 /xxx/
 			return path.startsWith(this.subpath)
 					&& (path.length() == this.length || path.charAt(this.length) == '/');
 		}
 
+		/**
+		 * path中没有模板变量，所以返回空map
+		 */
 		@Override
 		public Map<String, String> extractUriTemplateVariables(String path) {
 			return Collections.emptyMap();

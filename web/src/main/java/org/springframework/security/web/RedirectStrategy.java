@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 封装逻辑重定向
+ * 
  * Encapsulates the redirection logic for all classes in the framework which perform
  * redirects.
  *

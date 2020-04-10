@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
+ * 在使用Spring Security框架过程中，经常会有这样的需求，即在登录验证时，附带增加额外的数据，如验证码、用户类型等
+ * 
  * A holder of selected HTTP details related to a web authentication request.
  *
  * @author Ben Alex

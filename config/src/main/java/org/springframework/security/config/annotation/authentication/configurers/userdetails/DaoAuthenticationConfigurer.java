@@ -20,6 +20,8 @@ import org.springframework.security.config.annotation.authentication.ProviderMan
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
+ * 主要用来配置DaoAuthenticationProvider
+ * 
  * Allows configuring a {@link DaoAuthenticationProvider}
  *
  * @author Rob Winch

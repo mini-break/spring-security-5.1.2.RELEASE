@@ -62,6 +62,7 @@ public class RunAsManagerImplTests {
 
 		RunAsManagerImpl runAs = new RunAsManagerImpl();
 		runAs.setKey("my_password");
+		// 设置角色前缀
 		runAs.setRolePrefix("FOOBAR_");
 
 		Authentication result = runAs.buildRunAs(inputToken, new Object(),

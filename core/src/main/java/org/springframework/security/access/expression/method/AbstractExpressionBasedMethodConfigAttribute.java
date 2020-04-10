@@ -33,7 +33,13 @@ import org.springframework.util.Assert;
  * @since 3.0
  */
 abstract class AbstractExpressionBasedMethodConfigAttribute implements ConfigAttribute {
+	/**
+	 * 过滤器表达式
+	 */
 	private final Expression filterExpression;
+	/**
+	 * 认证表达式
+	 */
 	private final Expression authorizeExpression;
 
 	/**
@@ -43,6 +49,7 @@ abstract class AbstractExpressionBasedMethodConfigAttribute implements ConfigAtt
 			String authorizeExpression) throws ParseException {
 		Assert.isTrue(filterExpression != null || authorizeExpression != null,
 				"Filter and authorization Expressions cannot both be null");
+		// 表达式解析器
 		SpelExpressionParser parser = new SpelExpressionParser();
 		this.filterExpression = filterExpression == null ? null : parser
 				.parseExpression(filterExpression);

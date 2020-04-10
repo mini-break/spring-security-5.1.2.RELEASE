@@ -63,6 +63,8 @@ public interface RunAsManager {
 	// ========================================================================================================
 
 	/**
+	 * 在方法的调用期间替换以前的 Authentication 对象。 如果方法返回null，意味着不需要进行替换
+	 * 
 	 * Returns a replacement <code>Authentication</code> object for the current secure
 	 * object invocation, or <code>null</code> if replacement not required.
 	 *

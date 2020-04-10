@@ -33,6 +33,7 @@ final class NullRunAsManager implements RunAsManager {
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public Authentication buildRunAs(Authentication authentication, Object object,
 			Collection<ConfigAttribute> config) {
 		return null;

@@ -28,6 +28,10 @@ public interface AuthenticationTrustResolver {
 	// ========================================================================================================
 
 	/**
+	 * 判断传递过来的Authentication对象是不是AnonymousAuthenticationToken，
+	 * 如果是AnonymousAuthenticationToken则表示没有登录，
+	 * 因为登录之后生成的对象是UsernamePasswordAuthenticationToken或其他Authentication对象
+	 *
 	 * Indicates whether the passed <code>Authentication</code> token represents an
 	 * anonymous user. Typically the framework will call this method if it is trying to
 	 * decide whether an <code>AccessDeniedException</code> should result in a final

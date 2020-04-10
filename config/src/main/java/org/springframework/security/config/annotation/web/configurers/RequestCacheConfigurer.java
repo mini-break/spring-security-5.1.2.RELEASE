@@ -101,10 +101,13 @@ public final class RequestCacheConfigurer<H extends HttpSecurityBuilder<H>> exte
 
 	@Override
 	public void configure(H http) throws Exception {
+		// 创建 RequestCache
 		RequestCache requestCache = getRequestCache(http);
+		// 创建 RequestCacheAwareFilter
 		RequestCacheAwareFilter requestCacheFilter = new RequestCacheAwareFilter(
 				requestCache);
 		requestCacheFilter = postProcess(requestCacheFilter);
+		// HttpSecurity中加入RequestCacheAwareFilter
 		http.addFilter(requestCacheFilter);
 	}
 
@@ -118,14 +121,17 @@ public final class RequestCacheConfigurer<H extends HttpSecurityBuilder<H>> exte
 	 * @return the {@link RequestCache} to use
 	 */
 	private RequestCache getRequestCache(H http) {
+		// 首先尝试从共享对象获取 RequestCache
 		RequestCache result = http.getSharedObject(RequestCache.class);
 		if (result != null) {
 			return result;
 		}
+		// 其次尝试从bean容器中获取 RequestCache
 		result = getBeanOrNull(RequestCache.class);
 		if (result != null) {
 			return result;
 		}
+		// 最后尝试使用缺省 RequestCache :  HttpSessionRequestCache
 		HttpSessionRequestCache defaultCache = new HttpSessionRequestCache();
 		defaultCache.setRequestMatcher(createDefaultSavedRequestMatcher(http));
 		return defaultCache;
@@ -142,8 +148,17 @@ public final class RequestCacheConfigurer<H extends HttpSecurityBuilder<H>> exte
 			return null;
 		}
 	}
+
+	//	  针对以下几种情况之外的请求不会被缓存
+	//	 1./**/favicon.*
+	//	 2.XMLHttpRequest
+	//	 3.application/json
 	@SuppressWarnings("unchecked")
 	private RequestMatcher createDefaultSavedRequestMatcher(H http) {
+		/**
+		 *  处理请求中的媒体类型的策略接口
+		 *  (说白了，这个接口就是想知道你（客户端）需要什么类型（MediaType）的数据。不是针对Content-Type的，因为没有解析charset)
+		 */
 		ContentNegotiationStrategy contentNegotiationStrategy = http
 				.getSharedObject(ContentNegotiationStrategy.class);
 		if (contentNegotiationStrategy == null) {

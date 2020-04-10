@@ -45,10 +45,16 @@ public abstract class AbstractAccessDecisionManager implements AccessDecisionMan
 	// ================================================================================================
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 投票器集合
+	 */
 	private List<AccessDecisionVoter<? extends Object>> decisionVoters;
 
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 
+	/**
+	 * 允许所有弃权
+	 */
 	private boolean allowIfAllAbstainDecisions = false;
 
 	protected AbstractAccessDecisionManager(
@@ -89,7 +95,9 @@ public abstract class AbstractAccessDecisionManager implements AccessDecisionMan
 	}
 
 	public boolean supports(ConfigAttribute attribute) {
+		// 遍历决策管理列表
 		for (AccessDecisionVoter voter : this.decisionVoters) {
+			// 只要有一个支持就返回
 			if (voter.supports(attribute)) {
 				return true;
 			}

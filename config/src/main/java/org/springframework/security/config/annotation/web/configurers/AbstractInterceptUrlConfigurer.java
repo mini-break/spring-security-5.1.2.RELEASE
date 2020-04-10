@@ -72,10 +72,14 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 
 	@Override
 	public void configure(H http) throws Exception {
+		// 封装请求与权限元数据
 		FilterInvocationSecurityMetadataSource metadataSource = createMetadataSource(http);
 		if (metadataSource == null) {
 			return;
 		}
+		/**
+		 * http.getSharedObject(AuthenticationManager.class)将认证管理器加入拦截器中
+		 */
 		FilterSecurityInterceptor securityInterceptor = createFilterSecurityInterceptor(
 				http, metadataSource, http.getSharedObject(AuthenticationManager.class));
 		if (filterSecurityInterceptorOncePerRequest != null) {
@@ -83,11 +87,15 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 					.setObserveOncePerRequest(filterSecurityInterceptorOncePerRequest);
 		}
 		securityInterceptor = postProcess(securityInterceptor);
+		// 将FilterSecurityInterceptor 加入HttpSecurity中
 		http.addFilter(securityInterceptor);
 		http.setSharedObject(FilterSecurityInterceptor.class, securityInterceptor);
 	}
 
 	/**
+	 * 抽象方法，要求子类提供实现。用于创建安全元数据对象FilterInvocationSecurityMetadataSource,
+	 * 供目标安全拦截过滤器FilterSecurityInterceptor使用
+	 *
 	 * Subclasses should implement this method to provide a
 	 * {@link FilterInvocationSecurityMetadataSource} for the
 	 * {@link FilterSecurityInterceptor}.
@@ -100,6 +108,8 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 	abstract FilterInvocationSecurityMetadataSource createMetadataSource(H http);
 
 	/**
+	 * 获取投票器列表
+	 *
 	 * Subclasses should implement this method to provide the {@link AccessDecisionVoter}
 	 * instances used to create the default {@link AccessDecisionManager}
 	 *
@@ -110,6 +120,9 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 	 */
 	abstract List<AccessDecisionVoter<? extends Object>> getDecisionVoters(H http);
 
+	/**
+	 * 抽象类，由子类继承
+	 */
 	abstract class AbstractInterceptUrlRegistry<R extends AbstractInterceptUrlRegistry<R, T>, T>
 			extends AbstractConfigAttributeRequestMatcherRegistry<T> {
 
@@ -152,6 +165,7 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 	}
 
 	/**
+	 * 创建默认的投票管理器
 	 * Creates the default {@code AccessDecisionManager}
 	 * @return the default {@code AccessDecisionManager}
 	 */
@@ -177,6 +191,8 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 	}
 
 	/**
+	 * 创建FilterSecurityInterceptor
+	 * 
 	 * Creates the {@link FilterSecurityInterceptor}
 	 *
 	 * @param http the builder to use
@@ -189,8 +205,11 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 			FilterInvocationSecurityMetadataSource metadataSource,
 			AuthenticationManager authenticationManager) throws Exception {
 		FilterSecurityInterceptor securityInterceptor = new FilterSecurityInterceptor();
+		// 设置安全认证元数据(权限)信息
 		securityInterceptor.setSecurityMetadataSource(metadataSource);
+		// 设置访问决策管理器
 		securityInterceptor.setAccessDecisionManager(getAccessDecisionManager(http));
+		// 设置认证管理器
 		securityInterceptor.setAuthenticationManager(authenticationManager);
 		securityInterceptor.afterPropertiesSet();
 		return securityInterceptor;

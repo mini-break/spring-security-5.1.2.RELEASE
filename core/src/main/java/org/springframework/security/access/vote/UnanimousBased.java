@@ -26,6 +26,14 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 /**
+ * UnanimousBased的逻辑与另外两种实现有点不一样，另外两种会一次性把受保护对象的配置属性全部传递给AccessDecisionVoter进行投票，
+ * 而UnanimousBased会一次只传递一个ConfigAttribute给AccessDecisionVoter进行投票。
+ * 这也就意味着如果我们的AccessDecisionVoter的逻辑是只要传递进来的ConfigAttribute中有一个能够匹配则投赞成票，
+ * 但是放到UnanimousBased中其投票结果就不一定是赞成了。UnanimousBased的逻辑具体来说是这样的：
+ * 1.如果受保护对象配置的某一个ConfigAttribute被任意的AccessDecisionVoter反对了，则将抛出AccessDeniedException。
+ * 2.如果没有反对票，但是有赞成票，则表示通过。
+ * 3.如果全部弃权了，则将视参数allowIfAllAbstainDecisions的值而定，true则通过，false则抛出AccessDeniedException。
+ *        
  * Simple concrete implementation of
  * {@link org.springframework.security.access.AccessDecisionManager} that requires all
  * voters to abstain or grant access.
@@ -60,9 +68,11 @@ public class UnanimousBased extends AbstractAccessDecisionManager {
 	 *
 	 * @throws AccessDeniedException if access is denied
 	 */
+	@Override
 	public void decide(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) throws AccessDeniedException {
 
+		// 赞成票
 		int grant = 0;
 
 		List<ConfigAttribute> singleAttributeList = new ArrayList<>(1);
@@ -72,6 +82,7 @@ public class UnanimousBased extends AbstractAccessDecisionManager {
 			singleAttributeList.set(0, attribute);
 
 			for (AccessDecisionVoter voter : getDecisionVoters()) {
+				// 进行投票
 				int result = voter.vote(authentication, object, singleAttributeList);
 
 				if (logger.isDebugEnabled()) {

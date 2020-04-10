@@ -38,6 +38,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * 检测从当前请求处理最初到现在整个处理过程中是否发生了用户登录认证，如果确实发生了，调用所配置的
+ * SessionAuthenticationStrategy(session认证策略)执行与session相关的操作。比如针对session-fxation攻击
+ * 保护机制对应的策略可能是为废弃登录前的session为登录用户生成一个新的session等。
+ *
  * Detects that a user has been authenticated since the start of the request and, if they
  * have, calls the configured {@link SessionAuthenticationStrategy} to perform any
  * session-related activity such as activating session-fixation protection mechanisms or
@@ -75,6 +79,7 @@ public class SessionManagementFilter extends GenericFilterBean {
 		this.sessionAuthenticationStrategy = sessionStrategy;
 	}
 
+	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;

@@ -112,8 +112,14 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 	private ApplicationEventPublisher eventPublisher;
+	/**
+	 * 用来授权
+	 */
 	private AccessDecisionManager accessDecisionManager;
 	private AfterInvocationManager afterInvocationManager;
+	/**
+	 * 用来认证
+	 */
 	private AuthenticationManager authenticationManager = new NoOpAuthenticationManager();
 	private RunAsManager runAsManager = new NullRunAsManager();
 
@@ -125,6 +131,9 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 	// ~ Methods
 	// ========================================================================================================
 
+	/**
+	 * 主要用于校验
+	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(getSecureObjectClass(),
 				"Subclass must provide a non-null response to getSecureObjectClass()");
@@ -185,6 +194,11 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 		Assert.notNull(object, "Object was null");
 		final boolean debug = logger.isDebugEnabled();
 
+		/**
+		 * 检查该过滤器是否能处理指定类型的对象
+		 * 例如：FilterSecurityInterceptor 能够处理 FilterInvocation 类型的对象
+		 * 		MethodSecurityInterceptor 能够处理 MethodInvocation 类型的对象
+		 */
 		if (!getSecureObjectClass().isAssignableFrom(object.getClass())) {
 			throw new IllegalArgumentException(
 					"Security invocation attempted for object "
@@ -193,6 +207,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 							+ getSecureObjectClass());
 		}
 
+		// 通过 security metadata 获取与 secure object 相关的 ConfigAttribute 集合
 		Collection<ConfigAttribute> attributes = this.obtainSecurityMetadataSource()
 				.getAttributes(object);
 
@@ -226,10 +241,12 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 					object, attributes);
 		}
 
+		// 认证
 		Authentication authenticated = authenticateIfRequired();
 
 		// Attempt authorization
 		try {
+			// 通过 AccessDecisionManager 决定是否授权
 			this.accessDecisionManager.decide(authenticated, object, attributes);
 		}
 		catch (AccessDeniedException accessDeniedException) {
@@ -248,6 +265,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 		}
 
 		// Attempt to run as a different user
+		// 使用 run-as 功能进行，模仿另一个人获取安全权限（ROLE_RUN_AS_XXX）
 		Authentication runAs = this.runAsManager.buildRunAs(authenticated, object,
 				attributes);
 
@@ -343,6 +361,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
 
+		// 已认证过
 		if (authentication.isAuthenticated() && !alwaysReauthenticate) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Previously Authenticated: " + authentication);
@@ -351,6 +370,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 			return authentication;
 		}
 
+		// 执行认证
 		authentication = authenticationManager.authenticate(authentication);
 
 		// We don't authenticated.setAuthentication(true), because each provider should do
@@ -403,6 +423,7 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 	}
 
 	/**
+	 * 获取安全对象，抽象类，由子类实现
 	 * Indicates the type of secure objects the subclass will be presenting to the
 	 * abstract parent for processing. This is used to ensure collaborators wired to the
 	 * {@code AbstractSecurityInterceptor} all support the indicated secure object class.
@@ -423,6 +444,9 @@ public abstract class AbstractSecurityInterceptor implements InitializingBean,
 		return validateConfigAttributes;
 	}
 
+	/**
+	 * 获取权限设置信息，由子类实现
+	 */
 	public abstract SecurityMetadataSource obtainSecurityMetadataSource();
 
 	public void setAccessDecisionManager(AccessDecisionManager accessDecisionManager) {

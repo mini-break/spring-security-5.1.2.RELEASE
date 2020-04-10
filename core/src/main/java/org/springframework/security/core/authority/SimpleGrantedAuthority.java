@@ -20,6 +20,8 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.util.Assert;
 
 /**
+ * Spring Security针对GrantedAuthority有一个简单实现SimpleGrantedAuthority。该类只是简单的接收一个表示权限的字符串
+ *
  * Basic concrete implementation of a {@link GrantedAuthority}.
  *
  * <p>
@@ -32,6 +34,9 @@ public final class SimpleGrantedAuthority implements GrantedAuthority {
 
 	private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
+	/**
+	 * 角色,"ROLE_"为前缀
+	 */
 	private final String role;
 
 	public SimpleGrantedAuthority(String role) {

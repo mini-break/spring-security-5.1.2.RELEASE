@@ -84,6 +84,7 @@ public final class SecurityContextConfigurer<H extends HttpSecurityBuilder<H>> e
 	@SuppressWarnings("unchecked")
 	public void configure(H http) throws Exception {
 
+		// 获取共享对象
 		SecurityContextRepository securityContextRepository = http
 				.getSharedObject(SecurityContextRepository.class);
 		if (securityContextRepository == null) {
@@ -99,6 +100,7 @@ public final class SecurityContextConfigurer<H extends HttpSecurityBuilder<H>> e
 			securityContextFilter.setForceEagerSessionCreation(true);
 		}
 		securityContextFilter = postProcess(securityContextFilter);
+		// 将SecurityContextPersistenceFilter 加入HttpSecurity
 		http.addFilter(securityContextFilter);
 	}
 }

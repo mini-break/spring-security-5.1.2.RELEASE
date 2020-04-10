@@ -155,6 +155,7 @@ public final class HttpSecurity extends
 			Map<Class<? extends Object>, Object> sharedObjects) {
 		super(objectPostProcessor);
 		Assert.notNull(authenticationBuilder, "authenticationBuilder cannot be null");
+		// AuthenticationManagerBuilder加入共享对象
 		setSharedObject(AuthenticationManagerBuilder.class, authenticationBuilder);
 		for (Map.Entry<Class<? extends Object>, Object> entry : sharedObjects
 				.entrySet()) {
@@ -668,6 +669,7 @@ public final class HttpSecurity extends
 	public ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry authorizeRequests()
 			throws Exception {
 		ApplicationContext context = getContext();
+		// 初始化认证配置（ExpressionUrlAuthorizationConfigurer）并返回 其内部类ExpressionInterceptUrlRegistry
 		return getOrApply(new ExpressionUrlAuthorizationConfigurer<>(context))
 				.getRegistry();
 	}
@@ -1197,6 +1199,7 @@ public final class HttpSecurity extends
 	 * org.springframework.security.config.annotation.web.HttpSecurityBuilder#addFilter(javax.
 	 * servlet.Filter)
 	 */
+	@Override
 	public HttpSecurity addFilter(Filter filter) {
 		Class<? extends Filter> filterClass = filter.getClass();
 		if (!comparator.isRegistered(filterClass)) {
@@ -1205,6 +1208,7 @@ public final class HttpSecurity extends
 							+ filterClass.getName()
 							+ " does not have a registered order and cannot be added without a specified order. Consider using addFilterBefore or addFilterAfter instead.");
 		}
+		// 添加过滤器
 		this.filters.add(filter);
 		return this;
 	}

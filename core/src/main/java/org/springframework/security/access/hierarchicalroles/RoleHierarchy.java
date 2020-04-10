@@ -20,6 +20,8 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
+ * 角色权限的层次关系(扩展开来就是角色权限的继承问题)
+ * 
  * The simple interface of a role hierarchy.
  *
  * @author Michael Mayr
@@ -40,7 +42,7 @@ public interface RoleHierarchy {
 	 * @param authorities - List of the directly assigned authorities.
 	 * @return List of all reachable authorities given the assigned authorities.
 	 */
-	public Collection<? extends GrantedAuthority> getReachableGrantedAuthorities(
+	 Collection<? extends GrantedAuthority> getReachableGrantedAuthorities(
 			Collection<? extends GrantedAuthority> authorities);
 
 }

@@ -20,6 +20,7 @@ import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 在调用方法之前执行参数筛选和授权逻辑
  * Performs argument filtering and authorization logic before a method is invoked.
  *
  * @author Luke Taylor

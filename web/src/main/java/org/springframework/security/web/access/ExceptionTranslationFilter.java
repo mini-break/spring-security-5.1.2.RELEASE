@@ -42,6 +42,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * 该过滤器的作用是处理过滤器链中发生的 AccessDeniedException 和 AuthenticationException 异常，将它们转换成相应的HTTP响应
+ * 
  * Handles any <code>AccessDeniedException</code> and <code>AuthenticationException</code>
  * thrown within the filter chain.
  * <p>
@@ -110,6 +112,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 				"authenticationEntryPoint must be specified");
 	}
 
+	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
@@ -167,6 +170,9 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 	private void handleSpringSecurityException(HttpServletRequest request,
 			HttpServletResponse response, FilterChain chain, RuntimeException exception)
 			throws IOException, ServletException {
+		/**
+		 *  如果异常是 AuthenticationException，使用 AuthenticationEntryPoint 处理
+		 */
 		if (exception instanceof AuthenticationException) {
 			logger.debug(
 					"Authentication exception occurred; redirecting to authentication entry point",
@@ -177,6 +183,9 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		}
 		else if (exception instanceof AccessDeniedException) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			/**
+			 * 如果异常是 AccessDeniedException 且用户是匿名用户，使用 AuthenticationEntryPoint 处理
+			 */
 			if (authenticationTrustResolver.isAnonymous(authentication) || authenticationTrustResolver.isRememberMe(authentication)) {
 				logger.debug(
 						"Access is denied (user is " + (authenticationTrustResolver.isAnonymous(authentication) ? "anonymous" : "not fully authenticated") + "); redirecting to authentication entry point",
@@ -196,6 +205,9 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 						"Access is denied (user is not anonymous); delegating to AccessDeniedHandler",
 						exception);
 
+				/**
+				 * 如果异常是 AccessDeniedException 且用户不是匿名用户，如果否则交给 AccessDeniedHandler 处理
+				 */
 				accessDeniedHandler.handle(request, response,
 						(AccessDeniedException) exception);
 			}

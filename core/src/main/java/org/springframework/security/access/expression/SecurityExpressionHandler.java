@@ -21,6 +21,10 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 安全表达式处理器外观模式,主要作用如下：
+ * 1.获取解析器
+ * 2.获取估值上下文
+ * 
  * Facade which isolates Spring Security's requirements for evaluating security
  * expressions from the implementation of the underlying expression objects
  *
@@ -29,11 +33,13 @@ import org.springframework.security.core.Authentication;
  */
 public interface SecurityExpressionHandler<T> extends AopInfrastructureBean {
 	/**
+	 * 获取表达式解析器
 	 * @return an expression parser for the expressions used by the implementation.
 	 */
 	ExpressionParser getExpressionParser();
 
 	/**
+	 * 创建估值上下文
 	 * Provides an evaluation context in which to evaluate security expressions for the
 	 * invocation type.
 	 */

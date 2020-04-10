@@ -51,7 +51,7 @@ import org.springframework.security.web.context.AbstractSecurityWebApplicationIn
  * Spring Web Security 的配置类 :
  *  1. 使用一个 WebSecurity 对象基于安全配置创建一个 FilterChainProxy 对象来对用户请求进行安全过滤。
  *  2. 也会暴露一些必要的 bean。
- *  3. 如何定制 Spring security 的web 安全，也就是 WebSecurity 对象 ?
+ *  3. 如何定制 Spring security 的web 安全，也就是 WebSecurity 对象
  *    3.1 实现一个继承自 WebSecurityConfigurerAdapter 的配置类 ,
  *    3.2 或者 提供一个配置类，实现了接口 WebSecurityConfigurer
  *    该配置类的配置会在使用 @EnableWebSecurity 时应用到系统。
@@ -72,10 +72,21 @@ import org.springframework.security.web.context.AbstractSecurityWebApplicationIn
  */
 @Configuration
 public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAware {
+	/**
+	 * 使用一个WebSecurity对象基于用户指定的或者默认的安全配置，创建一个FilterChainProxy bean来对用户请求进行安全过滤。
+	 * 这个FilterChainProxy bean的名称为springSecurityFilterChain,它也是一个Filter，
+	 * 最终会被作为Servlet过滤器链中的一个Filter应用到Servlet容器中
+	 */
 	private WebSecurity webSecurity;
 
+	/**
+	 * 是否启用了调试模式，来自注解 @EnableWebSecurity 的属性 debug，缺省值 false
+	 */
 	private Boolean debugEnabled;
 
+	/**
+	 * 获取容器中所有WebSecurityConfigurer类型
+	 */
 	private List<SecurityConfigurer<Filter, WebSecurity>> webSecurityConfigurers;
 
 	private ClassLoader beanClassLoader;
@@ -119,7 +130,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 			webSecurity.apply(adapter);
 		}
 		/**
-		 * WebSecurity#build()会返回一个过滤器链
+		 * WebSecurity#build()会返回一个过滤器链(FilterChainProxy)
 		 * 根据配置 webSecurityConfigurers或者缺省 WebSecurityConfigurerAdapter 构建
 		 * Filter FilterChainProxy 并返回，这是最终加入到Servlet容器的Filter chain
 		 * 中的一个 Filter, 但实际上，它的内部也维护了一个自己的安全相关的 Filter chain

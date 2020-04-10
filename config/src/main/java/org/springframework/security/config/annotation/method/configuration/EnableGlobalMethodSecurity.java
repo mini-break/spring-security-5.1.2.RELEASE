@@ -44,12 +44,19 @@ import org.springframework.security.config.annotation.authentication.configurati
 @Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target(value = { java.lang.annotation.ElementType.TYPE })
 @Documented
+// @Import是springboot提供的用于引入外部的配置的注解，可以理解为：@EnableGlobalMethodSecurity注解激活了@Import注解中包含的配置类
 @Import({ GlobalMethodSecuritySelector.class })
 @EnableGlobalAuthentication
 @Configuration
 public @interface EnableGlobalMethodSecurity {
 
 	/**
+	 * 使用表达式实现方法级别的安全性4个注解可用
+	 * @PreAuthorize 在方法调用之前, 基于表达式的计算结果来限制对方法的访问
+	 * @PostAuthorize 允许方法调用, 但是如果表达式计算结果为false, 将抛出一个安全性异常
+	 * @PostFilter 允许方法调用, 但必须按照表达式来过滤方法的结果
+	 * @PreFilter 允许方法调用, 但必须在进入方法之前过滤输入值
+	 *
 	 * Determines if Spring Security's pre post annotations should be enabled. Default is
 	 * false.
 	 * @return true if pre post annotations should be enabled false otherwise.
@@ -57,6 +64,8 @@ public @interface EnableGlobalMethodSecurity {
 	boolean prePostEnabled() default false;
 
 	/**
+	 * 开启@Secured 注解过滤权限
+	 * 
 	 * Determines if Spring Security's {@link Secured} annotations should be enabled.
 	 * @return true if {@link Secured} annotations should be enabled false otherwise.
 	 * Default is false.
@@ -64,6 +73,8 @@ public @interface EnableGlobalMethodSecurity {
 	boolean securedEnabled() default false;
 
 	/**
+	 * 开启@RolesAllowed 注解过滤权限
+	 * 
 	 * Determines if JSR-250 annotations should be enabled. Default is false.
 	 * @return true if JSR-250 should be enabled false otherwise.
 	 */
@@ -89,6 +100,7 @@ public @interface EnableGlobalMethodSecurity {
 	boolean proxyTargetClass() default false;
 
 	/**
+	 * 默认代理模式
 	 * Indicate how security advice should be applied. The default is
 	 * {@link AdviceMode#PROXY}.
 	 * @see AdviceMode

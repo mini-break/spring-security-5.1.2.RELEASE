@@ -17,6 +17,9 @@
 package org.springframework.security.core.userdetails;
 
 /**
+ * UserDetailsPasswordService是Spring Security从5.1版本开始提供的一个接口。它定义了实现类要提供可以修改用户账号密码的能力。
+ * 比如InMemoryUserDetailsManager就实现了接口UserDetailsPasswordService,可以对自己管理的用户账号的密码进行修改
+ * 
  * An API for changing a {@link UserDetails} password.
  * @author Rob Winch
  * @since 5.1

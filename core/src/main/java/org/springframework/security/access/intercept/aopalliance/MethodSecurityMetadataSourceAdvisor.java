@@ -58,6 +58,9 @@ public class MethodSecurityMetadataSourceAdvisor extends AbstractPointcutAdvisor
 
 	private transient MethodSecurityMetadataSource attributeSource;
 	private transient MethodInterceptor interceptor;
+	/**
+	 * 切入点
+	 */
 	private final Pointcut pointcut = new MethodSecurityMetadataSourcePointcut();
 	private BeanFactory beanFactory;
 	private final String adviceBeanName;
@@ -95,10 +98,12 @@ public class MethodSecurityMetadataSourceAdvisor extends AbstractPointcutAdvisor
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public Pointcut getPointcut() {
 		return pointcut;
 	}
 
+	@Override
 	public Advice getAdvice() {
 		synchronized (this.adviceMonitor) {
 			if (interceptor == null) {

@@ -22,6 +22,8 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.context.SecurityContext;
 
 /**
+ * 拦截器状态令牌
+ *
  * A return object received by {@link AbstractSecurityInterceptor} subclasses.
  * <p>
  * This class reflects the status of the security interception, so that the final call to

@@ -24,6 +24,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
+ * RoleVoter是Spring Security内置的一个AccessDecisionVoter，其会将ConfigAttribute简单的看作是一个角色名称，
+ * 在投票的时如果拥有该角色即投赞成票。如果ConfigAttribute是以“ROLE_”开头的，则将使用RoleVoter进行投票。
+ * 当用户拥有的权限中有一个或多个能匹配受保护对象配置的以“ROLE_”开头的ConfigAttribute时其将投赞成票；
+ * 如果用户拥有的权限中没有一个能匹配受保护对象配置的以“ROLE_”开头的ConfigAttribute，则RoleVoter将投反对票；
+ * 如果受保护对象配置的ConfigAttribute中没有以“ROLE_”开头的，则RoleVoter将弃权
+ *
  * Votes if any {@link ConfigAttribute#getAttribute()} starts with a prefix indicating
  * that it is a role. The default prefix string is <Code>ROLE_</code>, but this may be
  * overridden to any value. It may also be set to empty, which means that essentially any
@@ -72,7 +78,9 @@ public class RoleVoter implements AccessDecisionVoter<Object> {
 		this.rolePrefix = rolePrefix;
 	}
 
+	@Override
 	public boolean supports(ConfigAttribute attribute) {
+		// 配置的权限是否特定前缀，默认前缀为"ROLE_"
 		if ((attribute.getAttribute() != null)
 				&& attribute.getAttribute().startsWith(getRolePrefix())) {
 			return true;
@@ -90,16 +98,19 @@ public class RoleVoter implements AccessDecisionVoter<Object> {
 	 *
 	 * @return always <code>true</code>
 	 */
+	@Override
 	public boolean supports(Class<?> clazz) {
 		return true;
 	}
 
+	@Override
 	public int vote(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) {
 		if (authentication == null) {
 			return ACCESS_DENIED;
 		}
 		int result = ACCESS_ABSTAIN;
+		// 获取已授予的权限
 		Collection<? extends GrantedAuthority> authorities = extractAuthorities(authentication);
 
 		for (ConfigAttribute attribute : attributes) {

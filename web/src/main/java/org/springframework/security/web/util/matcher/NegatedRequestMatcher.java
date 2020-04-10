@@ -23,6 +23,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 
 /**
+ * not操作一个RequestMatcher
+ * 
  * A {@link RequestMatcher} that will negate the {@link RequestMatcher} passed in. For
  * example, if the {@link RequestMatcher} passed in returns true,
  * {@link NegatedRequestMatcher} will return false. If the {@link RequestMatcher} passed

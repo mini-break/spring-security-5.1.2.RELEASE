@@ -31,6 +31,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 认证动作成功时使用一个跳转策略跳转到指定的URL
+ * 
  * Base class containing the logic used by strategies which handle redirection to a URL
  * and are passed an {@code Authentication} object as part of the contract. See
  * {@link AuthenticationSuccessHandler} and
@@ -63,10 +65,26 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 
 	protected final Log logger = LogFactory.getLog(this.getClass());
+	/**
+	 * 如果通过请求参数指定跳转目标URL，使用此属性指定相应的参数名称，可以设置，
+	 * 缺省值为 null， 表示不分析请求参数中指定的跳转目标URL
+	 */
 	private String targetUrlParameter = null;
+	/**
+	 * 缺省跳转目标 URL，可以设置, 缺省值一般使用"/"
+	 */
 	private String defaultTargetUrl = "/";
+	/**
+	 * 是否总是使用缺省跳转目标 URL，也就是属性 defaultTargetUrl ，可以设置,缺省值一般使用 false
+	 */
 	private boolean alwaysUseDefaultTargetUrl = false;
+	/**
+	 * 是否使用头部 Referer ，可以设置,缺省值一般使用 false
+	 */
 	private boolean useReferer = false;
+	/**
+	 * 跳转策略，可以设置,缺省使用 DefaultRedirectStrategy
+	 */
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
 	protected AbstractAuthenticationTargetUrlRequestHandler() {
@@ -80,14 +98,17 @@ public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 	 */
 	protected void handle(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
+		// 计算跳转目标URL : targetUrl
 		String targetUrl = determineTargetUrl(request, response);
 
 		if (response.isCommitted()) {
+			// 如果响应对象已经提交，则什么都不做，输出debug日志后直接返回
 			logger.debug("Response has already been committed. Unable to redirect to "
 					+ targetUrl);
 			return;
 		}
 
+		// 使用指定的跳转策略跳转到目标url :  targetUrl 
 		redirectStrategy.sendRedirect(request, response, targetUrl);
 	}
 
@@ -96,6 +117,7 @@ public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 	 */
 	protected String determineTargetUrl(HttpServletRequest request,
 			HttpServletResponse response) {
+		// 如果被设置要求总是使用缺省跳转目标url，则返回缺省跳转目标url : defaultTargetUrl
 		if (isAlwaysUseDefaultTargetUrl()) {
 			return defaultTargetUrl;
 		}
@@ -103,21 +125,31 @@ public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 		// Check for the parameter and use that if available
 		String targetUrl = null;
 
+		// 如果属性  targetUrlParameter 不为 null， 说明被设置成需要从请求参数中分析跳转目标url
 		if (targetUrlParameter != null) {
 			targetUrl = request.getParameter(targetUrlParameter);
 
 			if (StringUtils.hasText(targetUrl)) {
+				// 如果从请求参数中分析得到跳转目标url，返回该url
 				logger.debug("Found targetUrlParameter in request: " + targetUrl);
 
 				return targetUrl;
 			}
 		}
 
+		/**
+		 * 如果被设置为要使用请求头部 Referer 模式，并且目标 url 尚未分析得到，
+		 * 则尝试从请求头部 Referer 获取跳转目标url
+		 */
 		if (useReferer && !StringUtils.hasLength(targetUrl)) {
 			targetUrl = request.getHeader("Referer");
 			logger.debug("Using Referer header: " + targetUrl);
 		}
 
+		/**
+		 * 如果经过以上各种分析逻辑，仍未确定跳转目标url，则跳转目标url使用缺省跳转url，
+		 * 也就是 defaultTargetUrl
+		 */
 		if (!StringUtils.hasText(targetUrl)) {
 			targetUrl = defaultTargetUrl;
 			logger.debug("Using default Url: " + targetUrl);
@@ -138,6 +170,7 @@ public abstract class AbstractAuthenticationTargetUrlRequestHandler {
 	}
 
 	/**
+	 * 设置默认url
 	 * Supplies the default target Url that will be used if no saved request is found in
 	 * the session, or the {@code alwaysUseDefaultTargetUrl} property is set to true. If
 	 * not set, defaults to {@code /}. It will be treated as relative to the web-app's

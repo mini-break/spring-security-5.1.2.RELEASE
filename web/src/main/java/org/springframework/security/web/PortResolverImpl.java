@@ -48,6 +48,11 @@ public class PortResolverImpl implements PortResolver {
 	}
 
 	public int getServerPort(ServletRequest request) {
+		/**
+		 * getServerPort获取的是URL请求的端口，比如你的请求时127.0.0.1:8080，
+		 * 应用服务器的端口是80，那么getServerPort得到的端口是8080。
+		 * 而getLocalPort得到的是80
+		 */
 		int serverPort = request.getServerPort();
 		Integer portLookup = null;
 

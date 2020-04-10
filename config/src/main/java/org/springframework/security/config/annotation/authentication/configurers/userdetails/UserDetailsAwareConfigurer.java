@@ -22,6 +22,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
+ * 通过AuthenticationManagerBuilder获取UserDetailsService
+ * 
  * Base class that allows access to the {@link UserDetailsService} for using as a default
  * value with {@link AuthenticationManagerBuilder}.
  *

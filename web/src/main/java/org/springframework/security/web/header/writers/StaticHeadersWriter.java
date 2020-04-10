@@ -54,9 +54,11 @@ public class StaticHeadersWriter implements HeaderWriter {
 		this(Collections.singletonList(new Header(headerName, headerValues)));
 	}
 
+	@Override
 	public void writeHeaders(HttpServletRequest request, HttpServletResponse response) {
 		for (Header header : headers) {
 			for (String value : header.getValues()) {
+				// 执行响应头部写入
 				response.addHeader(header.getName(), value);
 			}
 		}

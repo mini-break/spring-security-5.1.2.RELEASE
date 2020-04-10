@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 持有http请求/应答
+ *
  * Used to pass the incoming request to
  * {@link SecurityContextRepository#loadContext(HttpRequestResponseHolder)}, allowing the
  * method to swap the request for a wrapped version, as well as returning the

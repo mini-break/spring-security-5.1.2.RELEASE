@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 头部写入器(向响应头中写入信息)
  * Contract for writing headers to a {@link HttpServletResponse}
  *
  * @see HeaderWriterFilter

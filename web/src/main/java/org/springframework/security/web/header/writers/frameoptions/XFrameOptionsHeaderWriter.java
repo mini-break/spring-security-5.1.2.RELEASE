@@ -22,6 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * X-Frame-Options 响应头有三个可选的值：
+ * DENY：页面不能被嵌入到任何iframe或frame中
+ * SAMEORIGIN：页面只能被本站页面嵌入到iframe或者frame中
+ * ALLOW-FROM：页面允许frame或frame加载
+ * 
  * {@code HeaderWriter} implementation for the X-Frame-Options headers. When using the
  * ALLOW-FROM directive the actual value is determined by a {@code AllowFromStrategy}.
  *

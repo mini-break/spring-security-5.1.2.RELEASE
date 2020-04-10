@@ -36,6 +36,9 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * 此过滤器过滤请求,检测SecurityContextHolder中是否存在Authentication对象，
+ * 如果不存在，说明用户尚未登录，此时为其提供一个匿名Authentication对象:AnonymousAuthentication
+ *
  * Detects if there is no {@code Authentication} object in the
  * {@code SecurityContextHolder}, and populates it with one if needed.
  *
@@ -48,12 +51,20 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 用于构造匿名Authentication中详情属性的详情来源对象，这里使用一个WebAuthenticationDetailsSource
+	 */
 	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
 	private String key;
 	private Object principal;
 	private List<GrantedAuthority> authorities;
 
 	/**
+	 * 使用外部指定的key构造一个AnonymousAuthenticationFilter:
+	 * 	1. 缺省情况下，Spring Security 配置机制为这里指定的key是一个随机的uuid;
+	 * 	2. 所对应的 principal(含义指当前登录主体) 是一个字符串"anonymousUser";
+	 * 	3. 所拥护的角色是 "ROLE_ANONYMOUS";
+	 *
 	 * Creates a filter with a principal named "anonymousUser" and the single authority
 	 * "ROLE_ANONYMOUS".
 	 *
@@ -64,7 +75,8 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements
 	}
 
 	/**
-	 *
+	 * 使用外部指定的参数构造一个AnonymousAuthenticationFilter
+	 * 
 	 * @param key key the key to identify tokens created by this filter
 	 * @param principal the principal which will be used to represent anonymous users
 	 * @param authorities the authority list for anonymous users
@@ -84,15 +96,21 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements
 
 	@Override
 	public void afterPropertiesSet() {
+		// 在当前Filter bean被创建时调用，主要目的是断言三个主要属性都必须已经有效设置
 		Assert.hasLength(key, "key must have length");
 		Assert.notNull(principal, "Anonymous authentication principal must be set");
 		Assert.notNull(authorities, "Anonymous authorities must be set");
 	}
 
+	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
 
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			/**
+			 * 如果SecurityContextHolder中SecurityContext对象的属性authentication是null,
+			 * 将其替换成一个匿名 Authentication: AnonymousAuthentication
+			 */
 			SecurityContextHolder.getContext().setAuthentication(
 					createAuthentication((HttpServletRequest) req));
 
@@ -111,6 +129,9 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements
 		chain.doFilter(req, res);
 	}
 
+	/**
+	 * 根据指定属性key,princpial,authorities和当前环境(servlet web环境)构造一个AnonymousAuthenticationToken
+	 */
 	protected Authentication createAuthentication(HttpServletRequest request) {
 		AnonymousAuthenticationToken auth = new AnonymousAuthenticationToken(key,
 				principal, authorities);
@@ -119,6 +140,10 @@ public class AnonymousAuthenticationFilter extends GenericFilterBean implements
 		return auth;
 	}
 
+	/**
+	 * 可以外部指定Authentication对象的详情来源, 缺省情况下使用的是WebAuthenticationDetailsSource,
+	 * 已经在属性authenticationDetailsSource初始化指定
+	 */
 	public void setAuthenticationDetailsSource(
 			AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource) {
 		Assert.notNull(authenticationDetailsSource,

@@ -29,6 +29,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  */
 final class PermitAllSupport {
 
+	/**
+	 * 遍历允许访问的url数组
+	 */
 	public static void permitAll(
 			HttpSecurityBuilder<? extends HttpSecurityBuilder<?>> http, String... urls) {
 		for (String url : urls) {

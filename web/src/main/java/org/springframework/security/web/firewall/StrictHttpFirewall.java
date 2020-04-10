@@ -292,7 +292,9 @@ public class StrictHttpFirewall implements HttpFirewall {
 
 	@Override
 	public FirewalledRequest getFirewalledRequest(HttpServletRequest request) throws RequestRejectedException {
+		// request 方法校验
 		rejectForbiddenHttpMethod(request);
+		// request 黑名单校验
 		rejectedBlacklistedUrls(request);
 
 		if (!isNormalized(request)) {

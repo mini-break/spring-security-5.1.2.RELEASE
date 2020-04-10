@@ -18,6 +18,7 @@ package org.springframework.security.config.core;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
+ * 设置角色默认前缀
  * Allows providing defaults for {@link GrantedAuthority}
  *
  * @author Eddú Meléndez

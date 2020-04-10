@@ -23,6 +23,8 @@ import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.util.Assert;
 
 /**
+ * Feature Policy是一个新的http响应头属性，允许一个站点开启或者禁止一些浏览器属性和API，来更好的确保站点的安全性和隐私性
+ * 
  * Provides support for <a href="https://wicg.github.io/feature-policy/">Feature
  * Policy</a>.
  * <p>

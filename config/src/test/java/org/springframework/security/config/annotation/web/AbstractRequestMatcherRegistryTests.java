@@ -27,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ * AbstractRequestMatcherRegistry 单元测试
  * Tests for {@link AbstractRequestMatcherRegistry}.
  *
  * @author Joe Grandja
@@ -39,6 +40,9 @@ public class AbstractRequestMatcherRegistryTests {
 		this.matcherRegistry = new TestRequestMatcherRegistry();
 	}
 
+	/**
+	 * 测试根据http method和请求正则表达式生成的请求匹配器
+	 */
 	@Test
 	public void regexMatchersWhenHttpMethodAndPatternParamsThenReturnRegexRequestMatcherType() {
 		List<RequestMatcher> requestMatchers = this.matcherRegistry.regexMatchers(HttpMethod.GET, "/a.*");
@@ -47,6 +51,9 @@ public class AbstractRequestMatcherRegistryTests {
 		assertThat(requestMatchers.get(0)).isExactlyInstanceOf(RegexRequestMatcher.class);
 	}
 
+	/**
+	 * 测试请求正则表达式生成的请求匹配器
+	 */
 	@Test
 	public void regexMatchersWhenPatternParamThenReturnRegexRequestMatcherType() {
 		List<RequestMatcher> requestMatchers = this.matcherRegistry.regexMatchers("/a.*");
@@ -55,6 +62,9 @@ public class AbstractRequestMatcherRegistryTests {
 		assertThat(requestMatchers.get(0)).isExactlyInstanceOf(RegexRequestMatcher.class);
 	}
 
+	/**
+	 * 测试根据http method和Ant风格请求表达式生成的请求匹配器
+	 */
 	@Test
 	public void antMatchersWhenHttpMethodAndPatternParamsThenReturnAntPathRequestMatcherType() {
 		List<RequestMatcher> requestMatchers = this.matcherRegistry.antMatchers(HttpMethod.GET, "/a.*");
@@ -63,6 +73,9 @@ public class AbstractRequestMatcherRegistryTests {
 		assertThat(requestMatchers.get(0)).isExactlyInstanceOf(AntPathRequestMatcher.class);
 	}
 
+	/**
+	 * 测试根据Ant风格请求表达式生成的请求匹配器
+	 */
 	@Test
 	public void antMatchersWhenPatternParamThenReturnAntPathRequestMatcherType() {
 		List<RequestMatcher> requestMatchers = this.matcherRegistry.antMatchers("/a.*");
@@ -85,6 +98,7 @@ public class AbstractRequestMatcherRegistryTests {
 
 		@Override
 		protected List<RequestMatcher> chainRequestMatchers(List<RequestMatcher> requestMatchers) {
+			// 直接返回RegexRequestMatcher集合
 			return requestMatchers;
 		}
 	}

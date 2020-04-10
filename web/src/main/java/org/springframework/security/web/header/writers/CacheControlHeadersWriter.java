@@ -28,6 +28,7 @@ import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * 禁止头部缓存 头部写入器
  * Inserts headers to prevent caching if no cache control headers have been specified.
  * Specifically it adds the following headers:
  * <ul>

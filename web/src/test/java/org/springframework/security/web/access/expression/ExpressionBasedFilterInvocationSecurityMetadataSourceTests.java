@@ -36,6 +36,7 @@ public class ExpressionBasedFilterInvocationSecurityMetadataSourceTests {
 	public void expectedAttributeIsReturned() {
 		final String expression = "hasRole('X')";
 		LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap = new LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>>();
+		// 配置任何请求都可访问
 		requestMap.put(AnyRequestMatcher.INSTANCE, SecurityConfig.createList(expression));
 		ExpressionBasedFilterInvocationSecurityMetadataSource mds = new ExpressionBasedFilterInvocationSecurityMetadataSource(
 				requestMap, new DefaultWebSecurityExpressionHandler());

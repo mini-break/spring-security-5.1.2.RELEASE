@@ -24,6 +24,12 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 一票通过
+ * AffirmativeBased的逻辑是这样的：
+ * 1.只要有AccessDecisionVoter的投票为ACCESS_GRANTED则同意用户进行访问
+ * 2.如果全部弃权 则将视allowIfAllAbstainDecisions而定
+ * 3.如果没有一个人投赞成票，但是有人投反对票，则将抛出AccessDeniedException
+ * 
  * Simple concrete implementation of
  * {@link org.springframework.security.access.AccessDecisionManager} that grants access if
  * any <code>AccessDecisionVoter</code> returns an affirmative response.
@@ -55,11 +61,14 @@ public class AffirmativeBased extends AbstractAccessDecisionManager {
 	 *
 	 * @throws AccessDeniedException if access is denied
 	 */
+	@Override
 	public void decide(Authentication authentication, Object object,
 			Collection<ConfigAttribute> configAttributes) throws AccessDeniedException {
+		// 反对票
 		int deny = 0;
 
 		for (AccessDecisionVoter voter : getDecisionVoters()) {
+			// 进行投票
 			int result = voter.vote(authentication, object, configAttributes);
 
 			if (logger.isDebugEnabled()) {
@@ -68,7 +77,7 @@ public class AffirmativeBased extends AbstractAccessDecisionManager {
 
 			switch (result) {
 			case AccessDecisionVoter.ACCESS_GRANTED:
-				return;
+				return;//1.只要有AccessDecisionVoter的投票为ACCESS_GRANTED则同意用户进行访问
 
 			case AccessDecisionVoter.ACCESS_DENIED:
 				deny++;
@@ -80,11 +89,13 @@ public class AffirmativeBased extends AbstractAccessDecisionManager {
 			}
 		}
 
+		// 3.如果没有一个人投赞成票，但是有人投反对票，则将抛出AccessDeniedException
 		if (deny > 0) {
 			throw new AccessDeniedException(messages.getMessage(
 					"AbstractAccessDecisionManager.accessDenied", "Access is denied"));
 		}
 
+		// 2.如果全部弃权也则将视allowIfAllAbstainDecisions而定
 		// To get this far, every AccessDecisionVoter abstained
 		checkAllowIfAllAbstainDecisions();
 	}

@@ -21,6 +21,11 @@ import java.io.Serializable;
 import org.springframework.security.access.intercept.RunAsManager;
 
 /**
+ * ConfigAttribute作为访问控制模板用于“描述”规则的组件，最常见的方式主要是两种 一种是基于注解的一种是基于JavaConfig在Web配置中进行配置的。
+ * 其中Spring Security对应方法级的注解主要又可以分为两类：
+ * 	第一类 @Secured 注解 - secured-annotations
+ * 	第二类 @PreAuthorize, @PreFilter, @PostAuthorize and @PostFilter - pre-post-annotations
+ *
  * Stores a security system related configuration attribute.
  *
  * <p>

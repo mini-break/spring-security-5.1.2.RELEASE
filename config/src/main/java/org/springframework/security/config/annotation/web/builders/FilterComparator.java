@@ -47,6 +47,8 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.filter.CorsFilter;
 
 /**
+ * 安全过滤器排序
+ * 
  * An internal use only {@link Comparator} that sorts the Security {@link Filter}
  * instances to ensure they are in the correct order.
  *
@@ -58,6 +60,9 @@ import org.springframework.web.filter.CorsFilter;
 final class FilterComparator implements Comparator<Filter>, Serializable {
 	private static final int INITIAL_ORDER = 100;
 	private static final int ORDER_STEP = 100;
+	/**
+	 * <过滤器名称,排序位置>
+	 */
 	private final Map<String, Integer> filterToOrder = new HashMap<>();
 
 	FilterComparator() {

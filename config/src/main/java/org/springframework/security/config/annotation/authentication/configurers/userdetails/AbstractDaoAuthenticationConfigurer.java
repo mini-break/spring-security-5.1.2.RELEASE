@@ -44,7 +44,7 @@ abstract class AbstractDaoAuthenticationConfigurer<B extends ProviderManagerBuil
 		extends UserDetailsAwareConfigurer<B, U> {
 
 	/**
-	 * 将要配置到目标安全构建器的 AuthenticationProvider， 是一个 DaoAuthenticationProvider
+	 * 将要配置到目标安全构建器的 AuthenticationProvider， 默认是一个 DaoAuthenticationProvider
 	 */
 	private DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 	/**
@@ -92,6 +92,7 @@ abstract class AbstractDaoAuthenticationConfigurer<B extends ProviderManagerBuil
 	 */
 	@SuppressWarnings("unchecked")
 	public C passwordEncoder(PasswordEncoder passwordEncoder) {
+		// 往认证提供者设置PasswordEncoder(密码加密器)
 		provider.setPasswordEncoder(passwordEncoder);
 		return (C) this;
 	}

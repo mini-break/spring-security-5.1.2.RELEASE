@@ -23,6 +23,8 @@ import org.springframework.security.access.prepost.PreInvocationAttribute;
 import org.springframework.security.access.prepost.PrePostInvocationAttributeFactory;
 
 /**
+ * 基于注解表达式的权限工厂
+ * 
  * {@link PrePostInvocationAttributeFactory} which interprets the annotation value as an
  * expression to be evaluated at runtime.
  *
@@ -45,7 +47,8 @@ public class ExpressionBasedAnnotationAttributeFactory implements
 			String filterObject, String preAuthorizeAttribute) {
 		try {
 			// TODO: Optimization of permitAll
-			ExpressionParser parser = getParser();
+			ExpressionParser parser = getParser(); // SpelExpressionParser
+			// 如果@PreAuthorize未配置，则默认为permitAll
 			Expression preAuthorizeExpression = preAuthorizeAttribute == null ? parser
 					.parseExpression("permitAll") : parser
 					.parseExpression(preAuthorizeAttribute);

@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 投票器（访问决策）
  * Indicates a class is responsible for voting on authorization decisions.
  * <p>
  * The coordination of voting (ie polling {@code AccessDecisionVoter}s, tallying their
@@ -33,8 +34,17 @@ public interface AccessDecisionVoter<S> {
 	// ~ Static fields/initializers
 	// =====================================================================================
 
+	/**
+	 * 同意
+	 */
 	int ACCESS_GRANTED = 1;
+	/**
+	 * 弃权
+	 */
 	int ACCESS_ABSTAIN = 0;
+	/**
+	 * 拒绝
+	 */
 	int ACCESS_DENIED = -1;
 
 	// ~ Methods

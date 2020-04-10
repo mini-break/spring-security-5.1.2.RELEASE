@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 登出处理
+ * 
  * Indicates a class that is able to participate in logout handling.
  *
  * <p>

@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 实现请求的恢复及保存
+ * 
  * Implements "saved request" logic, allowing a single request to be retrieved and
  * restarted after redirecting to an authentication mechanism.
  *

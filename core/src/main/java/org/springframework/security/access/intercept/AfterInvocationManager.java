@@ -23,6 +23,10 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 在请求受保护的对象完成以后，可以通过afterInvocation()方法对返回值进行修改。
+ * AbstractSecurityInterceptor把对返回值进行修改的控制权交给其所持有的AfterInvocationManager了。
+ * AfterInvocationManager可以选择对返回值进行修改、不修改或抛出异常（如：后置权限鉴定不通过）。
+ * 
  * Reviews the <code>Object</code> returned from a secure object invocation, being able to
  * modify the <code>Object</code> or throw an {@link AccessDeniedException}.
  * <p>

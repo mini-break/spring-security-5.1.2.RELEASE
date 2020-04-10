@@ -183,6 +183,11 @@ public class FilterChainProxy extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
+		/**
+		 * 请求中是否有org.springframework.security.web.FilterChainProxy.APPLIED 参数
+		 * 有:false
+		 * 无:true
+		 */
 		boolean clearContext = request.getAttribute(FILTER_APPLIED) == null;
 		if (clearContext) {
 			try {
@@ -346,7 +351,7 @@ public class FilterChainProxy extends GenericFilterBean {
 
 				originalChain.doFilter(request, response);
 			}
-			else {
+			else { // 遍历additionalFilters中的filter,顺序为FilterChainProxy——>各Filter——>FilterChainProxy
 				currentPosition++;
 
 				Filter nextFilter = additionalFilters.get(currentPosition - 1);
@@ -358,6 +363,7 @@ public class FilterChainProxy extends GenericFilterBean {
 							+ nextFilter.getClass().getSimpleName() + "'");
 				}
 
+				// this 为 FilterChainProxy内部类VirtualFilterChain类型
 				nextFilter.doFilter(request, response, this);
 			}
 		}

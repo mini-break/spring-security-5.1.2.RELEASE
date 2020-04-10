@@ -107,6 +107,10 @@ public final class HpkpHeaderWriter implements HeaderWriter {
 
 	private static final String HPKP_HEADER_NAME = "Public-Key-Pins";
 
+	/**
+	 * HTTP响应头部Public-Key-Pins-Report-Only用于设置在公钥固定不匹配时，发送错误信息到report-uri。
+	 * 但和Public-Key-Pins不同的是，即便公钥固定异常, 其允许浏览器继续访问服务器。
+	 */
 	private static final String HPKP_RO_HEADER_NAME = "Public-Key-Pins-Report-Only";
 
 	private final Log logger = LogFactory.getLog(getClass());

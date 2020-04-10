@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
+ * 这个投票器主要用于单元测试,明确拒绝访问
  * Implementation of an {@link AccessDecisionVoter} for unit testing.
  * <p>
  * If the {@link ConfigAttribute#getAttribute()} has a value of <code>DENY_FOR_SURE</code>
@@ -39,6 +40,7 @@ public class DenyVoter implements AccessDecisionVoter<Object> {
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public boolean supports(ConfigAttribute attribute) {
 		if ("DENY_FOR_SURE".equals(attribute.getAttribute())) {
 			return true;
@@ -48,10 +50,15 @@ public class DenyVoter implements AccessDecisionVoter<Object> {
 		}
 	}
 
+	/**
+	 * 固定返回true
+	 */
+	@Override
 	public boolean supports(Class<?> clazz) {
 		return true;
 	}
 
+	@Override
 	public int vote(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) {
 		Iterator<ConfigAttribute> iter = attributes.iterator();

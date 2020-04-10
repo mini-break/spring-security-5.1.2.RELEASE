@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 登出成功后处理流程
  * Strategy that is called after a successful logout by the {@link LogoutFilter}, to
  * handle redirection or forwarding to the appropriate destination.
  * <p>

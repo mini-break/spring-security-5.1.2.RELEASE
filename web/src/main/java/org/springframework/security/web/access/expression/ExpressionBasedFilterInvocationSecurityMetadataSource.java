@@ -37,6 +37,7 @@ import org.springframework.security.web.util.matcher.RequestVariablesExtractor;
 import org.springframework.util.Assert;
 
 /**
+ * 基于表达式的 FilterInvocationSecurityMetadataSource
  * Expression-based {@code FilterInvocationSecurityMetadataSource}.
  *
  * @author Luke Taylor
@@ -50,6 +51,7 @@ public final class ExpressionBasedFilterInvocationSecurityMetadataSource
 	public ExpressionBasedFilterInvocationSecurityMetadataSource(
 			LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap,
 			SecurityExpressionHandler<FilterInvocation> expressionHandler) {
+		// 通过SecurityExpressionHandler获取表达式解析器
 		super(processMap(requestMap, expressionHandler.getExpressionParser()));
 		Assert.notNull(expressionHandler,
 				"A non-null SecurityExpressionHandler is required");
@@ -66,9 +68,11 @@ public final class ExpressionBasedFilterInvocationSecurityMetadataSource
 		for (Map.Entry<RequestMatcher, Collection<ConfigAttribute>> entry : requestMap
 				.entrySet()) {
 			RequestMatcher request = entry.getKey();
+			// 对一个请求匹配器来说，只有一个权限与其对应
 			Assert.isTrue(entry.getValue().size() == 1,
 					() -> "Expected a single expression attribute for " + request);
 			ArrayList<ConfigAttribute> attributes = new ArrayList<>(1);
+			// 权限字符串表达式
 			String expression = entry.getValue().toArray(new ConfigAttribute[1])[0]
 					.getAttribute();
 			logger.debug("Adding web access control expression '" + expression + "', for "
@@ -77,6 +81,9 @@ public final class ExpressionBasedFilterInvocationSecurityMetadataSource
 			AbstractVariableEvaluationContextPostProcessor postProcessor = createPostProcessor(
 					request);
 			try {
+				/**
+				 * 将Expression封装到WebExpressionConfigAttribute中
+				 */
 				attributes.add(new WebExpressionConfigAttribute(
 						parser.parseExpression(expression), postProcessor));
 			}

@@ -18,6 +18,8 @@ package org.springframework.security.access.expression.method;
 import org.springframework.security.access.expression.SecurityExpressionOperations;
 
 /**
+ * 针对方法的基于表达式权限操作
+ *
  * Interface which must be implemented if you want to use filtering in method security
  * expressions.
  *

@@ -61,6 +61,7 @@ public class AfterInvocationProviderManager implements AfterInvocationManager,
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		checkIfValidList(this.providers);
 	}
@@ -72,6 +73,7 @@ public class AfterInvocationProviderManager implements AfterInvocationManager,
 		}
 	}
 
+	@Override
 	public Object decide(Authentication authentication, Object object,
 			Collection<ConfigAttribute> config, Object returnedObject)
 			throws AccessDeniedException {
@@ -94,6 +96,7 @@ public class AfterInvocationProviderManager implements AfterInvocationManager,
 		providers = new ArrayList<>(newList.size());
 
 		for (Object currentObject : newList) {
+			// 需要为AfterInvocationProvider类型
 			Assert.isInstanceOf(AfterInvocationProvider.class, currentObject,
 					() -> "AfterInvocationProvider " + currentObject.getClass().getName()
 							+ " must implement AfterInvocationProvider");
@@ -101,6 +104,7 @@ public class AfterInvocationProviderManager implements AfterInvocationManager,
 		}
 	}
 
+	@Override
 	public boolean supports(ConfigAttribute attribute) {
 		for (AfterInvocationProvider provider : providers) {
 			if (logger.isDebugEnabled()) {
@@ -128,6 +132,7 @@ public class AfterInvocationProviderManager implements AfterInvocationManager,
 	 * object class, which requires every one of its <code>AfterInvocationProvider</code>s
 	 * to support the secure object class
 	 */
+	@Override
 	public boolean supports(Class<?> clazz) {
 		for (AfterInvocationProvider provider : providers) {
 			if (!provider.supports(clazz)) {

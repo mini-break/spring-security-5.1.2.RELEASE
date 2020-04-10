@@ -39,6 +39,7 @@ public class WebSecurityExpressionRoot extends SecurityExpressionRoot {
 	}
 
 	/**
+	 * 增加一个ip校验
 	 * Takes a specific IP address or a range using the IP/Netmask (e.g. 192.168.1.0/24 or
 	 * 202.24.0.0/14).
 	 *

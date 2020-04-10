@@ -29,6 +29,7 @@ import org.springframework.security.access.prepost.PreInvocationAuthorizationAdv
 import org.springframework.security.core.Authentication;
 
 /**
+ * 基于方法调用前表达式处理器
  * Method pre-invocation handling based on expressions.
  *
  * @author Luke Taylor
@@ -38,9 +39,11 @@ public class ExpressionBasedPreInvocationAdvice implements
 		PreInvocationAuthorizationAdvice {
 	private MethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
 
+	@Override
 	public boolean before(Authentication authentication, MethodInvocation mi,
 			PreInvocationAttribute attr) {
 		PreInvocationExpressionAttribute preAttr = (PreInvocationExpressionAttribute) attr;
+		// 获取估值上下文
 		EvaluationContext ctx = expressionHandler.createEvaluationContext(authentication,
 				mi);
 		Expression preFilter = preAttr.getFilterExpression();

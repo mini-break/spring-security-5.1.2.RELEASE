@@ -19,6 +19,8 @@ package org.springframework.security.web;
 import javax.servlet.ServletRequest;
 
 /**
+ * 请求端口解析器接口
+ * 
  * A <code>PortResolver</code> determines the port a web request was received on.
  *
  * <P>

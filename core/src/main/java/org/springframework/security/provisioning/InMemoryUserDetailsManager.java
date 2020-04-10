@@ -37,6 +37,8 @@ import org.springframework.security.core.userdetails.memory.UserAttributeEditor;
 import org.springframework.util.Assert;
 
 /**
+ * 基于内存的用户信息管理
+ * 
  * Non-persistent implementation of {@code UserDetailsManager} which is backed by an
  * in-memory map.
  * <p>
@@ -50,6 +52,10 @@ public class InMemoryUserDetailsManager implements UserDetailsManager,
 		UserDetailsPasswordService {
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * Map保存用户信息
+	 * <用户名,用户详情>
+	 */
 	private final Map<String, MutableUserDetails> users = new HashMap<>();
 
 	private AuthenticationManager authenticationManager;
@@ -83,26 +89,31 @@ public class InMemoryUserDetailsManager implements UserDetailsManager,
 		}
 	}
 
+	@Override
 	public void createUser(UserDetails user) {
 		Assert.isTrue(!userExists(user.getUsername()), "user should not exist");
 
 		users.put(user.getUsername().toLowerCase(), new MutableUser(user));
 	}
 
+	@Override
 	public void deleteUser(String username) {
 		users.remove(username.toLowerCase());
 	}
 
+	@Override
 	public void updateUser(UserDetails user) {
 		Assert.isTrue(userExists(user.getUsername()), "user should exist");
 
 		users.put(user.getUsername().toLowerCase(), new MutableUser(user));
 	}
 
+	@Override
 	public boolean userExists(String username) {
 		return users.containsKey(username.toLowerCase());
 	}
 
+	@Override
 	public void changePassword(String oldPassword, String newPassword) {
 		Authentication currentUser = SecurityContextHolder.getContext()
 				.getAuthentication();
@@ -148,8 +159,10 @@ public class InMemoryUserDetailsManager implements UserDetailsManager,
 		return mutableUser;
 	}
 
+	@Override
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
+		// 从Map中获取用户详情信息
 		UserDetails user = users.get(username.toLowerCase());
 
 		if (user == null) {

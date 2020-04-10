@@ -77,6 +77,7 @@ public class DefaultFilterInvocationSecurityMetadataSource implements
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public Collection<ConfigAttribute> getAllConfigAttributes() {
 		Set<ConfigAttribute> allAttributes = new HashSet<>();
 
@@ -88,6 +89,10 @@ public class DefaultFilterInvocationSecurityMetadataSource implements
 		return allAttributes;
 	}
 
+	/**
+	 * 获取访问对象object匹配的ConfigAttribute集合
+	 */
+	@Override
 	public Collection<ConfigAttribute> getAttributes(Object object) {
 		final HttpServletRequest request = ((FilterInvocation) object).getRequest();
 		for (Map.Entry<RequestMatcher, Collection<ConfigAttribute>> entry : requestMap
@@ -99,6 +104,7 @@ public class DefaultFilterInvocationSecurityMetadataSource implements
 		return null;
 	}
 
+	@Override
 	public boolean supports(Class<?> clazz) {
 		return FilterInvocation.class.isAssignableFrom(clazz);
 	}

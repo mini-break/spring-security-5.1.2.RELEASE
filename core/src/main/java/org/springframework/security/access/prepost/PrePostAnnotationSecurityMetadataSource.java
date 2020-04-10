@@ -55,6 +55,7 @@ public class PrePostAnnotationSecurityMetadataSource extends
 		this.attributeFactory = attributeFactory;
 	}
 
+	@Override
 	public Collection<ConfigAttribute> getAttributes(Method method, Class<?> targetClass) {
 		if (method.getDeclaringClass() == Object.class) {
 			return Collections.emptyList();
@@ -62,11 +63,15 @@ public class PrePostAnnotationSecurityMetadataSource extends
 
 		logger.trace("Looking for Pre/Post annotations for method '" + method.getName()
 				+ "' on target class '" + targetClass + "'");
+		// 解析PreFilter注解
 		PreFilter preFilter = findAnnotation(method, targetClass, PreFilter.class);
+		// 解析PreAuthorize注解
 		PreAuthorize preAuthorize = findAnnotation(method, targetClass,
 				PreAuthorize.class);
+		// 解析PostFilter注解
 		PostFilter postFilter = findAnnotation(method, targetClass, PostFilter.class);
 		// TODO: Can we check for void methods and throw an exception here?
+		// 解析PostAuthorize注解
 		PostAuthorize postAuthorize = findAnnotation(method, targetClass,
 				PostAuthorize.class);
 
@@ -86,6 +91,7 @@ public class PrePostAnnotationSecurityMetadataSource extends
 
 		ArrayList<ConfigAttribute> attrs = new ArrayList<>(2);
 
+		// 工厂方法创建对象
 		PreInvocationAttribute pre = attributeFactory.createPreInvocationAttribute(
 				preFilterAttribute, filterObject, preAuthorizeAttribute);
 
@@ -117,10 +123,12 @@ public class PrePostAnnotationSecurityMetadataSource extends
 	 */
 	private <A extends Annotation> A findAnnotation(Method method, Class<?> targetClass,
 			Class<A> annotationClass) {
+		// 获取实现类的方法
 		// The method may be on an interface, but we need attributes from the target
 		// class.
 		// If the target class is null, the method will be unchanged.
 		Method specificMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
+		// 获取实现类方法上的注解,如果实现类有没有,则找接口方法上的注解
 		A annotation = AnnotationUtils.findAnnotation(specificMethod, annotationClass);
 
 		if (annotation != null) {
@@ -128,8 +136,13 @@ public class PrePostAnnotationSecurityMetadataSource extends
 			return annotation;
 		}
 
+		/**
+		 * specificMethod为实现类方法
+		 * method为接口类方法
+		 */
 		// Check the original (e.g. interface) method
 		if (specificMethod != method) {
+			// 获取接口上的注解
 			annotation = AnnotationUtils.findAnnotation(method, annotationClass);
 
 			if (annotation != null) {
@@ -138,6 +151,7 @@ public class PrePostAnnotationSecurityMetadataSource extends
 			}
 		}
 
+		// 获取实现类上的注解
 		// Check the class-level (note declaringClass, not targetClass, which may not
 		// actually implement the method)
 		annotation = AnnotationUtils.findAnnotation(specificMethod.getDeclaringClass(),

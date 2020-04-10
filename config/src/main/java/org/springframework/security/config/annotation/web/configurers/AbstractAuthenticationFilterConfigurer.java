@@ -62,8 +62,14 @@ import java.util.Collections;
 public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecurityBuilder<B>, T extends AbstractAuthenticationFilterConfigurer<B, T, F>, F extends AbstractAuthenticationProcessingFilter>
 		extends AbstractHttpConfigurer<T, B> {
 
+	/**
+	 * 认证过滤器
+	 */
 	private F authFilter;
 
+	/**
+	 * 对登录信息的扩展
+	 */
 	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource;
 
 	private SavedRequestAwareAuthenticationSuccessHandler defaultSuccessHandler = new SavedRequestAwareAuthenticationSuccessHandler();
@@ -71,8 +77,17 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 
 	private LoginUrlAuthenticationEntryPoint authenticationEntryPoint;
 
+	/**
+	 * 是否用户自定义登录页面
+	 */
 	private boolean customLoginPage;
+	/**
+	 * 登录页面url
+	 */
 	private String loginPage;
+	/**
+	 * 登录处理url
+	 */
 	private String loginProcessingUrl;
 
 	private AuthenticationFailureHandler failureHandler;
@@ -236,8 +251,11 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 
 	@Override
 	public void init(B http) throws Exception {
+		// 修改登录认证默认路径（/login）
 		updateAuthenticationDefaults();
+		// 修改默认访问权限
 		updateAccessDefaults(http);
+		// 注册认证入口点
 		registerDefaultAuthenticationEntryPoint(http);
 	}
 
@@ -269,6 +287,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 				new MediaType("image", "*"), MediaType.TEXT_HTML, MediaType.TEXT_PLAIN);
 		mediaMatcher.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));
 
+		// Ajax请求匹配器
 		RequestMatcher notXRequestedWith = new NegatedRequestMatcher(
 				new RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest"));
 
@@ -287,9 +306,12 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 			this.defaultSuccessHandler.setRequestCache(requestCache);
 		}
 
+		// 认证管理器设置
 		authFilter.setAuthenticationManager(http
 				.getSharedObject(AuthenticationManager.class));
+		// 认证成功处理器
 		authFilter.setAuthenticationSuccessHandler(successHandler);
+		// 认证失败处理器
 		authFilter.setAuthenticationFailureHandler(failureHandler);
 		if (authenticationDetailsSource != null) {
 			authFilter.setAuthenticationDetailsSource(authenticationDetailsSource);
@@ -305,6 +327,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 			authFilter.setRememberMeServices(rememberMeServices);
 		}
 		F filter = postProcess(authFilter);
+		// 将filter加入httpSecurity中(例如：UsernamePasswordAuthenticationFilter)
 		http.addFilter(filter);
 	}
 
@@ -323,7 +346,9 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	 */
 	protected T loginPage(String loginPage) {
 		setLoginPage(loginPage);
+		// 修改认证默认配置,包括登录url,登出成功跳转url
 		updateAuthenticationDefaults();
+		// 用户自定义登录页面标识为true
 		this.customLoginPage = true;
 		return getSelf();
 	}
@@ -337,6 +362,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	}
 
 	/**
+	 * 获取认证过滤器
 	 * Gets the Authentication Filter
 	 *
 	 * @return the Authentication Filter
@@ -392,11 +418,17 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	}
 
 	/**
+	 * 修改认证默认配置,包括登录url,登出成功跳转url
+	 * 自定义登录页面时被两个方法调用：
+	 * 1.loginPage(String loginPage)
+	 * 2.init(B http)
+	 * 
 	 * Updates the default values for authentication.
 	 *
 	 * @throws Exception
 	 */
 	protected final void updateAuthenticationDefaults() {
+		// 如果登录处理url未配置，则使用登录url作为登录处理url
 		if (loginProcessingUrl == null) {
 			loginProcessingUrl(loginPage);
 		}
@@ -407,6 +439,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 		final LogoutConfigurer<B> logoutConfigurer = getBuilder().getConfigurer(
 				LogoutConfigurer.class);
 		if (logoutConfigurer != null && !logoutConfigurer.isCustomLogoutSuccess()) {
+			// 自定义退出成功时跳转的页面
 			logoutConfigurer.logoutSuccessUrl(loginPage + "?logout");
 		}
 	}
@@ -421,11 +454,13 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	}
 
 	/**
+	 * 设置登录页面和登录认证入口
 	 * Sets the loginPage and updates the {@link AuthenticationEntryPoint}.
 	 * @param loginPage
 	 */
 	private void setLoginPage(String loginPage) {
 		this.loginPage = loginPage;
+		// 初始化LoginUrlAuthenticationEntryPoint
 		this.authenticationEntryPoint = new LoginUrlAuthenticationEntryPoint(loginPage);
 	}
 

@@ -79,14 +79,25 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 
 	private String loginFormUrl;
 
+	/**
+	 * 缺省是否强制使用HTTPS进行登录认证
+	 */
 	private boolean forceHttps = false;
 
+	/**
+	 * 指定是否要使用 forward， 缺省为 false
+	 * true -- 使用 forward
+	 * false -- 使用 redirect
+	 */
 	private boolean useForward = false;
 
+	/**
+	 * 跳转到登录页面的重定向策略
+	 */
 	private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
 	/**
-	 *
+	 * 登录页面的url。可以是相对路径，相对于 web-app context path ，前头带/，也可以是绝对路径url
 	 * @param loginFormUrl URL where the login page can be found. Should either be
 	 * relative to the web-app context path (include a leading {@code /}) or an absolute
 	 * URL.
@@ -99,6 +110,10 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 	// ~ Methods
 	// ========================================================================================================
 
+	/**
+	 * InitializingBean 接口定义的方法，在该bean创建后初始化阶段会调用该方法，主要是对属性 loginFormUrl进行
+	 * 格式检查和断言
+	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.isTrue(
 				StringUtils.hasText(loginFormUrl)
@@ -113,6 +128,9 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 	}
 
 	/**
+	 * 确定登录页面的url，子类可以覆盖实现该方法修改最终要应用的url。
+	 * 缺省等同于方法 getLoginFormUrl()
+	 *
 	 * Allows subclasses to modify the login form URL that should be applicable for a
 	 * given request.
 	 *
@@ -128,23 +146,32 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 	}
 
 	/**
+	 * 开始登录认证流程：重定向(redirect)或者forward到登录页面URL
+	 * 
 	 * Performs the redirect (or forward) to the login form URL.
 	 */
+	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 
 		String redirectUrl = null;
 
-		if (useForward) {
+		if (useForward) {// 使用 forward 的情况
 
 			if (forceHttps && "http".equals(request.getScheme())) {
 				// First redirect the current request to HTTPS.
 				// When that request is received, the forward to the login page will be
 				// used.
+				// 如果强制使用HTTPS进行登录认证则并忽略 useForward 指令，
+				// 构建相应的url,随后仍然进行 redirect
 				redirectUrl = buildHttpsRedirectUrlForRequest(request);
 			}
 
 			if (redirectUrl == null) {
+				/**
+				 * redirectUrl == null表示没有要求强制使用HTTPS
+				 * 则获取 loginFormUrl 执行 forward
+				 */
 				String loginForm = determineUrlToUseForThisRequest(request, response,
 						authException);
 
@@ -161,11 +188,11 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 		}
 		else {
 			// redirect to login page. Use https if forceHttps true
-
+			// 构建登录页面重定向URL,包含对forceHttps==true的处理
 			redirectUrl = buildRedirectUrlToLoginPage(request, response, authException);
 
 		}
-
+		// 重定向到登录认证页面
 		redirectStrategy.sendRedirect(request, response, redirectUrl);
 	}
 
@@ -175,6 +202,7 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 		String loginForm = determineUrlToUseForThisRequest(request, response,
 				authException);
 
+		// 如果loginForm url是绝对路径，直接返回使用
 		if (UrlUtils.isAbsoluteUrl(loginForm)) {
 			return loginForm;
 		}
@@ -190,6 +218,7 @@ public class LoginUrlAuthenticationEntryPoint implements AuthenticationEntryPoin
 		urlBuilder.setContextPath(request.getContextPath());
 		urlBuilder.setPathInfo(loginForm);
 
+		// 如果启用了 forceHttps , 则替换 协议部分和端口部分
 		if (forceHttps && "http".equals(scheme)) {
 			Integer httpsPort = portMapper.lookupHttpsPort(Integer.valueOf(serverPort));
 

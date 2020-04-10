@@ -21,6 +21,10 @@ import org.springframework.security.config.annotation.authentication.ProviderMan
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
+ * InMemoryUserDetailsManagerConfigurer是Spring Security Config提供的一个安全配置器SecurityConfigurer,
+ * 用来配置一个安全构建器ProviderManagerBuilder(通常可以认为就是AuthenticationManagerBuilder),
+ * 它为目标安全构建器提供的是一个基于内存存储用户账号详情的用户账号详情管理对象DaoAuthenticationProvider
+ *
  * Configures an
  * {@link org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder}
  * to have in memory authentication. It also allows easily adding users to the in memory
@@ -38,6 +42,7 @@ public class InMemoryUserDetailsManagerConfigurer<B extends ProviderManagerBuild
 	 * Creates a new instance
 	 */
 	public InMemoryUserDetailsManagerConfigurer() {
+		// 设置UserDetailsService
 		super(new InMemoryUserDetailsManager(new ArrayList<>()));
 	}
 }

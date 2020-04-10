@@ -31,6 +31,8 @@ import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
+ * 配置过滤器ExceptionTranslationFilter
+ *
  * Adds exception handling for Spring Security related exceptions to an application. All
  * properties have reasonable defaults, so no additional configuration is required other
  * than applying this
@@ -195,6 +197,7 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 		AccessDeniedHandler deniedHandler = getAccessDeniedHandler(http);
 		exceptionTranslationFilter.setAccessDeniedHandler(deniedHandler);
 		exceptionTranslationFilter = postProcess(exceptionTranslationFilter);
+		// ExceptionTranslationFilter过滤器加入HttpSecurity
 		http.addFilter(exceptionTranslationFilter);
 	}
 

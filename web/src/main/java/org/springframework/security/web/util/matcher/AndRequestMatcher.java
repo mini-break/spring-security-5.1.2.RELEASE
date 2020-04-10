@@ -60,11 +60,13 @@ public final class AndRequestMatcher implements RequestMatcher {
 		this(Arrays.asList(requestMatchers));
 	}
 
+	@Override
 	public boolean matches(HttpServletRequest request) {
 		for (RequestMatcher matcher : requestMatchers) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Trying to match using " + matcher);
 			}
+			// 只要有一个请求匹配器不匹配，则返回false
 			if (!matcher.matches(request)) {
 				logger.debug("Did not match");
 				return false;

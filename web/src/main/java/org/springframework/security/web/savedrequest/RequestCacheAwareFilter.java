@@ -28,6 +28,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * 用于用户登录成功后，重新恢复因为登录被打断的请求
+ * 被打算的请求：简单点说就是出现了AuthenticationException、AccessDeniedException两类异常
+ * 重新恢复：既然能够恢复，那肯定请求信息被保存到cache中了
+ * 
  * Responsible for reconstituting the saved request if one is cached and it matches the
  * current request.
  * <p>
@@ -54,9 +58,14 @@ public class RequestCacheAwareFilter extends GenericFilterBean {
 		this.requestCache = requestCache;
 	}
 
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
+		/**
+		 * 根据当前session取出DefaultSavedRequest，如果有被打断的请求，就把当前请求与被打断请求做匹配。
+		 * 如果匹配成功，对当前请求封装，再传递到下一个过滤器
+		 */
 		HttpServletRequest wrappedSavedRequest = requestCache.getMatchingRequest(
 				(HttpServletRequest) request, (HttpServletResponse) response);
 

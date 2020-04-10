@@ -128,6 +128,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 	 */
 	private AuthenticationManagerBuilder authenticationBuilder;
 	/**
+	 * 通过setApplicationContext 方法进行初始化
 	 * AuthenticationManager 构建器，缺省使用 : DefaultPasswordEncoderAuthenticationManagerBuilder
 	 * 所要构建的 AuthenticationManagerBuilder 会是目标 WebSecurity/HttpSecurity 所要直接使用的
 	 * AuthenticationManager 的双亲 AuthenticationManager。 不过缺省情况下，也就是开发人员不在子类
@@ -296,15 +297,15 @@ public abstract class WebSecurityConfigurerAdapter implements
 			http
 				.csrf().and() // 应用 CsrfConfigurer
 				.addFilter(new WebAsyncManagerIntegrationFilter()) // 添加过滤器 WebAsyncManagerIntegrationFilter
-				.exceptionHandling().and() // 应用 ExceptionHandlingConfigurer
-				.headers().and() // 应用 HeadersConfigurer
-				.sessionManagement().and() // 应用 SessionManagementConfigurer
-				.securityContext().and() // 应用 SecurityContextConfigurer
-				.requestCache().and() // 应用 RequestCacheConfigurer
-				.anonymous().and() // 应用 AnonymousConfigurer
-				.servletApi().and() // 应用 ServletApiConfigurer
-				.apply(new DefaultLoginPageConfigurer<>()).and() // 应用 DefaultLoginPageConfigurer
-				.logout(); // 应用 LogoutConfigurer
+				.exceptionHandling().and() // 应用 ExceptionHandlingConfigurer 添加过滤器 ExceptionTranslationFilter
+				.headers().and() // 应用 HeadersConfigurer 添加过滤器 HeaderWriterFilter
+				.sessionManagement().and() // 应用 SessionManagementConfigurer 添加过滤器 SessionManagementFilter
+				.securityContext().and() // 应用 SecurityContextConfigurer 添加过滤器 SecurityContextPersistenceFilter
+				.requestCache().and() // 应用 RequestCacheConfigurer 添加过滤器 RequestCacheAwareFilter
+				.anonymous().and() // 应用 AnonymousConfigurer 添加过滤器 AnonymousAuthenticationFilter
+				.servletApi().and() // 应用 ServletApiConfigurer 添加过滤器 SecurityContextHolderAwareRequestFilter
+				.apply(new DefaultLoginPageConfigurer<>()).and() // 应用 DefaultLoginPageConfigurer,默认的登录页面在这里生成
+				.logout(); // 应用 LogoutConfigurer 添加过滤器 LogoutFilter
 			// @formatter:on
 			ClassLoader classLoader = this.context.getClassLoader();
 			/**
@@ -440,14 +441,15 @@ public abstract class WebSecurityConfigurerAdapter implements
 
 	@Override
 	public void init(final WebSecurity web) throws Exception {
-		// 初始化了一个 http 对象
+		// 初始化了一个 httpSecurity 对象
 		final HttpSecurity http = getHttp();
-		// 将 http 设置进 webSecurity
+		// 将 httpSecurity 设置进 webSecurity
 		web.addSecurityFilterChainBuilder(http).postBuildAction(new Runnable() {
 			public void run() {
 				// 只设置了共享的变量 securityInterceptor
 				FilterSecurityInterceptor securityInterceptor = http
 						.getSharedObject(FilterSecurityInterceptor.class);
+				// FilterSecurityInterceptor 加入 WebSecurity
 				web.securityInterceptor(securityInterceptor);
 			}
 		});
@@ -459,6 +461,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 	 * Override this method to configure {@link WebSecurity}. For example, if you wish to
 	 * ignore certain requests.
 	 */
+	@Override
 	public void configure(WebSecurity web) throws Exception {
 	}
 
@@ -481,11 +484,17 @@ public abstract class WebSecurityConfigurerAdapter implements
 		logger.debug("Using default configure(HttpSecurity). If subclassed this will potentially override subclass configure(HttpSecurity).");
 
 		http
-			.authorizeRequests()
-				.anyRequest().authenticated()
+			.authorizeRequests() // 应用 ExpressionUrlAuthorizationConfigurer 添加拦截器 FilterSecurityInterceptor
+				.anyRequest() // 增加RequestMatcher为任何请求都可以访问
+				.authenticated() // authenticated()必须登录后才能访问
 				.and()
-			.formLogin().and()
-			.httpBasic();
+				/**
+				 * 应用FormLoginConfigurer 添加过滤器 UsernamePasswordAuthenticationFilter
+				 * .formLogin().loginPage("/login3") // 设置登录/登出url，跳转登录页面的控制器，该地址要保证和表单提交的地址一致
+				 */
+			.formLogin()
+				.and()
+			.httpBasic(); // 应用HttpBasicConfigurer 添加过滤器 BasicAuthenticationFilter
 	}
 	// @formatter:on
 
@@ -509,6 +518,8 @@ public abstract class WebSecurityConfigurerAdapter implements
 		// 目标 WebSecurity/HttpSecurity 所要直接使用的  AuthenticationManager 的构建器
 		authenticationBuilder = new DefaultPasswordEncoderAuthenticationManagerBuilder(objectPostProcessor, passwordEncoder);
 		/**
+		 * 这里相当于localConfigureAuthenticationBldr 为 继承 DefaultPasswordEncoderAuthenticationManagerBuilder的子类
+		 * 
 		 * 目标 WebSecurity/HttpSecurity 所要直接使用的  AuthenticationManager  的双亲  AuthenticationManager
 		 * 的构建器, 可能被用的上，也可能用不上，要看开发人员是否决定使用这个 localConfigureAuthenticationBldr
 		 */
@@ -561,6 +572,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 		Map<Class<? extends Object>, Object> sharedObjects = new HashMap<Class<? extends Object>, Object>();
 		sharedObjects.putAll(localConfigureAuthenticationBldr.getSharedObjects());
 		sharedObjects.put(UserDetailsService.class, userDetailsService());
+		// 将应用上下文也放入共享对象中
 		sharedObjects.put(ApplicationContext.class, context);
 		sharedObjects.put(ContentNegotiationStrategy.class, contentNegotiationStrategy);
 		sharedObjects.put(AuthenticationTrustResolver.class, trustResolver);

@@ -29,6 +29,8 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
+ * 认证基类
+ * 
  * Base class for <code>Authentication</code> objects.
  * <p>
  * Implementations which use this class should be immutable.
@@ -41,7 +43,13 @@ public abstract class AbstractAuthenticationToken implements Authentication,
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 权限
+	 */
 	private final Collection<GrantedAuthority> authorities;
+	/**
+	 * 认证所带的额外信息
+	 */
 	private Object details;
 	private boolean authenticated = false;
 

@@ -18,6 +18,8 @@ package org.springframework.security.access.expression;
 import org.springframework.security.core.Authentication;
 
 /**
+ * 基于表达式的权限操作
+ * 
  * Standard interface for expression root objects used with expression-based security.
  *
  * @author Andrei Stefan
@@ -49,6 +51,8 @@ public interface SecurityExpressionOperations {
 	boolean hasAnyAuthority(String... authorities);
 
 	/**
+	 * 当前用户是否拥有指定角色
+	 * 
 	 * <p>
 	 * Determines if the {@link #getAuthentication()} has a particular authority within
 	 * {@link Authentication#getAuthorities()}.
@@ -66,6 +70,8 @@ public interface SecurityExpressionOperations {
 	boolean hasRole(String role);
 
 	/**
+	 * 多个角色是一个以逗号进行分隔的字符串。如果当前用户拥有指定角色中的任意一个则返回true
+	 * 
 	 * <p>
 	 * Determines if the {@link #getAuthentication()} has any of the specified authorities
 	 * within {@link Authentication#getAuthorities()}.
@@ -83,30 +89,40 @@ public interface SecurityExpressionOperations {
 	boolean hasAnyRole(String... roles);
 
 	/**
+	 * 总是返回true，表示允许所有的访问
+	 *
 	 * Always grants access.
 	 * @return true
 	 */
 	boolean permitAll();
 
 	/**
+	 * 总是返回false，表示拒绝所有的访问
+	 *
 	 * Always denies access
 	 * @return false
 	 */
 	boolean denyAll();
 
 	/**
+	 * 当前用户是否是一个匿名用户
+	 *
 	 * Determines if the {@link #getAuthentication()} is anonymous
 	 * @return true if the user is anonymous, else false
 	 */
 	boolean isAnonymous();
 
 	/**
+	 * 表示当前用户是否已经登录认证成功了
+	 *
 	 * Determines ifthe {@link #getAuthentication()} is authenticated
 	 * @return true if the {@link #getAuthentication()} is authenticated, else false
 	 */
 	boolean isAuthenticated();
 
 	/**
+	 * 表示当前用户是否是通过Remember-Me自动登录的
+	 *
 	 * Determines if the {@link #getAuthentication()} was authenticated using remember me
 	 * @return true if the {@link #getAuthentication()} authenticated using remember me,
 	 * else false
@@ -114,6 +130,8 @@ public interface SecurityExpressionOperations {
 	boolean isRememberMe();
 
 	/**
+	 * 如果当前用户既不是一个匿名用户，同时又不是通过Remember-Me自动登录的，则返回true
+	 * 
 	 * Determines if the {@link #getAuthentication()} authenticated without the use of
 	 * remember me
 	 * @return true if the {@link #getAuthentication()} authenticated without the use of

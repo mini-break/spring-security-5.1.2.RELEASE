@@ -28,6 +28,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 /**
+ * 基于表达式的权限控制基类
+ *
  * Base root object for use in Spring Security expression evaluations.
  *
  * @author Luke Taylor
@@ -38,8 +40,15 @@ public abstract class SecurityExpressionRoot implements SecurityExpressionOperat
 	private AuthenticationTrustResolver trustResolver;
 	private RoleHierarchy roleHierarchy;
 	private Set<String> roles;
+
+	/**
+	 * 默认角色前缀
+	 */
 	private String defaultRolePrefix = "ROLE_";
 
+	/**
+	 * permitAll ConfigAttribute投票返回true
+	 */
 	/** Allows "permitAll" expression */
 	public final boolean permitAll = true;
 
@@ -63,18 +72,22 @@ public abstract class SecurityExpressionRoot implements SecurityExpressionOperat
 		this.authentication = authentication;
 	}
 
+	@Override
 	public final boolean hasAuthority(String authority) {
 		return hasAnyAuthority(authority);
 	}
 
+	@Override
 	public final boolean hasAnyAuthority(String... authorities) {
 		return hasAnyAuthorityName(null, authorities);
 	}
 
+	@Override
 	public final boolean hasRole(String role) {
 		return hasAnyRole(role);
 	}
 
+	@Override
 	public final boolean hasAnyRole(String... roles) {
 		return hasAnyAuthorityName(defaultRolePrefix, roles);
 	}
@@ -96,22 +109,27 @@ public abstract class SecurityExpressionRoot implements SecurityExpressionOperat
 		return authentication;
 	}
 
+	@Override
 	public final boolean permitAll() {
 		return true;
 	}
 
+	@Override
 	public final boolean denyAll() {
 		return false;
 	}
 
+	@Override
 	public final boolean isAnonymous() {
 		return trustResolver.isAnonymous(authentication);
 	}
 
+	@Override
 	public final boolean isAuthenticated() {
 		return !isAnonymous();
 	}
 
+	@Override
 	public final boolean isRememberMe() {
 		return trustResolver.isRememberMe(authentication);
 	}
@@ -173,10 +191,12 @@ public abstract class SecurityExpressionRoot implements SecurityExpressionOperat
 		return roles;
 	}
 
+	@Override
 	public boolean hasPermission(Object target, Object permission) {
 		return permissionEvaluator.hasPermission(authentication, target, permission);
 	}
 
+	@Override
 	public boolean hasPermission(Object targetId, String targetType, Object permission) {
 		return permissionEvaluator.hasPermission(authentication, (Serializable) targetId,
 				targetType, permission);

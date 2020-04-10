@@ -28,6 +28,9 @@ import org.springframework.security.web.FilterInvocation;
  */
 class WebExpressionConfigAttribute implements ConfigAttribute,
 		EvaluationContextPostProcessor<FilterInvocation> {
+	/**
+	 * ExpressionParser 接口用于解析表达式字符串 。 Expression 接口用来计算表达式串的值
+	 */
 	private final Expression authorizeExpression;
 	private final EvaluationContextPostProcessor<FilterInvocation> postProcessor;
 

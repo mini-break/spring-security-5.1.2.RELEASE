@@ -28,31 +28,64 @@ import org.springframework.security.web.util.matcher.AnyRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
+ * Spring Security Web认证机制(通常指表单登录)中登录成功后页面需要跳转到原来客户请求的URL。
+ * 该过程中首先需要将原来的客户请求缓存下来，然后登录成功后将缓存的请求从缓存中提取出来
+ * 
  * {@code RequestCache} which stores the {@code SavedRequest} in the HttpSession.
+ * 将SavedRequest保存到HttpSession中的RequestCache
  *
  * The {@link DefaultSavedRequest} class is used as the implementation.
+ * 这里使用的SavedRequest是其缺省实现DefaultSavedRequest
  *
  * @author Luke Taylor
  * @author Eddú Meléndez
  * @since 3.0
  */
 public class HttpSessionRequestCache implements RequestCache {
+	/**
+	 * 将请求缓存到session时缺省使用的session属性名称
+	 */
 	static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
+	/**
+	 * 用于解析请求中的 server:port 信息
+	 */
 	private PortResolver portResolver = new PortResolverImpl();
+	/**
+	 * 如果session不存在是否允许创建，缺省为true可以创建
+	 */
 	private boolean createSessionAllowed = true;
+	// 用于判断哪些请求可以被缓存的请求匹配器，缺省为任何请求都可以被缓存，
+	// 实际上会被外部指定覆盖成:
+	// 1. 必须是 GET /**
+	// 2. 并且不能是 /**/favicon.*
+	// 3. 并且不能是 application.json
+	// 4. 并且不能是 XMLHttpRequest (也就是一般意义上的 ajax 请求)
 	private RequestMatcher requestMatcher = AnyRequestMatcher.INSTANCE;
+	/**
+	 * 将请求缓存到session时使用的session属性名称，初始化为使用SAVED_REQUEST
+	 */
 	private String sessionAttrName = SAVED_REQUEST;
 
 	/**
+	 * 在配置属性requestMatcher匹配的情况下缓存当前请求
 	 * Stores the current request, provided the configuration properties allow it.
 	 */
 	public void saveRequest(HttpServletRequest request, HttpServletResponse response) {
 		if (requestMatcher.matches(request)) {
+			/**
+			 * 在配置属性requestMatcher匹配的情况下缓存当前请求，
+			 * 首先将当前请求包装成一个DefaultSavedRequest,也就是从当前请求中获取
+			 * 各种必要的信息组装成一个DefaultSavedRequest
+			 */
 			DefaultSavedRequest savedRequest = new DefaultSavedRequest(request,
 					portResolver);
 
+			/**
+			 * 获取session并执行缓存动作，也就是将上面创建的DefaultSavedRequest对象
+			 * 添加为session的一个名称为this.sessionAttrName的属性
+			 */
 			if (createSessionAllowed || request.getSession(false) != null) {
 				// Store the HTTP request itself. Used by
 				// AbstractAuthenticationProcessingFilter
@@ -66,6 +99,10 @@ public class HttpSessionRequestCache implements RequestCache {
 		}
 	}
 
+	/**
+	 * 从session中提取所缓存的请求对象，也就是获取session中名称为this.sessionAttrName的属性，
+	 * 如果 session 不存在直接返回 null
+	 */
 	public SavedRequest getRequest(HttpServletRequest currentRequest,
 			HttpServletResponse response) {
 		HttpSession session = currentRequest.getSession(false);
@@ -77,6 +114,9 @@ public class HttpSessionRequestCache implements RequestCache {
 		return null;
 	}
 
+	/**
+	 * 从 session 中删除所缓存的请求对象,也就是移除session中名称为this.sessionAttrName的属性
+	 */
 	public void removeRequest(HttpServletRequest currentRequest,
 			HttpServletResponse response) {
 		HttpSession session = currentRequest.getSession(false);
@@ -87,35 +127,55 @@ public class HttpSessionRequestCache implements RequestCache {
 		}
 	}
 
+	/**
+	 * 从 session 获取缓存的请求对象，检验它和当前请求是否一致，如果一致的话将其封装成
+	 * 一个SavedRequestAwareWrapper返回，同时删除所缓存的请求。其他情况则不做任何修改动作，直接返回null
+	 */
 	public HttpServletRequest getMatchingRequest(HttpServletRequest request,
 			HttpServletResponse response) {
+		// 从 session 获取缓存的请求对象
 		SavedRequest saved = getRequest(request, response);
 
 		if (!matchesSavedRequest(request, saved)) {
+			// 如果缓存的请求和当前请求不匹配则返回null
 			logger.debug("saved request doesn't match");
 			return null;
 		}
 
+		// 如果缓存的请求和当前请求匹配则删除缓存中缓存的请求对象
 		removeRequest(request, response);
 
+		// 封装和返回从缓存中提取到的请求对象
 		return new SavedRequestAwareWrapper(saved, request);
 	}
 
+	/**
+	 * 检测当前请求和参数savedRequest是否匹配
+	 */
 	private boolean matchesSavedRequest(HttpServletRequest request, SavedRequest savedRequest) {
 		if (savedRequest == null) {
 			return false;
 		}
 
 		if (savedRequest instanceof DefaultSavedRequest) {
+			/**
+			 * 如果savedRequest是一个DefaultSavedRequest，则使用DefaultSavedRequest的
+			 * 方法doesRequestMatch检验是否匹配
+			 */
 			DefaultSavedRequest defaultSavedRequest = (DefaultSavedRequest) savedRequest;
 			return defaultSavedRequest.doesRequestMatch(request, this.portResolver);
 		}
 
+		/**
+		 * 如果savedRequest不是一个DefaultSavedRequest，则通过比较二者的url是否相等来检验二者是否匹配
+		 */
 		String currentUrl = UrlUtils.buildFullRequestUrl(request);
 		return savedRequest.getRedirectUrl().equals(currentUrl);
 	}
 
 	/**
+	 * 指定哪些请求会被缓存，如果不指定，缺省情况是所有请求都会被缓存
+	 * 
 	 * Allows selective use of saved requests for a subset of requests. By default any
 	 * request will be cached by the {@code saveRequest} method.
 	 * <p>

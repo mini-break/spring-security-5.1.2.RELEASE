@@ -21,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import java.io.Serializable;
 
 /**
+ * 安全上下文
+ * 
  * Interface defining the minimum security information associated with the current thread
  * of execution.
  *

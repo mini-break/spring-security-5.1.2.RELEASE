@@ -17,6 +17,8 @@
 package org.springframework.security.authentication;
 
 /**
+ * 该接口用于在Spring Security登录过程中对用户的登录信息的详细信息进行填充,默认实现是WebAuthenticationDetailsSource
+ * 
  * Provides a {@link org.springframework.security.core.Authentication#getDetails()} object
  * for a given web request.
  *

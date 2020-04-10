@@ -21,6 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.web.header.HeaderWriter;
 
 /**
+ * HTTP X-XSS-Protection 响应头是Internet Explorer，Chrome和Safari的一个功能，当检测到跨站脚本攻击 (XSS)时，浏览器将停止加载页面
+ * 它有几种配置：
+ * 0：禁用XSS保护；
+ * 1：启用XSS保护；
+ * 1; mode=block：启用XSS保护，并在检查到XSS攻击时，停止渲染页面（例如IE8中，检查到攻击时，整个页面会被一个#替换）
+ * 
  * Renders the <a href=
  * "http://blogs.msdn.com/b/ieinternals/archive/2011/01/31/controlling-the-internet-explorer-xss-filter-with-the-x-xss-protection-http-header.aspx"
  * >X-XSS-Protection header</a>.

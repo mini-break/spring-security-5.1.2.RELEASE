@@ -96,6 +96,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 	// ========================================================================================================
 
 	/**
+	 * 抽象方法，子类实现
 	 * Allows subclasses to perform any additional checks of a returned (or cached)
 	 * <code>UserDetails</code> for a given authentication request. Generally a subclass
 	 * will at least compare the {@link Authentication#getCredentials()} with a
@@ -127,11 +128,13 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 	@Override
 	public Authentication authenticate(Authentication authentication)
 			throws AuthenticationException {
+		// authentication必须是UsernamePasswordAuthenticationToken类型实例
 		Assert.isInstanceOf(UsernamePasswordAuthenticationToken.class, authentication,
 				() -> messages.getMessage(
 						"AbstractUserDetailsAuthenticationProvider.onlySupports",
 						"Only UsernamePasswordAuthenticationToken is supported"));
 
+		// 用户名
 		// Determine username
 		String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED"
 				: authentication.getName();
@@ -205,6 +208,8 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 	}
 
 	/**
+	 * 认证成功后,重新封装Authentication 并返回
+	 * 
 	 * Creates a successful {@link Authentication} object.
 	 * <p>
 	 * Protected so subclasses can override.

@@ -36,6 +36,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 
 /**
+ * HeadersConfigurer自己内置定义了一组特定头部的配置类并允许使用者配置,这些配置类每个其实对应一个相应的头部写入器HeaderWriter。
+ * 除此之外,HeadersConfigurer也允许开发者提供自定义的头部写入器HeaderWriter
+ *
  * <p>
  * Adds the Security HTTP headers to the response. Security HTTP headers is activated by
  * default when using {@link WebSecurityConfigurerAdapter}'s default constructor.
@@ -68,22 +71,62 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends
 
 	// --- default header writers ---
 
+	/**
+	 * 禁用了客户端的 MIME 类型嗅探行为
+	 * X-Content-Type-Options
+	 */
 	private final ContentTypeOptionsConfig contentTypeOptions = new ContentTypeOptionsConfig();
 
+	/**
+	 * 跨站脚本攻击
+	 * X-XSS-Protection
+	 */
 	private final XXssConfig xssProtection = new XXssConfig();
 
+	/**
+	 * 对应头部缓存配置
+	 * Expires
+	 * Pragma
+	 * Cache-Control
+	 */
 	private final CacheControlConfig cacheControl = new CacheControlConfig();
 
+	/**
+	 * 对应头部安全配置
+	 * Strict-Transport-Security
+	 */
 	private final HstsConfig hsts = new HstsConfig();
 
+	/**
+	 * 对应页面是否允许被iframe配置
+	 * X-Frame-Options
+	 */
 	private final FrameOptionsConfig frameOptions = new FrameOptionsConfig();
 
+	/**
+	 * 响应头将特定的加密公钥与特定的 Web 服务器相关联，以降低伪造证书对 MITM 攻击的风险
+	 * Public-Key-Pins
+	 * Public-Key-Pins-Report-Only
+	 */
 	private final HpkpConfig hpkp = new HpkpConfig();
 
+	/**
+	 * 内容安全策略CSP(Content-Security-Policy) 
+	 * Content-Security-Policy
+	 * Content-Security-Policy-Report-Only
+	 */
 	private final ContentSecurityPolicyConfig contentSecurityPolicy = new ContentSecurityPolicyConfig();
 
+	/**
+	 * 是否需要指明当前流量的来源参考页面
+	 * Referrer-Policy
+	 */
 	private final ReferrerPolicyConfig referrerPolicy = new ReferrerPolicyConfig();
 
+	/**
+	 * 允许一个站点开启或者禁止一些浏览器属性和API
+	 * Feature-Policy
+	 */
 	private final FeaturePolicyConfig featurePolicy = new FeaturePolicyConfig();
 
 	/**
@@ -95,6 +138,8 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends
 	}
 
 	/**
+	 * 通过此方法允许开发人员添加自定义头部写入器
+	 * 
 	 * Adds a {@link HeaderWriter} instance
 	 *
 	 * @param headerWriter the {@link HeaderWriter} instance to add
@@ -272,6 +317,7 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends
 		private CacheControlHeadersWriter writer;
 
 		private CacheControlConfig() {
+			// 构造函数默认创建CacheControlHeadersWriter
 			enable();
 		}
 
@@ -302,6 +348,7 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends
 		 */
 		private CacheControlConfig enable() {
 			if (writer == null) {
+				// 实例化CacheControlHeadersWriter
 				writer = new CacheControlHeadersWriter();
 			}
 			return this;
@@ -745,6 +792,7 @@ public class HeadersConfigurer<H extends HttpSecurityBuilder<H>> extends
 	@Override
 	public void configure(H http) throws Exception {
 		HeaderWriterFilter headersFilter = createHeaderWriterFilter();
+		// HeaderWriterFilter过滤器加入HttpSecurity
 		http.addFilter(headersFilter);
 	}
 

@@ -22,6 +22,9 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Constructor;
 
 /**
+ * 这是一个工具类，只提供一些静态方法。这个工具类的目的是用来保存应用程序中当前使用人的安全上下文
+ * 将一个给定的SecurityContext绑定到当前执行线程
+ * 
  * Associates a given {@link SecurityContext} with the current execution thread.
  * <p>
  * This class provides a series of static methods that delegate to an instance of
@@ -51,12 +54,23 @@ public class SecurityContextHolder {
 	// ~ Static fields/initializers
 	// =====================================================================================
 
+	/**
+	 * 三种工作模式的定义，每种工作模式对应一种策略
+	 */
 	public static final String MODE_THREADLOCAL = "MODE_THREADLOCAL";
 	public static final String MODE_INHERITABLETHREADLOCAL = "MODE_INHERITABLETHREADLOCAL";
 	public static final String MODE_GLOBAL = "MODE_GLOBAL";
+	/**
+	 * 类加载时首先尝试从环境属性中获取所指定的工作模式
+	 */
 	public static final String SYSTEM_PROPERTY = "spring.security.strategy";
 	private static String strategyName = System.getProperty(SYSTEM_PROPERTY);
 	private static SecurityContextHolderStrategy strategy;
+	/**
+	 * 初始化计数器,初始为0,
+	 * 1. 类加载过程中会被初始化一次，此值变为1
+	 * 2. 此后每次调用 setStrategyName 会对新的策略对象执行一次初始化，相应的该值会增1
+	 */
 	private static int initializeCount = 0;
 
 	static {
@@ -95,7 +109,7 @@ public class SecurityContextHolder {
 
 	private static void initialize() {
 		if (!StringUtils.hasText(strategyName)) {
-			// Set default
+			// Set default 设置缺省工作模式/策略 MODE_THREADLOCAL
 			strategyName = MODE_THREADLOCAL;
 		}
 

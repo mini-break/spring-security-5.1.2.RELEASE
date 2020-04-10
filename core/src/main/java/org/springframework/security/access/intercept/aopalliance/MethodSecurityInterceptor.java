@@ -25,6 +25,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 /**
+ * 基于方法的安全拦截器,基于Spring AOP技术
+ * 
  * Provides security interception of AOP Alliance based method invocations.
  * <p>
  * The <code>SecurityMetadataSource</code> required by this security interceptor is of
@@ -61,6 +63,7 @@ public class MethodSecurityInterceptor extends AbstractSecurityInterceptor imple
 	 *
 	 * @throws Throwable if any error occurs
 	 */
+	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		InterceptorStatusToken token = super.beforeInvocation(mi);
 

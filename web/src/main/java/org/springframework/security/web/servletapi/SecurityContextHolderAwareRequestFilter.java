@@ -39,6 +39,10 @@ import org.springframework.util.ClassUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
+ * SecurityContextHolderAwareRequestFilter对请求HttpServletRequest采用Wrapper/Decorator模式
+ * 包装成一个可以访问SecurityContextHolder中安全上下文的SecurityContextHolderAwareRequestWrapper。
+ * 这样接口HttpServletRequest上定义的getUserPrincipal这种安全相关的方法才能访问到相应的安全信息
+ *
  * A <code>Filter</code> which populates the <code>ServletRequest</code> with a request
  * wrapper which implements the servlet API security methods.
  * <p>
@@ -77,8 +81,16 @@ public class SecurityContextHolderAwareRequestFilter extends GenericFilterBean {
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 缺省角色名称的前缀
+	 */
 	private String rolePrefix = "ROLE_";
 
+	/**
+	 * 用于封装HttpServletRequest的工厂类，最终目的是封装HttpServletRequest
+	 * 使之具有访问SecurityContextHolder中安全上下文的能力。
+	 * 针对 Servlet 2.5 和 Servlet 3 使用的不同实现类
+	 */
 	private HttpServletRequestFactory requestFactory;
 
 	private AuthenticationEntryPoint authenticationEntryPoint;
@@ -87,14 +99,25 @@ public class SecurityContextHolderAwareRequestFilter extends GenericFilterBean {
 
 	private List<LogoutHandler> logoutHandlers;
 
+	/**
+	 * 判断认证对象Authentication是何种类型:是否匿名Authentication,
+	 * 是否 Remember Me Authentication。
+	 * 缺省使用实现AuthenticationTrustResolverImpl,
+	 * 根据对象Authentication所使用的实现类是AnonymousAuthenticationToken
+	 * 还是RememberMeAuthenticationToken达到上述目的
+	 */
 	private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
 	// ~ Methods
 	// ========================================================================================================
 
+	/**
+	 * 指定角色前缀
+	 */
 	public void setRolePrefix(String rolePrefix) {
 		Assert.notNull(rolePrefix, "Role prefix must not be null");
 		this.rolePrefix = rolePrefix;
+		// 角色前缀变更时更新requestFactory工厂
 		updateFactory();
 	}
 
@@ -178,6 +201,10 @@ public class SecurityContextHolderAwareRequestFilter extends GenericFilterBean {
 	}
 
 	private void updateFactory() {
+		/**
+		 * 更新封装HttpServletRequest的工厂实例requestFactory，
+		 * 根据当前使用的Servlet版本的不同使用不同的工厂类
+		 */
 		String rolePrefix = this.rolePrefix;
 		this.requestFactory = isServlet3() ? createServlet3Factory(rolePrefix)
 				: new HttpServlet25RequestFactory(this.trustResolver, rolePrefix);
@@ -193,6 +220,7 @@ public class SecurityContextHolderAwareRequestFilter extends GenericFilterBean {
 	public void setTrustResolver(AuthenticationTrustResolver trustResolver) {
 		Assert.notNull(trustResolver, "trustResolver cannot be null");
 		this.trustResolver = trustResolver;
+		// trustResolver 变更时更新requestFactory工厂
 		updateFactory();
 	}
 

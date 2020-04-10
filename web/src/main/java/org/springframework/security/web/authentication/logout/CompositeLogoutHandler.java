@@ -50,6 +50,7 @@ public final class CompositeLogoutHandler implements LogoutHandler {
 
 	@Override
 	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+		// 遍历多个LogoutHandler
 		for (LogoutHandler handler : this.logoutHandlers) {
 			handler.logout(request, response, authentication);
 		}

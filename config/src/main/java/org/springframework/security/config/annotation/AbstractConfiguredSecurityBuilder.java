@@ -234,6 +234,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 			}
 			configs.add(configurer);
 			this.configurers.put(clazz, configs);
+			// 初始化期间添加进来的配置
 			if (buildState.isInitializing()) {
 				this.configurersAddedInInitializing.add(configurer);
 			}
@@ -373,7 +374,10 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 
 			buildState = BuildState.BUILDING;
 
-			// 子类提供实现
+			/**
+			 * 子类提供实现
+			 * 获取ProviderManager
+ 			 */
 			O result = performBuild();
 
 			buildState = BuildState.BUILT;
@@ -400,6 +404,8 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	}
 
 	/**
+	 * 执行构建逻辑，由子类实现
+	 * 
 	 * Subclasses must implement this method to build the object that is being returned.
 	 *
 	 * @return the Object to be buit or null if the implementation allows it

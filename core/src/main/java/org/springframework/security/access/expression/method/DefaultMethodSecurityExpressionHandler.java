@@ -38,6 +38,7 @@ import org.springframework.security.core.parameters.DefaultSecurityParameterName
 import org.springframework.util.Assert;
 
 /**
+ * 基于方法调用的安全表达式处理器
  * The standard implementation of {@code MethodSecurityExpressionHandler}.
  * <p>
  * A single instance should usually be shared amongst the beans that require expression

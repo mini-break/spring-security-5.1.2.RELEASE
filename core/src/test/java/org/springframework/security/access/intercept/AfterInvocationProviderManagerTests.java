@@ -186,6 +186,7 @@ public class AfterInvocationProviderManagerTests {
 			this.configAttribute = configAttribute;
 		}
 
+		@Override
 		public Object decide(Authentication authentication, Object object,
 				Collection<ConfigAttribute> config, Object returnedObject)
 						throws AccessDeniedException {
@@ -196,10 +197,12 @@ public class AfterInvocationProviderManagerTests {
 			return returnedObject;
 		}
 
+		@Override
 		public boolean supports(Class<?> clazz) {
 			return secureObject.isAssignableFrom(clazz);
 		}
 
+		@Override
 		public boolean supports(ConfigAttribute attribute) {
 			return attribute.equals(configAttribute);
 		}

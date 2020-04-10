@@ -21,6 +21,8 @@ import java.io.Serializable;
 import org.springframework.security.access.AccessDecisionManager;
 
 /**
+ * 已授予的权限
+ * 
  * Represents an authority granted to an {@link Authentication} object.
  *
  * <p>

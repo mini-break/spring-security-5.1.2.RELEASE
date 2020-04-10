@@ -26,6 +26,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 
 /**
+ * 基于正则表达式的请求匹配器
+ * 
  * Uses a regular expression to decide whether a supplied the URL of a supplied
  * {@code HttpServletRequest}.
  *
@@ -42,10 +44,17 @@ import org.springframework.util.StringUtils;
 public final class RegexRequestMatcher implements RequestMatcher {
 	private final static Log logger = LogFactory.getLog(RegexRequestMatcher.class);
 
+	/**
+	 * 正则表达式
+	 */
 	private final Pattern pattern;
+	/**
+	 * 请求方式
+	 */
 	private final HttpMethod httpMethod;
 
 	/**
+	 * 区分大小写的构造器
 	 * Creates a case-sensitive {@code Pattern} instance to match against the request.
 	 *
 	 * @param pattern the regular expression to compile into a pattern.
@@ -70,6 +79,7 @@ public final class RegexRequestMatcher implements RequestMatcher {
 		else {
 			this.pattern = Pattern.compile(pattern);
 		}
+		// http method允许为null
 		this.httpMethod = StringUtils.hasText(httpMethod) ? HttpMethod
 				.valueOf(httpMethod) : null;
 	}

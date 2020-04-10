@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 根据启动的相关环境配置来决定让哪些类能够被Spring容器初始化
  * Dynamically determines which imports to include using the
  * {@link EnableGlobalMethodSecurity} annotation.
  *
@@ -36,8 +37,10 @@ import org.springframework.util.ClassUtils;
  */
 final class GlobalMethodSecuritySelector implements ImportSelector {
 
+	@Override
 	public final String[] selectImports(AnnotationMetadata importingClassMetadata) {
 		Class<EnableGlobalMethodSecurity> annoType = EnableGlobalMethodSecurity.class;
+		// 获取@EnableGlobalMethodSecurity注解 的属性及值
 		Map<String, Object> annotationAttributes = importingClassMetadata
 				.getAnnotationAttributes(annoType.getName(), false);
 		AnnotationAttributes attributes = AnnotationAttributes
@@ -50,6 +53,7 @@ final class GlobalMethodSecuritySelector implements ImportSelector {
 		Class<?> importingClass = ClassUtils
 				.resolveClassName(importingClassMetadata.getClassName(),
 						ClassUtils.getDefaultClassLoader());
+		// importingClass 是不是GlobalMethodSecurityConfiguration的子类或子接口
 		boolean skipMethodSecurityConfiguration = GlobalMethodSecurityConfiguration.class
 				.isAssignableFrom(importingClass);
 
@@ -63,12 +67,14 @@ final class GlobalMethodSecuritySelector implements ImportSelector {
 
 		List<String> classNames = new ArrayList<>(4);
 		if (isProxy) {
+			// 用于拦截权限注解方法
 			classNames.add(MethodSecurityMetadataSourceAdvisorRegistrar.class.getName());
 		}
 
 		classNames.add(autoProxyClassName);
 
 		if (!skipMethodSecurityConfiguration) {
+			// 对GlobalMethodSecurityConfiguration进行初始化
 			classNames.add(GlobalMethodSecurityConfiguration.class.getName());
 		}
 

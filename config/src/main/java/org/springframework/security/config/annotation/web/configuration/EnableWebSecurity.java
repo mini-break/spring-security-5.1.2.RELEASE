@@ -25,6 +25,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 
 /**
+ * Spring Security用于启用Web安全的注解。
+ * 典型的用法是该注解用在某个Web安全配置类上(实现了接口WebSecurityConfigurer或者继承自WebSecurityConfigurerAdapter)
+ *
  * Add this annotation to an {@code @Configuration} class to have the Spring Security
  * configuration defined in any {@link WebSecurityConfigurer} or more likely by extending
  * the {@link WebSecurityConfigurerAdapter} base class and overriding individual methods:
@@ -72,6 +75,7 @@ import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 @Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target(value = { java.lang.annotation.ElementType.TYPE })
 @Documented
+// 导入 WebSecurityConfiguration Web安全配置,Spring Web Mvc 有关安全的配置，OAuth2 有关安全的配置
 @Import({ WebSecurityConfiguration.class,
 		SpringWebMvcImportSelector.class,
 		OAuth2ImportSelector.class })

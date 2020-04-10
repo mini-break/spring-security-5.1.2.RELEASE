@@ -24,6 +24,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.util.Assert;
 
 /**
+ * 一个基于HttpSession保存csrf token的存储库实现
+ * 
  * A {@link CsrfTokenRepository} that stores the {@link CsrfToken} in the
  * {@link HttpSession}.
  *
@@ -38,39 +40,46 @@ public final class HttpSessionCsrfTokenRepository implements CsrfTokenRepository
 	private static final String DEFAULT_CSRF_TOKEN_ATTR_NAME = HttpSessionCsrfTokenRepository.class
 			.getName().concat(".CSRF_TOKEN");
 
+	/**
+	 * 将 csrf token 保存在请求参数中时，使用的参数名称
+	 */
 	private String parameterName = DEFAULT_CSRF_PARAMETER_NAME;
 
+	/**
+	 * 将 csrf token 保存在HTTP头部时，使用的头部名称
+	 */
 	private String headerName = DEFAULT_CSRF_HEADER_NAME;
 
+	/**
+	 * 将 csrf token 保存在 http session 中时使用的属性名称
+	 */
 	private String sessionAttributeName = DEFAULT_CSRF_TOKEN_ATTR_NAME;
 
 	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.security.web.csrf.CsrfTokenRepository#saveToken(org.
-	 * springframework .security.web.csrf.CsrfToken,
-	 * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 * 保存 csrf token 到当前请求对应的 http session 中
 	 */
 	public void saveToken(CsrfToken token, HttpServletRequest request,
 			HttpServletResponse response) {
 		if (token == null) {
+			/**
+			 * 如果将要保存的 csrf token 为 null，则获取当前 session，清除其中的csrf token 属性
+			 */
 			HttpSession session = request.getSession(false);
 			if (session != null) {
 				session.removeAttribute(this.sessionAttributeName);
 			}
 		}
 		else {
+			/**
+			 * 如果将要保存的 csrf token 不为 null， 则获取将当前 session，将csrf token 保存到其中
+			 */
 			HttpSession session = request.getSession();
 			session.setAttribute(this.sessionAttributeName, token);
 		}
 	}
 
 	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.springframework.security.web.csrf.CsrfTokenRepository#loadToken(javax.servlet
-	 * .http.HttpServletRequest)
+	 * 从当前 http session 中获取所保存的 csrf token
 	 */
 	public CsrfToken loadToken(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
@@ -81,10 +90,9 @@ public final class HttpSessionCsrfTokenRepository implements CsrfTokenRepository
 	}
 
 	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.springframework.security.web.csrf.CsrfTokenRepository#generateToken(javax.
-	 * servlet .http.HttpServletRequest)
+	 * 针对当前请求生成一个 csrf token 对象 CsrfToken， 实现类使用 DefaultCsrfToken,
+     * 这里设置了该 CsrfToken 在头部中保存时的名称为 this.headerName, 在参数中保存时
+	 * 的名称为 this.parameterName,csrf token 的值为一个随机 UUID 的字符串值
 	 */
 	public CsrfToken generateToken(HttpServletRequest request) {
 		return new DefaultCsrfToken(this.headerName, this.parameterName,
@@ -122,6 +130,9 @@ public final class HttpSessionCsrfTokenRepository implements CsrfTokenRepository
 		this.sessionAttributeName = sessionAttributeName;
 	}
 
+	/**
+	 * 产生一个 csrf token 的值，其实是一个随机 UUID 的字符串形式
+	 */
 	private String createNewToken() {
 		return UUID.randomUUID().toString();
 	}

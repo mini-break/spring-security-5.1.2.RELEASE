@@ -24,6 +24,14 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 /**
+ * ConsensusBased的逻辑是这样的：
+ * 1.如果赞成票多于反对票则表示通过。
+ * 2.反过来，如果反对票多于赞成票则将抛出AccessDeniedException。
+ * 3.如果赞成票与反对票相同且不等于0，并且属性allowIfEqualGrantedDeniedDecisions的值为true，
+ * 	 则表示通过，否则将抛出异常AccessDeniedException。参数allowIfEqualGrantedDeniedDecisions的值默认为true。
+ * 4.如果所有的AccessDecisionVoter都弃权了，则将视参数allowIfAllAbstainDecisions的值而定，
+ *   如果该值为true则表示通过，否则将抛出异常AccessDeniedException。参数allowIfAllAbstainDecisions的值默认为false。
+ *
  * Simple concrete implementation of
  * {@link org.springframework.security.access.AccessDecisionManager} that uses a
  * consensus-based approach.
@@ -66,10 +74,13 @@ public class ConsensusBased extends AbstractAccessDecisionManager {
 	 */
 	public void decide(Authentication authentication, Object object,
 			Collection<ConfigAttribute> configAttributes) throws AccessDeniedException {
+		// 赞成票
 		int grant = 0;
+		// 反对票
 		int deny = 0;
 
 		for (AccessDecisionVoter voter : getDecisionVoters()) {
+			// 进行投票
 			int result = voter.vote(authentication, object, configAttributes);
 
 			if (logger.isDebugEnabled()) {
@@ -92,11 +103,13 @@ public class ConsensusBased extends AbstractAccessDecisionManager {
 			}
 		}
 
-		if (grant > deny) {
+		// 赞成票大于反对票
+		if (grant > deny) {// 1.如果赞成票多于反对票则表示通过。
 			return;
 		}
 
-		if (deny > grant) {
+		// 反对票大于赞成票
+		if (deny > grant) {// 2.如果反对票多于赞成票则将抛出AccessDeniedException。
 			throw new AccessDeniedException(messages.getMessage(
 					"AbstractAccessDecisionManager.accessDenied", "Access is denied"));
 		}

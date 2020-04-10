@@ -60,12 +60,15 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 
 	@Before
 	public void setUpData() throws Exception {
+		// ============返回值为空 begin================
 		voidImpl1 = new MockMethodInvocation(new ReturnVoidImpl1(), ReturnVoid.class,
 				"doSomething", List.class);
 		voidImpl2 = new MockMethodInvocation(new ReturnVoidImpl2(), ReturnVoid.class,
 				"doSomething", List.class);
 		voidImpl3 = new MockMethodInvocation(new ReturnVoidImpl3(), ReturnVoid.class,
 				"doSomething", List.class);
+		// ============返回值为空 end================
+		
 		listImpl1 = new MockMethodInvocation(new ReturnAListImpl1(), ReturnAList.class,
 				"doSomething", List.class);
 		notherListImpl1 = new MockMethodInvocation(new ReturnAnotherListImpl1(),
@@ -83,6 +86,10 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 				List.class);
 	}
 
+	/**
+	 * 类级别@PreAuthorize注解,并且方法上没有注解
+	 * @throws Exception
+	 */
 	@Test
 	public void classLevelPreAnnotationIsPickedUpWhenNoMethodLevelExists()
 			throws Exception {
@@ -97,6 +104,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(pre.getFilterExpression()).isNull();
 	}
 
+	/**
+	 * 类和方法都存在注解
+	 */
 	@Test
 	public void mixedClassAndMethodPreAnnotationsAreBothIncluded() {
 		ConfigAttribute[] attrs = mds.getAttributes(voidImpl2).toArray(
@@ -110,6 +120,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(pre.getFilterExpression().getExpressionString()).isEqualTo("somePreFilterExpression");
 	}
 
+	/**
+	 * 只有方法有@PreFilter注解
+	 */
 	@Test
 	public void methodWithPreFilterOnlyIsAllowed() {
 		ConfigAttribute[] attrs = mds.getAttributes(voidImpl3).toArray(
@@ -123,6 +136,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(pre.getFilterExpression().getExpressionString()).isEqualTo("somePreFilterExpression");
 	}
 
+	/**
+	 * 只有方法有@PostFilter注解
+	 */
 	@Test
 	public void methodWithPostFilterOnlyIsAllowed() {
 		ConfigAttribute[] attrs = mds.getAttributes(listImpl1).toArray(
@@ -138,6 +154,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(post.getFilterExpression().getExpressionString()).isEqualTo("somePostFilterExpression");
 	}
 
+	/**
+	 * 接口中存在@PreAuthorize，@PreFilter 注解
+	 */
 	@Test
 	public void interfaceAttributesAreIncluded() {
 		ConfigAttribute[] attrs = mds.getAttributes(notherListImpl1).toArray(
@@ -152,6 +171,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(pre.getFilterExpression().getExpressionString()).isEqualTo("interfacePreFilterExpression");
 	}
 
+	/**
+	 * 实现类有注解则以实现类上的注解为准
+	 */
 	@Test
 	public void classAttributesTakesPrecedeceOverInterfaceAttributes() {
 		ConfigAttribute[] attrs = mds.getAttributes(notherListImpl2).toArray(
@@ -166,6 +188,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(pre.getFilterExpression().getExpressionString()).isEqualTo("classMethodPreFilterExpression");
 	}
 
+	/**
+	 * 用户自定义注解作用于实现类上
+	 */
 	@Test
 	public void customAnnotationAtClassLevelIsDetected() throws Exception {
 		ConfigAttribute[] attrs = mds.getAttributes(annotatedAtClassLevel).toArray(
@@ -174,6 +199,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(attrs).hasSize(1);
 	}
 
+	/**
+	 * 用户自定义注解作用于接口上
+	 */
 	@Test
 	public void customAnnotationAtInterfaceLevelIsDetected() throws Exception {
 		ConfigAttribute[] attrs = mds.getAttributes(annotatedAtInterfaceLevel).toArray(
@@ -182,6 +210,9 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 		assertThat(attrs).hasSize(1);
 	}
 
+	/**
+	 * 用户自定义注解作用于实现类方法上
+	 */
 	@Test
 	public void customAnnotationAtMethodLevelIsDetected() throws Exception {
 		ConfigAttribute[] attrs = mds.getAttributes(annotatedAtMethodLevel).toArray(
@@ -220,18 +251,21 @@ public class PrePostAnnotationSecurityMetadataSourceTests {
 
 	@PreAuthorize("someExpression")
 	public static class ReturnVoidImpl1 implements ReturnVoid {
+		@Override
 		public void doSomething(List<?> param) {
 		}
 	}
 
 	@PreAuthorize("someExpression")
 	public static class ReturnVoidImpl2 implements ReturnVoid {
+		@Override
 		@PreFilter(filterTarget = "param", value = "somePreFilterExpression")
 		public void doSomething(List<?> param) {
 		}
 	}
 
 	public static class ReturnVoidImpl3 implements ReturnVoid {
+		@Override
 		@PreFilter(filterTarget = "param", value = "somePreFilterExpression")
 		public void doSomething(List<?> param) {
 		}

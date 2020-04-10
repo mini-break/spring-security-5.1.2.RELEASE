@@ -77,6 +77,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 	protected void additionalAuthenticationChecks(UserDetails userDetails,
 			UsernamePasswordAuthenticationToken authentication)
 			throws AuthenticationException {
+		// 认证凭证（用户密码）不能为空
 		if (authentication.getCredentials() == null) {
 			logger.debug("Authentication failed: no credentials provided");
 
@@ -87,6 +88,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 
 		String presentedPassword = authentication.getCredentials().toString();
 
+		// 密码解密
 		if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
 			logger.debug("Authentication failed: password does not match stored value");
 
@@ -107,6 +109,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 			throws AuthenticationException {
 		prepareTimingAttackProtection();
 		try {
+			// 通过UserDetailsService查询用户信息
 			UserDetails loadedUser = this.getUserDetailsService().loadUserByUsername(username);
 			if (loadedUser == null) {
 				throw new InternalAuthenticationServiceException(

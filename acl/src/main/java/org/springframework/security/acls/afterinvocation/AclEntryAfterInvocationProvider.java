@@ -87,6 +87,7 @@ public class AclEntryAfterInvocationProvider extends AbstractAclProvider impleme
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public Object decide(Authentication authentication, Object object,
 			Collection<ConfigAttribute> config, Object returnedObject)
 			throws AccessDeniedException {

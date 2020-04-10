@@ -38,6 +38,12 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
+ * 当开发人员在安全配置中没有配置登录页面时，Spring Security Web会自动构造一个登录页面给用户。
+ * 完成这一任务是通过一个过滤器来完成的，该过滤器就是DefaultLoginPageGeneratingFilter
+ * 该过滤器支持两种登录情景:
+ *	1.用户名/密码表单登录
+ *  2.OpenID表单登录
+ *
  * For internal use with namespace configuration in the case where a user doesn't
  * configure a login page. The configuration code will insert this filter in the chain
  * instead.
@@ -56,13 +62,40 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 	private boolean formLoginEnabled;
 	private boolean openIdEnabled;
 	private boolean oauth2LoginEnabled;
+
+	// ----用于构造用户名/密码表单登录页面的参数 begin---
+	/**
+	 * 表单提交时的认证处理地址
+	 */
 	private String authenticationUrl;
+	/**
+	 * 用户名表单字段的名称
+	 */
 	private String usernameParameter;
+	/**
+	 * 密码表单字段的名称
+	 */
 	private String passwordParameter;
+	/**
+	 * rememberMe表单字段的名称
+	 */
 	private String rememberMeParameter;
+	// -----用于构造用户名/密码表单登录页面的参数 end----
+
+	// -----用于构造openID表单登录页面的参数 begin----
+	/**
+	 * 提交时的认证处理地址
+	 */
 	private String openIDauthenticationUrl;
+	/**
+	 * 用户名表单字段的名称
+	 */
 	private String openIDusernameParameter;
+	/**
+	 * rememberMe表单字段的名称
+	 */
 	private String openIDrememberMeParameter;
+	// -----用于构造openID表单登录页面的参数 end----
 	private Map<String, String> oauth2AuthenticationUrlToClientName;
 	private Function<HttpServletRequest, Map<String, String>> resolveHiddenInputs = request -> Collections
 		.emptyMap();
@@ -186,6 +219,7 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 		this.oauth2AuthenticationUrlToClientName = oauth2AuthenticationUrlToClientName;
 	}
 
+	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;

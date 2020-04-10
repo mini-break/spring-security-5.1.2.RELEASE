@@ -18,6 +18,7 @@ package org.springframework.security.access.prepost;
 import org.springframework.security.access.ConfigAttribute;
 
 /**
+ * 标记类
  * Marker interface for attributes which are created from combined @PreFilter and @PreAuthorize
  * annotations.
  * <p>

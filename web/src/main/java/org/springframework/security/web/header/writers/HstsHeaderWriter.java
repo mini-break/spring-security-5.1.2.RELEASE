@@ -26,6 +26,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 
 /**
+ * HTTP Strict Transport Security（通常简称为HSTS）是一个安全功能，它告诉浏览器只能通过HTTPS访问当前资源，而不是HTTP
+ * 
  * Provides support for <a href="http://tools.ietf.org/html/rfc6797">HTTP Strict Transport
  * Security (HSTS)</a>.
  *
@@ -58,10 +60,21 @@ public final class HstsHeaderWriter implements HeaderWriter {
 
 	private RequestMatcher requestMatcher;
 
+	/**
+	 * max-age=<expire-time>
+	 * 设置在浏览器收到这个请求后的<expire-time>秒的时间内凡是访问这个域名下的请求都使用HTTPS请求
+	 */
 	private long maxAgeInSeconds;
 
+	/**
+	 * includeSubDomains 可选
+	 * 如果这个可选的参数被指定，那么说明此规则也适用于该网站的所有子域名
+	 */
 	private boolean includeSubDomains;
 
+	/**
+	 * Strict-Transport-Security头部值的组合
+	 */
 	private String hstsHeaderValue;
 
 	/**

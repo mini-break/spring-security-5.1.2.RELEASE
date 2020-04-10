@@ -21,6 +21,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * 抽取请求路径中的变量
+ * 
  * An interface for extracting URI variables from the {@link HttpServletRequest}.
  *
  * @author Rob Winch

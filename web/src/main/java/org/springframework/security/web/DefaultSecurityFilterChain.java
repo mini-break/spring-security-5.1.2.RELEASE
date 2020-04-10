@@ -32,7 +32,13 @@ import java.util.*;
  */
 public final class DefaultSecurityFilterChain implements SecurityFilterChain {
 	private static final Log logger = LogFactory.getLog(DefaultSecurityFilterChain.class);
+	/**
+	 * 请求匹配器
+	 */
 	private final RequestMatcher requestMatcher;
+	/**
+	 * 过滤器集合
+	 */
 	private final List<Filter> filters;
 
 	public DefaultSecurityFilterChain(RequestMatcher requestMatcher, Filter... filters) {
@@ -49,10 +55,12 @@ public final class DefaultSecurityFilterChain implements SecurityFilterChain {
 		return requestMatcher;
 	}
 
+	@Override
 	public List<Filter> getFilters() {
 		return filters;
 	}
 
+	@Override
 	public boolean matches(HttpServletRequest request) {
 		return requestMatcher.matches(request);
 	}

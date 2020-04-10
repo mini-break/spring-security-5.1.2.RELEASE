@@ -18,7 +18,7 @@ package org.springframework.security.access.prepost;
 import org.springframework.aop.framework.AopInfrastructureBean;
 
 /**
- *
+ * 权限属性工厂类
  * @author Luke Taylor
  * @since 3.0
  */

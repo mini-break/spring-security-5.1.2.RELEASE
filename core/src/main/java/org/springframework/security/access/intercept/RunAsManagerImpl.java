@@ -58,22 +58,31 @@ public class RunAsManagerImpl implements RunAsManager, InitializingBean {
 	// ================================================================================================
 
 	private String key;
+	/**
+	 * 角色前缀
+	 */
 	private String rolePrefix = "ROLE_";
 
 	// ~ Methods
 	// ========================================================================================================
 
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(
 				key,
 				"A Key is required and should match that configured for the RunAsImplAuthenticationProvider");
 	}
 
+	/**
+	 * 构建新的Authentication
+	 */
+	@Override
 	public Authentication buildRunAs(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) {
 		List<GrantedAuthority> newAuthorities = new ArrayList<>();
 
 		for (ConfigAttribute attribute : attributes) {
+			// 如果受保护对象对应的ConfigAttribute中拥有以“RUN_AS_”开头的配置属性，则在该属性前加上“ROLE_”
 			if (this.supports(attribute)) {
 				GrantedAuthority extraAuthority = new SimpleGrantedAuthority(
 						getRolePrefix() + attribute.getAttribute());

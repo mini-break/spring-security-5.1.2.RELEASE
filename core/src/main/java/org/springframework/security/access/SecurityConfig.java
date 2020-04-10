@@ -23,6 +23,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 权限配置实现
+ * 
  * Stores a {@link ConfigAttribute} as a <code>String</code>.
  *
  * @author Ben Alex
@@ -31,6 +33,9 @@ public class SecurityConfig implements ConfigAttribute {
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 权限字符串
+	 */
 	private final String attrib;
 
 	// ~ Constructors
@@ -74,6 +79,9 @@ public class SecurityConfig implements ConfigAttribute {
 		return createList(StringUtils.commaDelimitedListToStringArray(access));
 	}
 
+	/**
+	 * 将字符数组转换成ConfigAttribute集合
+	 */
 	public static List<ConfigAttribute> createList(String... attributeNames) {
 		Assert.notNull(attributeNames, "You must supply an array of attribute names");
 		List<ConfigAttribute> attributes = new ArrayList<>(

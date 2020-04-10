@@ -82,6 +82,7 @@ import org.springframework.web.util.WebUtils;
  */
 public class HttpSessionSecurityContextRepository implements SecurityContextRepository {
 	/**
+	 * 安全上下文在HttpSession中保存时会保存为HttpSession的一个属性，这个字符串是缺省使用的属性名称
 	 * The default key under which the security context will be stored in the session.
 	 */
 	public static final String SPRING_SECURITY_CONTEXT_KEY = "SPRING_SECURITY_CONTEXT";
@@ -89,6 +90,7 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
 	/**
+	 * 缺省情况，也就是未认证情况下检查安全上下文相等时缺省使用的安全上下文实例
 	 * SecurityContext instance used to check for equality with default (unauthenticated)
 	 * content
 	 */
@@ -101,6 +103,10 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 	private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
 	/**
+	 * 获取当前请求的安全上下文并返回
+	 * 如果当前请求对应的session为null，安全上下文对象为null，或者session中保存的安全上下文对象
+	 * 不是类SecurityContext的实例，创建一个新的安全上下文对象并返回
+	 *
 	 * Gets the security context for the current request (if available) and returns it.
 	 * <p>
 	 * If the session is null, the context object is null or the context object stored in
@@ -110,15 +116,29 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 	public SecurityContext loadContext(HttpRequestResponseHolder requestResponseHolder) {
 		HttpServletRequest request = requestResponseHolder.getRequest();
 		HttpServletResponse response = requestResponseHolder.getResponse();
+		/**
+		 * 获取当前请求对应的session对象httpSession，注意这里的参数是false，也就是说
+		 * 如果当前请求对应的session对象为null并不创建新的session对象，而是返回null
+		 */
 		HttpSession httpSession = request.getSession(false);
 
+		/**
+		 * 从当前请求的session对象 httpSession 中获取安全上下文对象
+		 */
 		SecurityContext context = readSecurityContextFromSession(httpSession);
 
 		if (context == null) {
+			/**
+			 * 逻辑走到这里说明可能出现了以下情况:
+			 * 1. 当前请求对应的session对象不存在
+			 * 2. session对象中的安全上下文对象为null
+			 * 3. session对象中的安全上下文对象不是类SecurityContext的实例
+			 */
 			if (logger.isDebugEnabled()) {
 				logger.debug("No SecurityContext was available from the HttpSession: "
 						+ httpSession + ". " + "A new one will be created.");
 			}
+			// 创建一个新的空的安全上下文SecurityContext对象
 			context = generateNewContext();
 
 		}
@@ -135,6 +155,10 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 		return context;
 	}
 
+	/**
+	 * 保存安全上下文到session属性
+	 * 会被 SecurityContextPersistenceFilter 在一个请求处理结束返回响应结果时调用
+	 */
 	public void saveContext(SecurityContext context, HttpServletRequest request,
 			HttpServletResponse response) {
 		SaveContextOnUpdateOrErrorResponseWrapper responseWrapper = WebUtils
@@ -155,6 +179,9 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 		}
 	}
 
+	/**
+	 * 检查请求的session中是否已经含有非null安全上下文对象
+	 */
 	public boolean containsContext(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 
@@ -166,7 +193,7 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 	}
 
 	/**
-	 *
+	 * 从session对象中获取安全上下文对象
 	 * @param httpSession the session obtained from the request.
 	 */
 	private SecurityContext readSecurityContextFromSession(HttpSession httpSession) {
@@ -182,6 +209,7 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 
 		// Session exists, so try to obtain a context from it.
 
+		// session中获取值
 		Object contextFromSession = httpSession.getAttribute(springSecurityContextKey);
 
 		if (contextFromSession == null) {
@@ -217,6 +245,11 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 	}
 
 	/**
+	 * 缺省情况下,调用SecurityContextHolder#createEmptyContext()获取一个新的空的安全上下文对象
+	 * (此时安全上下文持有器SecurityContextHolder中应该不能有安全上下文对象存在)。实际上是否使用
+	 * 哪种安全上下文对象创建策略由SecurityContextHolder所使用的SecurityContextHolderStrategy
+	 * 决定。缺省的实现是返回一个新建的SecurityContextImpl对象。
+	 *
 	 * By default, calls {@link SecurityContextHolder#createEmptyContext()} to obtain a
 	 * new context (there should be no context present in the holder when this method is
 	 * called). Using this approach the context creation strategy is decided by the
@@ -255,6 +288,8 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 	}
 
 	/**
+	 * 在session保存安全上下文对象时所使用的属性名称可以通过这里定制，缺省是：SPRING_SECURITY_CONTEXT
+	 * 
 	 * Allows the session attribute name to be customized for this repository instance.
 	 *
 	 * @param springSecurityContextKey the key under which the security context will be
@@ -294,6 +329,9 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 	}
 
 	/**
+	 * response包装器，包装之后，每个request/response在sendError(),或者sendRedirect发生时
+	 * 会更新session中的安全上下文对象，参考 SEC-398。
+	 *
 	 * Wrapper that is applied to every request/response to update the
 	 * <code>HttpSession<code> with
 	 * the <code>SecurityContext</code> when a <code>sendError()</code> or
