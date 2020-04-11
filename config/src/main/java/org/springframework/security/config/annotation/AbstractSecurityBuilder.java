@@ -70,7 +70,7 @@ public abstract class AbstractSecurityBuilder<O> implements SecurityBuilder<O> {
 	}
 
 	/**
-	 * 类继承实现 doBuild(), 做实际的 Build 逻辑
+	 * 子类继承实现 doBuild(), 做实际的 Build 逻辑
 	 * 
 	 * Subclasses should implement this to perform the build.
 	 *

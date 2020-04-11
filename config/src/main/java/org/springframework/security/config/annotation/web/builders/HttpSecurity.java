@@ -1198,6 +1198,7 @@ public final class HttpSecurity extends
 	 * @see
 	 * org.springframework.security.config.annotation.web.HttpSecurityBuilder#addFilter(javax.
 	 * servlet.Filter)
+	 * 往HttpSecurity过滤器链中加入过滤器
 	 */
 	@Override
 	public HttpSecurity addFilter(Filter filter) {

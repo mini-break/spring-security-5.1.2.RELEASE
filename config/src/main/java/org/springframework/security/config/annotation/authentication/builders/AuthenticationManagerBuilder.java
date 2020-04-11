@@ -60,6 +60,9 @@ public class AuthenticationManagerBuilder
 	 * 双亲AuthenticationManager
 	 */
 	private AuthenticationManager parentAuthenticationManager;
+	/**
+	 * 认证提供者列表
+	 */
 	private List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
 	/**
 	 * 用户详情信息服务

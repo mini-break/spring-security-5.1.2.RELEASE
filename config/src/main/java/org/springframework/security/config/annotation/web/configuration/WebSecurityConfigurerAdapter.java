@@ -248,7 +248,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 
 	/**
 	 * 用于获取HttpSecurity实例
-	 * 我们继承这个类, 重写了 configure(http) 方法的时候, 会在 httpSecurity.configurers 里加入 filter
+	 * 我们继承这个类, 重写 configure(http) 方法的时候, 会在 httpSecurity.configurers 里加入 filter
 	 * http.csrf() 会将 CsrfConfigurer<HttpSecurity> 存入 HttpSecurity.configurers 中
 	 * http.csrf().disable() 从 HttpSecurity.configurers 中移除 CsrfConfigurer
 	 * 依次类推
@@ -388,6 +388,8 @@ public abstract class WebSecurityConfigurerAdapter implements
 				 * 方法，则 localConfigureAuthenticationBldr 会被用于构建一个 AuthenticationManager,
 				 * 该 AuthenticationManager 会充当目标WebSecurity/HttpSecurity 所要直接使用的
 				 * AuthenticationManager 的双亲
+				 *
+				 * localConfigureAuthenticationBldr通过setApplicationContext(ApplicationContext context)初始化
 				 */
 				authenticationManager = localConfigureAuthenticationBldr.build();
 			}

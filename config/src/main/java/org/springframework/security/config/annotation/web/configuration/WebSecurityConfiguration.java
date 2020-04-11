@@ -172,7 +172,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 	 * create the web configuration
 	 * @throws Exception
 	 */
-	@Autowired(required = false)
+	@Autowired(required = false) // @Autowired注解，方法会在程序启动时执行一遍
 	public void setFilterChainProxySecurityConfigurer(
 			ObjectPostProcessor<Object> objectPostProcessor,
 			@Value("#{@autowiredWebSecurityConfigurersIgnoreParents.getWebSecurityConfigurers()}") List<SecurityConfigurer<Filter, WebSecurity>> webSecurityConfigurers)
