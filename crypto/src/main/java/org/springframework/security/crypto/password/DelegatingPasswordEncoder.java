@@ -191,13 +191,17 @@ public class DelegatingPasswordEncoder implements PasswordEncoder {
 		if (rawPassword == null && prefixEncodedPassword == null) {
 			return true;
 		}
+		// {id}encodedPassword 取出编码算法的id
 		String id = extractId(prefixEncodedPassword);
+		// 根据编码算法的id从支持的密码编码器Map(构造时传入)中取出对应编码器
 		PasswordEncoder delegate = this.idToPasswordEncoder.get(id);
 		if (delegate == null) {
 			return this.defaultPasswordEncoderForMatches
 				.matches(rawPassword, prefixEncodedPassword);
 		}
+		// 从 prefixEncodedPassword 中提取 encodedPassword
 		String encodedPassword = extractEncodedPassword(prefixEncodedPassword);
+		// 使用对应编码器进行匹配判断,此时比较的密码字符串是 encodedPassword,不携带编码算法id头
 		return delegate.matches(rawPassword, encodedPassword);
 	}
 

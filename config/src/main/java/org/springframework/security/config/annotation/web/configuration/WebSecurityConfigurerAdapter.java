@@ -295,7 +295,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 			 * headers()等方法将configure apply()到了http的属性configurers中，这里默认会注入10个configurer
  			 */
 			http
-				.csrf().and() // 应用 CsrfConfigurer
+				.csrf().and() // 应用 CsrfConfigurer 
 				.addFilter(new WebAsyncManagerIntegrationFilter()) // 添加过滤器 WebAsyncManagerIntegrationFilter
 				.exceptionHandling().and() // 应用 ExceptionHandlingConfigurer 添加过滤器 ExceptionTranslationFilter
 				.headers().and() // 应用 HeadersConfigurer 添加过滤器 HeaderWriterFilter
@@ -443,7 +443,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 
 	@Override
 	public void init(final WebSecurity web) throws Exception {
-		// 初始化了一个 httpSecurity 对象
+		// 初始化了一个 HttpSecurity 对象
 		final HttpSecurity http = getHttp();
 		// 将 httpSecurity 设置进 webSecurity
 		web.addSecurityFilterChainBuilder(http).postBuildAction(new Runnable() {

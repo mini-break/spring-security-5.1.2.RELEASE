@@ -86,6 +86,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 					"Bad credentials"));
 		}
 
+		// 登录提供的密码
 		String presentedPassword = authentication.getCredentials().toString();
 
 		// 密码解密

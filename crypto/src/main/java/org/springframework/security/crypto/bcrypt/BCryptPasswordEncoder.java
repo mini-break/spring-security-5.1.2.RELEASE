@@ -80,6 +80,11 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 		return BCrypt.hashpw(rawPassword.toString(), salt);
 	}
 
+	/**
+	 * @param rawPassword     ????
+	 * @param encodedPassword ??????
+	 * @return
+	 */
 	public boolean matches(CharSequence rawPassword, String encodedPassword) {
 		if (encodedPassword == null || encodedPassword.length() == 0) {
 			logger.warn("Empty encoded password");

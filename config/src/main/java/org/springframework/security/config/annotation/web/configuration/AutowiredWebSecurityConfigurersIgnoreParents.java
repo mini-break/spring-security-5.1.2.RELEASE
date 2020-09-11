@@ -50,6 +50,7 @@ final class AutowiredWebSecurityConfigurersIgnoreParents {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<SecurityConfigurer<Filter, WebSecurity>> getWebSecurityConfigurers() {
 		List<SecurityConfigurer<Filter, WebSecurity>> webSecurityConfigurers = new ArrayList<SecurityConfigurer<Filter, WebSecurity>>();
+		// IOC容器中获取所有类型为WebSecurityConfigurer的类
 		Map<String, WebSecurityConfigurer> beansOfType = beanFactory
 				.getBeansOfType(WebSecurityConfigurer.class);
 		for (Entry<String, WebSecurityConfigurer> entry : beansOfType.entrySet()) {

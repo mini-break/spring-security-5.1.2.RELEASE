@@ -207,7 +207,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 		}
 		// 依次将webSecurityConfigurer加入到 webSecurity 里面
 		for (SecurityConfigurer<Filter, WebSecurity> webSecurityConfigurer : webSecurityConfigurers) {
-			// 自定义的WebSecurityConfigurerAdapter也会加入WebSecurity
+			// 自定义的WebSecurityConfigurerAdapter也会加入WebSecurity(AbstractConfiguredSecurityBuilder中configurers集合)
 			webSecurity.apply(webSecurityConfigurer);
 		}
 		// 设置 webSecurityConfigurers
