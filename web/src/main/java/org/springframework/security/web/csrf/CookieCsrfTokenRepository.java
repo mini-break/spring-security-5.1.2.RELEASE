@@ -80,9 +80,11 @@ public final class CookieCsrfTokenRepository implements CsrfTokenRepository {
 				cookie.setPath(this.getRequestContext(request));
 		}
 		if (token == null) {
+			// 设置Cookie立即失效,setPath需要设置才会生效
 			cookie.setMaxAge(0);
 		}
 		else {
+			// 关闭浏览器就失效,setPath需要设置才会生效
 			cookie.setMaxAge(-1);
 		}
 		if (cookieHttpOnly && setHttpOnlyMethod != null) {
@@ -173,6 +175,7 @@ public final class CookieCsrfTokenRepository implements CsrfTokenRepository {
 	}
 
 	private String createNewToken() {
+		// 生成UUID作为csrf token
 		return UUID.randomUUID().toString();
 	}
 

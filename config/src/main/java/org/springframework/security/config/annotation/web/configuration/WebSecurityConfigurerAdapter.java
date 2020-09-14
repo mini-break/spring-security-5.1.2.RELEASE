@@ -123,6 +123,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 	 */
 	private AuthenticationConfiguration authenticationConfiguration;
 	/**
+	 * 通过setApplicationContext 方法进行初始化
 	 * AuthenticationManager 构建器，缺省使用 : DefaultPasswordEncoderAuthenticationManagerBuilder
 	 * 所有构建的 AuthenticationManager 会是目标 WebSecurity/HttpSecurity 所要直接使用的 AuthenticationManager
 	 */
