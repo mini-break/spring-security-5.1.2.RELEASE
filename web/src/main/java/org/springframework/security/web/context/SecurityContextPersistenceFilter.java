@@ -31,8 +31,8 @@ import org.springframework.web.filter.GenericFilterBean;
 
 /**
  * SecurityContextPersistenceFilter有两个主要任务:
- * 1.在请求到达时处理之前，从SecurityContextRepository(通常为HttpSessionSecurityContextRepository)中获取安全上下文信息填充到SecurityContextHolder;
- * 2.在请求处理结束后返回响应时，将SecurityContextHolder中的安全上下文信息保存回SecurityContextRepository,并清空SecurityContextHolder。
+ * 1.在请求到达时处理之前，从SecurityContextRepository(通常为HttpSessionSecurityContextRepository)中获取安全上下文信息填充到SecurityContextHolder
+ * 2.在请求处理结束后返回响应时，将SecurityContextHolder中的安全上下文信息保存回SecurityContextRepository,并清空SecurityContextHolder
  * 跨请求安全上下文SecurityContext的保持
  *
  * Populates the {@link SecurityContextHolder} with information obtained from the

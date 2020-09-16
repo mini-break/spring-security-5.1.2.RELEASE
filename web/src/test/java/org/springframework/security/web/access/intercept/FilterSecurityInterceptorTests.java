@@ -83,6 +83,7 @@ public class FilterSecurityInterceptorTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void testEnsuresAccessDecisionManagerSupportsFilterInvocationClass()
 			throws Exception {
+		// 通过 when(mock.someMethod()).thenReturn(value) 来设定 Mock 对象某个方法调用时的返回值
 		when(adm.supports(FilterInvocation.class)).thenReturn(true);
 		interceptor.afterPropertiesSet();
 	}

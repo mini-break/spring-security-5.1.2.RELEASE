@@ -25,6 +25,8 @@ import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.util.Assert;
 
 /**
+ * 匿名用户身份认证提供者
+ *
  * An {@link AuthenticationProvider} implementation that validates
  * {@link AnonymousAuthenticationToken}s.
  * <p>

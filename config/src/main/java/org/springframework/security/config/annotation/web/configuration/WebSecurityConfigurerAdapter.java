@@ -276,9 +276,7 @@ public abstract class WebSecurityConfigurerAdapter implements
  		 */
 		AuthenticationManager authenticationManager = authenticationManager();
 		/**
-		 * 设置在父级里面, 此变量也是在 setObjectPostProcessor() 方法里被赋值
-		 * authenticationBuilder 所要构建的目标 AuthenticationManager 才是
-		 * 当前配置器所配置的 WebSecurity/HttpSecurity 所要直接使用的  AuthenticationManager
+		 * 设置在父级里面, 当某个AuthenticationManager不匹配时,会使用父级AuthenticationManager去做认证(如:UsernamePasswordAuthenticationFilter)
 		 */
 		authenticationBuilder.parentAuthenticationManager(authenticationManager);
 		authenticationBuilder.authenticationEventPublisher(eventPublisher);
@@ -296,7 +294,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 			 * headers()等方法将configure apply()到了http的属性configurers中，这里默认会注入10个configurer
  			 */
 			http
-				.csrf().and() // 应用 CsrfConfigurer 
+				.csrf().and() // 应用 CsrfConfigurer 添加过滤器 CsrfFilter
 				.addFilter(new WebAsyncManagerIntegrationFilter()) // 添加过滤器 WebAsyncManagerIntegrationFilter
 				.exceptionHandling().and() // 应用 ExceptionHandlingConfigurer 添加过滤器 ExceptionTranslationFilter
 				.headers().and() // 应用 HeadersConfigurer 添加过滤器 HeaderWriterFilter
@@ -311,7 +309,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 			ClassLoader classLoader = this.context.getClassLoader();
 			/**
 			 * SpringFactoriesLoader 这个类实现了检索 META-INF/spring.factories 文件，并获取指定接口的配置的功能。
-			 * 这是 java spi 的约定, 基于这样一个约定就能很好的找到服务接口的实现类，而不需要再代码里制定
+			 * 这是 java spi 的约定, 基于这样一个约定就能很好的找到服务接口的实现类，而不需要在代码里制定
 			 */
 			List<AbstractHttpConfigurer> defaultHttpConfigurers =
 					SpringFactoriesLoader.loadFactories(AbstractHttpConfigurer.class, classLoader);

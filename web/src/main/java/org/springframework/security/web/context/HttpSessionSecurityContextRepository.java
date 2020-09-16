@@ -385,6 +385,10 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 		@Override
 		protected void saveContext(SecurityContext context) {
 			final Authentication authentication = context.getAuthentication();
+			/**
+			 * HttpServletRequest.getSession(true) 等同于 HttpServletRequest.getSession()
+			 * HttpServletRequest.getSession(false) 等同于 如果当前Session没有就为null
+			 */
 			HttpSession httpSession = request.getSession(false);
 
 			// See SEC-776

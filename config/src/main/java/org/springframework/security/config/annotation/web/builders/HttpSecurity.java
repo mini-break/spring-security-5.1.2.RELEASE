@@ -155,7 +155,7 @@ public final class HttpSecurity extends
 			Map<Class<? extends Object>, Object> sharedObjects) {
 		super(objectPostProcessor);
 		Assert.notNull(authenticationBuilder, "authenticationBuilder cannot be null");
-		// AuthenticationManagerBuilder加入共享对象
+		// AuthenticationManagerBuilder加入共享对象,方便后面调用build方法获取AuthenticationManager
 		setSharedObject(AuthenticationManagerBuilder.class, authenticationBuilder);
 		for (Map.Entry<Class<? extends Object>, Object> entry : sharedObjects
 				.entrySet()) {
@@ -167,6 +167,9 @@ public final class HttpSecurity extends
 		this.requestMatcherConfigurer = new RequestMatcherConfigurer(context);
 	}
 
+	/**
+	 * 从共享变量中获取Application
+	 */
 	private ApplicationContext getContext() {
 		return getSharedObject(ApplicationContext.class);
 	}
@@ -1119,8 +1122,12 @@ public final class HttpSecurity extends
 		super.setSharedObject(sharedType, object);
 	}
 
+	/**
+	 * 扩展AbstractConfiguredSecurityBuilder,将AuthenticationManager设置到共享对象中
+	 */
 	@Override
 	protected void beforeConfigure() throws Exception {
+		// 重点：这里需要重新build,生成ProviderManager
 		setSharedObject(AuthenticationManager.class, getAuthenticationRegistry().build());
 	}
 
@@ -1468,6 +1475,9 @@ public final class HttpSecurity extends
 	public class RequestMatcherConfigurer
 			extends AbstractRequestMatcherRegistry<RequestMatcherConfigurer> {
 
+		/**
+		 * 请求匹配器
+		 */
 		protected List<RequestMatcher> matchers = new ArrayList<>();
 
 		/**

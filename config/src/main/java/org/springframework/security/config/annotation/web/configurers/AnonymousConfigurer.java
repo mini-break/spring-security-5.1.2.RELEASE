@@ -44,6 +44,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 public final class AnonymousConfigurer<H extends HttpSecurityBuilder<H>> extends
 		AbstractHttpConfigurer<AnonymousConfigurer<H>, H> {
 	private String key;
+	// 认证提供者
 	private AuthenticationProvider authenticationProvider;
 	private AnonymousAuthenticationFilter authenticationFilter;
 	private Object principal = "anonymousUser";
@@ -156,6 +157,7 @@ public final class AnonymousConfigurer<H extends HttpSecurityBuilder<H>> extends
 					authorities);
 		}
 		authenticationProvider = postProcess(authenticationProvider);
+		// 增加匿名认证者
 		http.authenticationProvider(authenticationProvider);
 	}
 

@@ -285,6 +285,7 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 	 */
 	protected boolean requiresAuthentication(HttpServletRequest request,
 			HttpServletResponse response) {
+		// AntPathRequestMatcher("/login", "POST")
 		return requiresAuthenticationRequestMatcher.matches(request);
 	}
 

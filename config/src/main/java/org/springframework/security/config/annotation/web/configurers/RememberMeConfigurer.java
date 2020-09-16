@@ -276,6 +276,7 @@ public final class RememberMeConfigurer<H extends HttpSecurityBuilder<H>>
 		RememberMeAuthenticationProvider authenticationProvider = new RememberMeAuthenticationProvider(
 				key);
 		authenticationProvider = postProcess(authenticationProvider);
+		// 增加记住我认证提供者
 		http.authenticationProvider(authenticationProvider);
 
 		initDefaultLoginFilter(http);

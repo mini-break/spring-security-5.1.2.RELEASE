@@ -180,6 +180,7 @@ public final class RequestCacheConfigurer<H extends HttpSecurityBuilder<H>> exte
 
 		List<RequestMatcher> matchers = new ArrayList<>();
 		if (isCsrfEnabled) {
+			// 只支持Get请求
 			RequestMatcher getRequests = new AntPathRequestMatcher("/**", "GET");
 			matchers.add(0, getRequests);
 		}

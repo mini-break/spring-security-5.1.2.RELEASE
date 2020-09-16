@@ -117,6 +117,7 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends
 	}
 
 	/**
+	 * 通过该方法添加登出处理
 	 * Adds a {@link LogoutHandler}. The {@link SecurityContextLogoutHandler} is added as
 	 * the last {@link LogoutHandler} by default.
 	 *
