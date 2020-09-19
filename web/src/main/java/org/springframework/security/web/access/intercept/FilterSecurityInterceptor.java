@@ -122,7 +122,7 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 	}
 
 	public void invoke(FilterInvocation fi) throws IOException, ServletException {
-		// 如果应用过该过滤器直接跳过执行下一个过滤器
+		// 如果运用过该过滤器直接跳过执行下一个过滤器
 		if ((fi.getRequest() != null)
 				&& (fi.getRequest().getAttribute(FILTER_APPLIED) != null)
 				&& observeOncePerRequest) {

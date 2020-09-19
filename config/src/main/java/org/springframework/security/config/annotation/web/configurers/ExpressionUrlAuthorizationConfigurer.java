@@ -568,6 +568,7 @@ public final class ExpressionUrlAuthorizationConfigurer<H extends HttpSecurityBu
 			if (not) {
 				attribute = "!" + attribute;
 			}
+			// 调用外部类
 			interceptUrl(requestMatchers, SecurityConfig.createList(attribute));
 			return ExpressionUrlAuthorizationConfigurer.this.REGISTRY;
 		}

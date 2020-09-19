@@ -89,6 +89,7 @@ abstract class AbstractInterceptUrlConfigurer<C extends AbstractInterceptUrlConf
 		securityInterceptor = postProcess(securityInterceptor);
 		// 将FilterSecurityInterceptor 加入HttpSecurity中
 		http.addFilter(securityInterceptor);
+		// 加入共享对象
 		http.setSharedObject(FilterSecurityInterceptor.class, securityInterceptor);
 	}
 

@@ -606,6 +606,8 @@ public final class HttpSecurity extends
 	}
 
 	/**
+	 * 控制http request访问配置,返回ExpressionInterceptUrlRegistry用于配置RequestMatcher链
+	 * 
 	 * Allows restricting access based upon the {@link HttpServletRequest} using
 	 *
 	 * <h2>Example Configurations</h2>

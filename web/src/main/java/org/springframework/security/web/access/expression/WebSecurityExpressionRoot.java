@@ -23,6 +23,7 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 /**
+ * SpEL根对象
  *
  * @author Luke Taylor
  * @since 3.0
