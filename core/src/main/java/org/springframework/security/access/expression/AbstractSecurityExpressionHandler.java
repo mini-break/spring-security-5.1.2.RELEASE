@@ -46,9 +46,12 @@ public abstract class AbstractSecurityExpressionHandler<T> implements
 	 */
 	private ExpressionParser expressionParser = new SpelExpressionParser();
 	private BeanResolver br;
+	/**
+	 * 角色权限的继承
+	 */
 	private RoleHierarchy roleHierarchy;
 	/**
-	 * 缺省使用 denyAll 评估器
+	 * 权限评估器：缺省使用 denyAll 评估器
 	 */
 	private PermissionEvaluator permissionEvaluator = new DenyAllPermissionEvaluator();
 
