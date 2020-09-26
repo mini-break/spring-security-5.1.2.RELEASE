@@ -73,6 +73,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 				dispatcher.forward(request, response);
 			}
 			else {
+				// 如果没有设置访问拒绝页面，FORBIDDEN(403, "Forbidden")
 				response.sendError(HttpStatus.FORBIDDEN.value(),
 					HttpStatus.FORBIDDEN.getReasonPhrase());
 			}

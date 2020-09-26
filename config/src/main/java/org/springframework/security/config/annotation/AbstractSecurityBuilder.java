@@ -32,12 +32,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  */
 public abstract class AbstractSecurityBuilder<O> implements SecurityBuilder<O> {
+
 	/**
 	 * 原子变量,相当于值为false的原子变量
 	 * AtomicBoolean building = new AtomicBoolean(false)
 	 */
 	private AtomicBoolean building = new AtomicBoolean();
 
+	/**
+	 * build方法创建的对象
+	 */
 	private O object;
 
 	/*
@@ -63,6 +67,7 @@ public abstract class AbstractSecurityBuilder<O> implements SecurityBuilder<O> {
 	 * @return the Object that was built
 	 */
 	public final O getObject() {
+		// 如果获取到building为false，说明build方法没有执行compareAndSet操作
 		if (!this.building.get()) {
 			throw new IllegalStateException("This object has not been built");
 		}

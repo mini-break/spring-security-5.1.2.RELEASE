@@ -90,7 +90,7 @@ public final class WebSecurity extends
 	private final Log logger = LogFactory.getLog(getClass());
 
 	/**
-	 * 记录开发人员通过类似下面例子语句指定忽略的URL :
+	 * 记录开发人员通过类似下面例子语句指定忽略(不拦截)的URL :
 	 * webSecurity.ignoring().antMatchers("/images/**", "/favicon.ico")
 	 * 在该例子中，会在 ignoredRequests 添加两个元素，分别对应 /images/**, /favicon.ico
 	 */

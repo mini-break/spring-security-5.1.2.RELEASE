@@ -192,7 +192,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 
 		Integer previousOrder = null;
 		Object previousConfig = null;
-		// 校验SecurityConfigurer
+		// 校验SecurityConfigurer Order配置
 		for (SecurityConfigurer<Filter, WebSecurity> config : webSecurityConfigurers) {
 			Integer order = AnnotationAwareOrderComparator.lookupOrder(config);
 			// 校验Order

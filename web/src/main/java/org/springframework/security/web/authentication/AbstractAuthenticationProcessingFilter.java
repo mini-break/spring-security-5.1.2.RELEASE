@@ -269,7 +269,7 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 	}
 
 	/**
-	 * 判断request是否需要进行认证
+	 * 判断request是否与请求匹配器匹配
 	 * 
 	 * Indicates whether this filter should attempt to process a login request for the
 	 * current invocation.
@@ -393,14 +393,14 @@ public abstract class AbstractAuthenticationProcessingFilter extends GenericFilt
 	}
 
 	/**
-	 * 获取认证管理服务
+	 * 获取认证管理器
 	 */
 	protected AuthenticationManager getAuthenticationManager() {
 		return authenticationManager;
 	}
 
 	/**
-	 * 设置认证管理服务
+	 * 设置认证管理器
 	 */
 	public void setAuthenticationManager(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;

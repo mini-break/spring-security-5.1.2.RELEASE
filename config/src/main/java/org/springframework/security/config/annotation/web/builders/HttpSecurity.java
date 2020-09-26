@@ -133,7 +133,7 @@ public final class HttpSecurity extends
 	 */
 	private List<Filter> filters = new ArrayList<>();
 	/**
-	 * 匹配任何请求的匹配器
+	 * 默认匹配任何请求的匹配器
 	 */
 	private RequestMatcher requestMatcher = AnyRequestMatcher.INSTANCE;
 	/**
@@ -1382,6 +1382,8 @@ public final class HttpSecurity extends
 	}
 
 	/**
+	 * http.antMatcher("/api/**")表明这个 HttpSecurity 只适用于以 /api/ 开头的URL
+	 *
 	 * Allows configuring the {@link HttpSecurity} to only be invoked when matching the
 	 * provided ant pattern. If more advanced configuration is necessary, consider using
 	 * {@link #requestMatchers()} or {@link #requestMatcher(RequestMatcher)}.

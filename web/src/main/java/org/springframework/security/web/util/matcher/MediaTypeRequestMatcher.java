@@ -33,6 +33,8 @@ import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.context.request.ServletWebRequest;
 
 /**
+ * 多媒体类型请求匹配器
+ *
  * Allows matching {@link HttpServletRequest} based upon the {@link MediaType}'s resolved
  * from a {@link ContentNegotiationStrategy}.
  *
@@ -140,9 +142,18 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 public final class MediaTypeRequestMatcher implements RequestMatcher {
 	private final Log logger = LogFactory.getLog(getClass());
+	/**
+	 * 这个接口就是想知道你（客户端）需要什么类型（MediaType）的数据
+	 */
 	private final ContentNegotiationStrategy contentNegotiationStrategy;
+	/**
+	 * 匹配类型列表
+	 */
 	private final Collection<MediaType> matchingMediaTypes;
 	private boolean useEquals;
+	/**
+	 * 忽略类型列表
+	 */
 	private Set<MediaType> ignoredMediaTypes = Collections.emptySet();
 
 	/**
@@ -174,6 +185,14 @@ public final class MediaTypeRequestMatcher implements RequestMatcher {
 	public boolean matches(HttpServletRequest request) {
 		List<MediaType> httpRequestMediaTypes;
 		try {
+			/**
+			 * 将给定的请求解析为媒体类型列表
+			 * 返回的 List 首先按照 specificity 参数排序，其次按照 quality 参数排序
+			 *
+			 * webRequest: 当前的请求
+			 * 返回请求的媒体类型或者是一个空的 List
+			 * 如果请求的媒体类型不能被解析则抛出 HttpMediaTypeNotAcceptableException 异常
+			 */
 			httpRequestMediaTypes = this.contentNegotiationStrategy
 					.resolveMediaTypes(new ServletWebRequest(request));
 		}
@@ -188,6 +207,7 @@ public final class MediaTypeRequestMatcher implements RequestMatcher {
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("Processing " + httpRequestMediaType);
 			}
+			// 有忽略类型则终止本次循环
 			if (shouldIgnore(httpRequestMediaType)) {
 				this.logger.debug("Ignoring");
 				continue;
@@ -199,6 +219,9 @@ public final class MediaTypeRequestMatcher implements RequestMatcher {
 				return isEqualTo;
 			}
 			for (MediaType matchingMediaType : this.matchingMediaTypes) {
+				/**
+				 * MediaType中的type、subType 比较
+				 */
 				boolean isCompatibleWith = matchingMediaType
 						.isCompatibleWith(httpRequestMediaType);
 				if (this.logger.isDebugEnabled()) {
@@ -234,6 +257,7 @@ public final class MediaTypeRequestMatcher implements RequestMatcher {
 	}
 
 	/**
+	 * 设置排除类型，例如：只匹配 application/json ，但不匹配 星/星
 	 * Set the {@link MediaType} to ignore from the {@link ContentNegotiationStrategy}.
 	 * This is useful if for example, you want to match on
 	 * {@link MediaType#APPLICATION_JSON} but want to ignore {@link MediaType#ALL}.

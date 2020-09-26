@@ -105,7 +105,7 @@ abstract class AbstractDaoAuthenticationConfigurer<B extends ProviderManagerBuil
 	/**
 	 * SecurityConfigurer 接口定义的配置方法：对目标安全配置器builder进行配置
 	 * 1. 对 provider 进行后置处理;
-	 * 2. 将 provider 设置到 builder 上
+	 * 2. 调用builder(DefaultPasswordEncoderAuthenticationManagerBuilder)将 DaoAuthenticationProvider 加入到 builder 属性上
 	 */
 	@Override
 	public void configure(B builder) throws Exception {

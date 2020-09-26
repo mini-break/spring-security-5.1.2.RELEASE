@@ -392,7 +392,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 				 */
 				authenticationManager = localConfigureAuthenticationBldr.build();
 			}
-			// authenticationManager 初始化完成的情况，设置相应标志
+			// authenticationManager 初始化完成的情况，设置相应标志为true
 			authenticationManagerInitialized = true;
 		}
 		return authenticationManager;
@@ -740,6 +740,21 @@ public abstract class WebSecurityConfigurerAdapter implements
 				.passwordEncoder(this.defaultPasswordEncoder);
 		}
 
+		/**
+		 * 用户自定义WebSecurityConfigurerAdapter 通常需要设置 自定义UserDetailsService
+		 * 如下：
+		 * public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+		 *     @Autowired
+		 *     private MyUserDetailsService userDetailService;
+		 *     @Override
+		 *     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		 *         auth
+		 *                 .userDetailsService(userDetailService) // 将DaoAuthenticationConfigurer加入AbstractConfiguredSecurityBuilder中的List中
+		 *                 .passwordEncoder(passwordEncoder());
+		 *     }
+		 * }
+		 *
+		 */
 		@Override
 		public <T extends UserDetailsService> DaoAuthenticationConfigurer<AuthenticationManagerBuilder, T> userDetailsService(
 			T userDetailsService) throws Exception {

@@ -91,6 +91,9 @@ public class MediaTypeRequestMatcherTests {
 
 	@Test
 	public void mediaAllMatches() throws Exception {
+		/**
+		 * when(xxxx).thenReturn(yyyy); 是指定当执行了这个方法(xxxx)的时候，返回 thenReturn 的值
+		 */
 		when(negotiationStrategy.resolveMediaTypes(any(NativeWebRequest.class)))
 				.thenReturn(Arrays.asList(MediaType.ALL));
 

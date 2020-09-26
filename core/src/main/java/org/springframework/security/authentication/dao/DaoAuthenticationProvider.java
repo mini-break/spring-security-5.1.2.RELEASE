@@ -62,6 +62,9 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 	 */
 	private volatile String userNotFoundEncodedPassword;
 
+	/**
+	 * 用户信息查询服务
+	 */
 	private UserDetailsService userDetailsService;
 
 	private UserDetailsPasswordService userDetailsPasswordService;

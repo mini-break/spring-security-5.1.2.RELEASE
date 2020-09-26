@@ -66,7 +66,7 @@ public abstract class AbstractRequestMatcherRegistry<C> {
 	}
 
 	/**
-	 * 任何请求都可访问
+	 * 任何请求都匹配
 	 * Maps any request.
 	 *
 	 * @return the object that is chained after creating the {@link RequestMatcher}

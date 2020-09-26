@@ -61,6 +61,9 @@ public class FilterSecurityInterceptor extends AbstractSecurityInterceptor imple
 	 * 安全认证元数据(权限)信息
 	 */
 	private FilterInvocationSecurityMetadataSource securityMetadataSource;
+	/**
+	 * 每次请求观察标识
+	 */
 	private boolean observeOncePerRequest = true;
 
 	// ~ Methods

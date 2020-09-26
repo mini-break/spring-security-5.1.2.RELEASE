@@ -41,7 +41,13 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 用户名
+	 */
 	private final Object principal;
+	/**
+	 * 密码
+	 */
 	private Object credentials;
 
 	// ~ Constructors

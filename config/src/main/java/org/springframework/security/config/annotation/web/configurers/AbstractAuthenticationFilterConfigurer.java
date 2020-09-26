@@ -75,6 +75,9 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	private SavedRequestAwareAuthenticationSuccessHandler defaultSuccessHandler = new SavedRequestAwareAuthenticationSuccessHandler();
 	private AuthenticationSuccessHandler successHandler = this.defaultSuccessHandler;
 
+	/**
+	 * 认证入口点
+	 */
 	private LoginUrlAuthenticationEntryPoint authenticationEntryPoint;
 
 	/**
@@ -100,6 +103,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	 * Creates a new instance with minimal defaults
 	 */
 	protected AbstractAuthenticationFilterConfigurer() {
+		// 设置默认登录页面
 		setLoginPage("/login");
 	}
 
@@ -271,6 +275,10 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 		if (exceptionHandling == null) {
 			return;
 		}
+		/**
+		 * 向ExceptionHandlingConfigurer中加入认证入口点及匹配器
+		 * authenticationEntryPoint通过初始化函数生成
+		 */
 		exceptionHandling.defaultAuthenticationEntryPointFor(
 				postProcess(authenticationEntryPoint), getAuthenticationEntryPointMatcher(http));
 	}

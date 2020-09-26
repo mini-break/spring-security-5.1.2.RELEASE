@@ -79,6 +79,9 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	 */
 	private final Map<Class<? extends Object>, Object> sharedObjects = new HashMap<Class<? extends Object>, Object>();
 
+	/**
+	 * 是否允许相同类型的SecurityConfigurer配置,如果不允许,后面配置的会覆盖前面的配置
+	 */
 	private final boolean allowConfigurersOfSameType;
 
 	/**
@@ -101,6 +104,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	 */
 	protected AbstractConfiguredSecurityBuilder(
 			ObjectPostProcessor<Object> objectPostProcessor) {
+		// 默认不支持同类型配置
 		this(objectPostProcessor, false);
 	}
 
@@ -415,7 +419,12 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 	@SuppressWarnings("unchecked")
 	private void init() throws Exception {
 		Collection<SecurityConfigurer<O, B>> configurers = getConfigurers();
-
+		/**
+		 * this指:
+		 * 1.WebSecurity
+		 * 2.
+		 * 3.
+		 */
 		for (SecurityConfigurer<O, B> configurer : configurers) {
 			configurer.init((B) this);
 		}

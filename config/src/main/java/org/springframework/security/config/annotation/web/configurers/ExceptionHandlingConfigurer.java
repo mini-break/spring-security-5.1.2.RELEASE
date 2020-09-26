@@ -71,6 +71,9 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 
 	private AccessDeniedHandler accessDeniedHandler;
 
+	/**
+	 * 入口点Map<请求匹配器,认证入口点>
+	 */
 	private LinkedHashMap<RequestMatcher, AuthenticationEntryPoint> defaultEntryPointMappings = new LinkedHashMap<>();
 
 	private LinkedHashMap<RequestMatcher, AccessDeniedHandler> defaultDeniedHandlerMappings = new LinkedHashMap<>();
@@ -154,6 +157,7 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 	}
 
 	/**
+	 * 通过本方法增加 匹配器及认证入口(例：AbstractAuthenticationFilterConfigurer.registerAuthenticationEntryPoint方法)
 	 * Sets a default {@link AuthenticationEntryPoint} to be used which prefers being
 	 * invoked for the provided {@link RequestMatcher}. If only a single default
 	 * {@link AuthenticationEntryPoint} is specified, it will be what is used for the
@@ -191,9 +195,11 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 
 	@Override
 	public void configure(H http) throws Exception {
+		// 获取认证入口点
 		AuthenticationEntryPoint entryPoint = getAuthenticationEntryPoint(http);
 		ExceptionTranslationFilter exceptionTranslationFilter = new ExceptionTranslationFilter(
 				entryPoint, getRequestCache(http));
+		// 获取拒绝访问处理器
 		AccessDeniedHandler deniedHandler = getAccessDeniedHandler(http);
 		exceptionTranslationFilter.setAccessDeniedHandler(deniedHandler);
 		exceptionTranslationFilter = postProcess(exceptionTranslationFilter);
@@ -226,6 +232,7 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 	AuthenticationEntryPoint getAuthenticationEntryPoint(H http) {
 		AuthenticationEntryPoint entryPoint = this.authenticationEntryPoint;
 		if (entryPoint == null) {
+			// 创建默认认证入口点
 			entryPoint = createDefaultEntryPoint(http);
 		}
 		return entryPoint;
@@ -233,6 +240,7 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 
 	private AccessDeniedHandler createDefaultDeniedHandler(H http) {
 		if (this.defaultDeniedHandlerMappings.isEmpty()) {
+			// 默认的访问拒绝处理类
 			return new AccessDeniedHandlerImpl();
 		}
 		if (this.defaultDeniedHandlerMappings.size() == 1) {

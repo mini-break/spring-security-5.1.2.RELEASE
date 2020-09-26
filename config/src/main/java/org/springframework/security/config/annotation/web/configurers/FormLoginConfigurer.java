@@ -181,6 +181,7 @@ public final class FormLoginConfigurer<H extends HttpSecurityBuilder<H>> extends
 	 * @return the {@link FormLoginConfigurer} for additional customization
 	 *
 	 * 通过本方法设置用户自定义登录Url
+	 * 当需要认证时的认证登录页面配置
 	 */
 	@Override
 	public FormLoginConfigurer<H> loginPage(String loginPage) {

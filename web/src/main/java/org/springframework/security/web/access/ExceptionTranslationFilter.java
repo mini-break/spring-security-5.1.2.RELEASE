@@ -81,11 +81,18 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 	// ~ Instance fields
 	// ================================================================================================
 
+	// 拒绝访问处理器
 	private AccessDeniedHandler accessDeniedHandler = new AccessDeniedHandlerImpl();
+	// 认证入口点（如:LoginUrlAuthenticationEntryPoint）
 	private AuthenticationEntryPoint authenticationEntryPoint;
+	// 用于判断一个Authentication是否Anonymous,Remember Me
 	private AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
+	// 用于分析一个Throwable抛出的原因
 	private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
-
+	/**
+	 * 请求缓存，缺省使用HttpSessionRequestCache，在遇到异常启动认证过程时会用到,
+	 * 	因为要先把原始请求缓存下来，一旦认证成功结果，需要把原始请求提出重新跳转到相应URL
+	 */
 	private RequestCache requestCache = new HttpSessionRequestCache();
 
 	private final MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
@@ -119,6 +126,13 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		HttpServletResponse response = (HttpServletResponse) res;
 
 		try {
+			/**
+			 * 在任何请求到达时不做任何操作，直接放行，继续filter chain的执行，
+			 * 但是使用一个 try-catch 来捕获filter chain中接下来会发生的各种异常，
+			 * 重点关注其中的以下异常，其他异常继续向外抛出 :
+			 * AuthenticationException : 认证失败异常,通常因为认证信息错误导致
+			 * AccessDeniedException : 访问被拒绝异常，通常因为权限不足导致
+			 */
 			chain.doFilter(request, response);
 
 			logger.debug("Chain processed normally");
@@ -138,6 +152,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 			}
 
 			if (ase != null) {
+				// 如果response已经提交，则没办法向响应中转换和写入这些异常了，只好抛一个异常
 				if (response.isCommitted()) {
 					throw new ServletException("Unable to handle the Spring Security Exception because the response is already committed.", ex);
 				}
@@ -184,7 +199,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		else if (exception instanceof AccessDeniedException) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			/**
-			 * 如果异常是 AccessDeniedException 且用户是匿名用户，使用 AuthenticationEntryPoint 处理
+			 * 如果异常是 AccessDeniedException 且用户是匿名用户或Remember Me，使用 AuthenticationEntryPoint 处理
 			 */
 			if (authenticationTrustResolver.isAnonymous(authentication) || authenticationTrustResolver.isRememberMe(authentication)) {
 				logger.debug(
@@ -206,7 +221,7 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 						exception);
 
 				/**
-				 * 如果异常是 AccessDeniedException 且用户不是匿名用户，如果否则交给 AccessDeniedHandler 处理
+				 * 如果异常是 AccessDeniedException 且用户不是匿名用户，则交给 AccessDeniedHandler 处理
 				 */
 				accessDeniedHandler.handle(request, response,
 						(AccessDeniedException) exception);
@@ -220,8 +235,10 @@ public class ExceptionTranslationFilter extends GenericFilterBean {
 		// SEC-112: Clear the SecurityContextHolder's Authentication, as the
 		// existing Authentication is no longer considered valid
 		SecurityContextHolder.getContext().setAuthentication(null);
+		// 缓存请求
 		requestCache.saveRequest(request, response);
 		logger.debug("Calling Authentication entry point.");
+		// 处理认证入口逻辑
 		authenticationEntryPoint.commence(request, response, reason);
 	}
 

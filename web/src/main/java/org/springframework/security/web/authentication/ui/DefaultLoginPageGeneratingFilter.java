@@ -240,6 +240,9 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 		chain.doFilter(request, response);
 	}
 
+	/**
+	 * 生成默认登录页面
+	 */
 	private String generateLoginPageHtml(HttpServletRequest request, boolean loginError,
 			boolean logoutSuccess) {
 		String errorMsg = "Invalid credentials";
