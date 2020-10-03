@@ -54,6 +54,7 @@ import java.util.function.Function;
  * @since 2.0
  */
 public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
+	// 默认的登录url
 	public static final String DEFAULT_LOGIN_PAGE_URL = "/login";
 	public static final String ERROR_PARAMETER_NAME = "error";
 	private String loginPageUrl;

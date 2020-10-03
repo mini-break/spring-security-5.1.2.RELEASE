@@ -84,6 +84,8 @@ import org.springframework.security.config.annotation.web.servlet.configuration.
 @Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target(value = { java.lang.annotation.ElementType.TYPE })
 @Documented
+// 如果用户未自定义WebSecurityConfigurerAdapter且重写configure(AuthenticationManagerBuilder auth)方法,
+// 则使用AuthenticationConfiguration创建AuthenticationManager
 @Import(AuthenticationConfiguration.class)
 @Configuration
 public @interface EnableGlobalAuthentication {

@@ -288,6 +288,7 @@ public class AuthenticationConfiguration {
 		}
 	}
 
+	// 没有什么实质性内容
 	private static class EnableGlobalAuthenticationAutowiredConfigurer extends
 			GlobalAuthenticationConfigurerAdapter {
 		private final ApplicationContext context;

@@ -101,6 +101,7 @@ public class AuthenticationManagerBuilder
 	public AuthenticationManagerBuilder parentAuthenticationManager(
 			AuthenticationManager authenticationManager) {
 		if (authenticationManager instanceof ProviderManager) {
+			// 设置是否擦除密码方法
 			eraseCredentials(((ProviderManager) authenticationManager)
 					.isEraseCredentialsAfterAuthentication());
 		}
@@ -267,6 +268,9 @@ public class AuthenticationManagerBuilder
 		return this;
 	}
 
+	/**
+	 * 执行ProviderManager生成逻辑
+	 */
 	@Override
 	protected ProviderManager performBuild() throws Exception {
 		// 是否配置了AuthenticationProvider

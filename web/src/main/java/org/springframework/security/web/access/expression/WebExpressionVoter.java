@@ -47,7 +47,7 @@ public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation>
 			return ACCESS_ABSTAIN;
 		}
 
-		// 获取评估上下文
+		// 获取评估上下文(这里面会设置根对象)
 		EvaluationContext ctx = expressionHandler.createEvaluationContext(authentication,
 				fi);
 		ctx = weca.postProcess(ctx, fi);
