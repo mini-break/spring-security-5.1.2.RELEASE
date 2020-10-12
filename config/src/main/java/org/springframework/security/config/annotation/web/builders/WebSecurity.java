@@ -102,6 +102,9 @@ public final class WebSecurity extends
 	 */
 	private final List<SecurityBuilder<? extends SecurityFilterChain>> securityFilterChainBuilders = new ArrayList<SecurityBuilder<? extends SecurityFilterChain>>();
 
+	/**
+	 * 不需要安全认证的RequestMatcher配置
+	 */
 	private IgnoredRequestConfigurer ignoredRequestRegistry;
 
 	private FilterSecurityInterceptor filterSecurityInterceptor;

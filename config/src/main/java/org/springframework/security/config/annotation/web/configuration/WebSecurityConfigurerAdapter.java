@@ -325,6 +325,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 	}
 
 	/**
+	 * 以Bean的方式暴露AuthenticationManager
 	 * Override this method to expose the {@link AuthenticationManager} from
 	 * {@link #configure(AuthenticationManagerBuilder)} to be exposed as a Bean. For
 	 * example:
@@ -669,7 +670,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 				if (delegate == null) {
 					/**
 					 * 如果被代理的 AuthenticationManager delegate 尚未被构建，则在本次认证调用
-					 * 中先对其进行构建，构建成功后忘掉所用的delegateBuilder
+					 * 中先对其进行构建(调用这个方法前已经构建)，构建成功后忘掉所用的delegateBuilder
 					 * 该模式中，这次认证也是对被代理的目标 AuthenticationManager 的首次认证调用
 					 */
 					delegate = this.delegateBuilder.getObject();
