@@ -88,17 +88,25 @@ public class ConcurrentSessionControlAuthenticationStrategy implements
 	public void onAuthentication(Authentication authentication,
 			HttpServletRequest request, HttpServletResponse response) {
 
+		/**
+		 * 获取当前用户的所有 session
+		 * false 表示不包含已经过期的 session（在用户登录成功后，会将用户的 sessionid 存起来，其中 key 是用户的主体（principal），value 则是该主题对应的 sessionid 组成的一个集合）
+		 */
 		final List<SessionInformation> sessions = sessionRegistry.getAllSessions(
 				authentication.getPrincipal(), false);
 
+		// 当前 session数
 		int sessionCount = sessions.size();
+		// 获取允许的 session 并发数
 		int allowedSessions = getMaximumSessionsForThisUser(authentication);
 
+		// 如果当前 session 数（sessionCount）小于 session 并发数（allowedSessions），则不做任何处理
 		if (sessionCount < allowedSessions) {
 			// They haven't got too many login sessions running at present
 			return;
 		}
 
+		// 如果 allowedSessions 的值为 -1，表示对 session 数量不做任何限制
 		if (allowedSessions == -1) {
 			// We permit unlimited logins
 			return;
@@ -120,6 +128,7 @@ public class ConcurrentSessionControlAuthenticationStrategy implements
 			// exceeding the allowed number
 		}
 
+		// 进入策略判断方法 
 		allowableSessionsExceeded(sessions, allowedSessions, sessionRegistry);
 	}
 

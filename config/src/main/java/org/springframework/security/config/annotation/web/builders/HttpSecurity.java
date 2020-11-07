@@ -756,6 +756,7 @@ public final class HttpSecurity extends
 	}
 
 	/**
+	 * 退出/注销 配置
 	 * Provides logout support. This is automatically applied when using
 	 * {@link WebSecurityConfigurerAdapter}. The default is that accessing the URL
 	 * "/logout" will log the user out by invalidating the HTTP Session, cleaning up any

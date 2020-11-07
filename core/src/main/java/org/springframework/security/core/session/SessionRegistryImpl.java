@@ -47,6 +47,10 @@ public class SessionRegistryImpl implements SessionRegistry,
 
 	protected final Log logger = LogFactory.getLog(SessionRegistryImpl.class);
 
+	/**
+	 * key 是用户的主体（principal）
+	 * value 则是一个 set 集合，这个 set 集合中保存了这个用户对应的 sessionid
+	 */
 	/** <principal:Object,SessionIdSet> */
 	private final ConcurrentMap<Object, Set<String>> principals;
 	/** <sessionId:Object,SessionInformation> */
@@ -101,6 +105,7 @@ public class SessionRegistryImpl implements SessionRegistry,
 		return sessionIds.get(sessionId);
 	}
 
+	@Override
 	public void onApplicationEvent(SessionDestroyedEvent event) {
 		String sessionId = event.getId();
 		removeSessionInformation(sessionId);

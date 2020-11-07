@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 
 /**
+ * 默认配置UserDetailsService
  * Lazily initializes the global authentication with a {@link UserDetailsService} if it is
  * not yet configured and there is only a single Bean of that type. Optionally, if a
  * {@link PasswordEncoder} is defined will wire this up too.
@@ -49,6 +50,7 @@ class InitializeUserDetailsBeanManagerConfigurer
 
 	@Override
 	public void init(AuthenticationManagerBuilder auth) throws Exception {
+		// AbstractConfiguredSecurityBuilder中加入UserDetailsService配置
 		auth.apply(new InitializeUserDetailsManagerConfigurer());
 	}
 
@@ -59,6 +61,10 @@ class InitializeUserDetailsBeanManagerConfigurer
 			if (auth.isConfigured()) {
 				return;
 			}
+			/**
+			 * 容器中获取用户详情服务bean
+			 * InMemoryUserDetailsManager 来自 UserDetailsServiceAutoConfiguration
+			 */
 			UserDetailsService userDetailsService = getBeanOrNull(
 					UserDetailsService.class);
 			if (userDetailsService == null) {
@@ -66,6 +72,10 @@ class InitializeUserDetailsBeanManagerConfigurer
 			}
 
 			PasswordEncoder passwordEncoder = getBeanOrNull(PasswordEncoder.class);
+			/**
+			 * 容器中获取用户详情密码修改服务bean
+			 * InMemoryUserDetailsManager 来自 UserDetailsServiceAutoConfiguration
+			 */
 			UserDetailsPasswordService passwordManager = getBeanOrNull(UserDetailsPasswordService.class);
 
 			DaoAuthenticationProvider provider = new DaoAuthenticationProvider();

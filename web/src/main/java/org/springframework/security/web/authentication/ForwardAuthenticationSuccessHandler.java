@@ -38,7 +38,7 @@ public class ForwardAuthenticationSuccessHandler implements AuthenticationSucces
 	private final String forwardUrl;
 
 	/**
-	 * @param forwardUrl
+	 * @param forwardUrl 转发路径
 	 */
 	public ForwardAuthenticationSuccessHandler(String forwardUrl) {
 		Assert.isTrue(UrlUtils.isValidRedirectUrl(forwardUrl),
@@ -47,6 +47,7 @@ public class ForwardAuthenticationSuccessHandler implements AuthenticationSucces
 	}
 
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+		// 转发
 		request.getRequestDispatcher(forwardUrl).forward(request, response);
 	}
 }

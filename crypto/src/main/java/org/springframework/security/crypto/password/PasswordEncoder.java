@@ -27,12 +27,14 @@ package org.springframework.security.crypto.password;
 public interface PasswordEncoder {
 
 	/**
+	 * 用来对明文密码进行加密，返回加密之后的密文
 	 * Encode the raw password. Generally, a good encoding algorithm applies a SHA-1 or
 	 * greater hash combined with an 8-byte or greater randomly generated salt.
 	 */
 	String encode(CharSequence rawPassword);
 
 	/**
+	 * 一个密码校对方法，在用户登录的时候，将用户传来的明文密码和数据库中保存的密文密码作为参数，传入到这个方法中去，根据返回的 Boolean 值判断用户密码是否输入正确
 	 * Verify the encoded password obtained from storage matches the submitted raw
 	 * password after it too is encoded. Returns true if the passwords match, false if
 	 * they do not. The stored password itself is never decoded.
@@ -45,6 +47,7 @@ public interface PasswordEncoder {
 	boolean matches(CharSequence rawPassword, String encodedPassword);
 
 	/**
+	 * 是否还要进行再次加密
 	 * Returns true if the encoded password should be encoded again for better security,
 	 * else false. The default implementation always returns false.
 	 * @param encodedPassword the encoded password to check

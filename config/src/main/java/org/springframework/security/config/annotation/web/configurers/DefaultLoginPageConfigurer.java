@@ -69,7 +69,7 @@ public final class DefaultLoginPageConfigurer<H extends HttpSecurityBuilder<H>> 
 		AbstractHttpConfigurer<DefaultLoginPageConfigurer<H>, H> {
 
 	/**
-	 * 仅在没有通过FormLoginConfigurer指定一个登录页面时应用
+	 * 仅在没有通过FormLoginConfigurer指定一个登录页面时运用
 	 * 安全过滤器，用于生成缺省的登录页面
 	 */
 	private DefaultLoginPageGeneratingFilter loginPageGeneratingFilter = new DefaultLoginPageGeneratingFilter();

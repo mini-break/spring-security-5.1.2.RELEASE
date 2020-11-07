@@ -24,6 +24,9 @@ public class PersistentRememberMeToken {
 	private final String username;
 	private final String series;
 	private final String tokenValue;
+	/**
+	 * 上一次使用自动登录的时间
+	 */
 	private final Date date;
 
 	public PersistentRememberMeToken(String username, String series, String tokenValue,

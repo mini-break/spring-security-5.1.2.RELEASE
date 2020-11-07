@@ -53,7 +53,7 @@ public class DefaultRedirectStrategy implements RedirectStrategy {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Redirecting to '" + redirectUrl + "'");
 		}
-
+		// 重定向
 		response.sendRedirect(redirectUrl);
 	}
 

@@ -86,7 +86,13 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 	private UserCache userCache = new NullUserCache();
+	/**
+	 * 是否强制将 Authentication 中的 principal 属性设置为字符串
+	 */
 	private boolean forcePrincipalAsString = false;
+	/**
+	 * 是否隐藏用户未找到异常
+	 */
 	protected boolean hideUserNotFoundExceptions = true;
 	private UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
 	private UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();

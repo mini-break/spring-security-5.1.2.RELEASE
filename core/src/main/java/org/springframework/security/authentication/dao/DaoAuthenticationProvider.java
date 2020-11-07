@@ -67,6 +67,9 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 	 */
 	private UserDetailsService userDetailsService;
 
+	/**
+	 * 用户详情密码修改服务
+	 */
 	private UserDetailsPasswordService userDetailsPasswordService;
 
 	public DaoAuthenticationProvider() {
@@ -92,7 +95,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 		// 登录提供的密码
 		String presentedPassword = authentication.getCredentials().toString();
 
-		// 密码解密
+		// 密码比对
 		if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
 			logger.debug("Authentication failed: password does not match stored value");
 

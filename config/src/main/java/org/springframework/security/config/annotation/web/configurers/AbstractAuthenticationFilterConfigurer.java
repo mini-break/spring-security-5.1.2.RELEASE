@@ -63,7 +63,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 		extends AbstractHttpConfigurer<T, B> {
 
 	/**
-	 * 认证过滤器
+	 * 认证过滤器  如：UsernamePasswordAuthenticationFilter
 	 */
 	private F authFilter;
 
@@ -73,6 +73,9 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource;
 
 	private SavedRequestAwareAuthenticationSuccessHandler defaultSuccessHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+	/**
+	 * 认证成功处理器
+	 */
 	private AuthenticationSuccessHandler successHandler = this.defaultSuccessHandler;
 
 	/**
@@ -93,6 +96,9 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	 */
 	private String loginProcessingUrl;
 
+	/**
+	 * 认证失败处理器
+	 */
 	private AuthenticationFailureHandler failureHandler;
 
 	private boolean permitAll;
@@ -141,7 +147,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	 * is a shortcut for calling {@link #successHandler(AuthenticationSuccessHandler)}.
 	 *
 	 * @param defaultSuccessUrl the default success url
-	 * @param alwaysUse true if the {@code defaultSuccesUrl} should be used after
+	 * @param alwaysUse true if the {@code defaultSuccessUrl} should be used after
 	 * authentication despite if a protected page had been previously visited
 	 * @return the {@link FormLoginConfigurer} for additional customization
 	 */
@@ -154,6 +160,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	}
 
 	/**
+	 * 配置自定义登录处理url
 	 * Specifies the URL to validate the credentials.
 	 *
 	 * @param loginProcessingUrl the URL to validate username and password
@@ -176,6 +183,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 			String loginProcessingUrl);
 
 	/**
+	 * 配置用户自定义 AuthenticationDetailsSource
 	 * Specifies a custom {@link AuthenticationDetailsSource}. The default is
 	 * {@link WebAuthenticationDetailsSource}.
 	 *
@@ -197,6 +205,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	 * @return the {@link FormLoginConfigurer} for additional customization
 	 */
 	public final T successHandler(AuthenticationSuccessHandler successHandler) {
+		// 设置登录成功处理器
 		this.successHandler = successHandler;
 		return getSelf();
 	}

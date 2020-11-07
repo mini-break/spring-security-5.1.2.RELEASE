@@ -94,6 +94,9 @@ public class RememberMeAuthenticationFilter extends GenericFilterBean implements
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 
+		/**
+		 * 如果从 SecurityContextHolder 中无法获取到当前登录用户实例，那么就调用 rememberMeServices.autoLogin 逻辑进行登录
+		 */
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
 			Authentication rememberMeAuth = rememberMeServices.autoLogin(request,
 					response);

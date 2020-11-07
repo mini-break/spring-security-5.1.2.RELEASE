@@ -28,6 +28,9 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 /**
+ * 这个类实现了 HttpSessionListener 接口，在该 Bean 中，可以将 session 创建以及销毁的事件及时感知到，
+ * 并且调用 Spring 中的事件机制将相关的创建和销毁事件发布出去，进而被 Spring Security 感知到
+ *
  * Declared in web.xml as
  *
  * <pre>

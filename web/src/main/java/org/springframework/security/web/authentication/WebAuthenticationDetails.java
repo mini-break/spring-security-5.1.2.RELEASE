@@ -50,9 +50,11 @@ public class WebAuthenticationDetails implements Serializable {
 	 * @param request that the authentication request was received from
 	 */
 	public WebAuthenticationDetails(HttpServletRequest request) {
+		// 获取ip地址
 		this.remoteAddress = request.getRemoteAddr();
 
 		HttpSession session = request.getSession(false);
+		// 获取sessionId
 		this.sessionId = (session != null) ? session.getId() : null;
 	}
 

@@ -36,6 +36,7 @@ package org.springframework.security.core.userdetails;
  */
 public interface UserDetailsChecker {
 	/**
+	 * 检验 user 中的各个账户状态属性是否正常，例如账户是否被禁用、账户是否被锁定、账户是否过期等等
 	 * Examines the User
 	 * @param toCheck the UserDetails instance whose status should be checked.
 	 */

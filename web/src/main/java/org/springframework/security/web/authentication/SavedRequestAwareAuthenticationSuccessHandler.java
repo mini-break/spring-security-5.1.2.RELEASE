@@ -68,20 +68,28 @@ public class SavedRequestAwareAuthenticationSuccessHandler extends
 		SimpleUrlAuthenticationSuccessHandler {
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
+	/**
+	 * 存储进行登陆前所在页面，方便登录后跳转回用户刚刚所处的页面
+	 */
 	private RequestCache requestCache = new HttpSessionRequestCache();
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request,
 			HttpServletResponse response, Authentication authentication)
 			throws ServletException, IOException {
+		// 从session中取出登陆前的请求对象，里面有登陆前页面的url 
 		SavedRequest savedRequest = requestCache.getRequest(request, response);
 
+		// 如果不存在缓存的request，那么从其他位置获取跳转的url信息,由父类实现
 		if (savedRequest == null) {
 			super.onAuthenticationSuccess(request, response, authentication);
-
 			return;
 		}
 		String targetUrlParameter = getTargetUrlParameter();
+		/**
+		 * 1.是否总是用默认的url（可在配置文件中配置）
+		 * 2.是否通过request来获取url
+		 */
 		if (isAlwaysUseDefaultTargetUrl()
 				|| (targetUrlParameter != null && StringUtils.hasText(request
 						.getParameter(targetUrlParameter)))) {
@@ -91,6 +99,7 @@ public class SavedRequestAwareAuthenticationSuccessHandler extends
 			return;
 		}
 
+		// 清除掉由登录失败存进session中的错误
 		clearAuthenticationAttributes(request);
 
 		// Use the DefaultSavedRequest URL

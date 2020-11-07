@@ -57,8 +57,11 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 	// 默认的登录url
 	public static final String DEFAULT_LOGIN_PAGE_URL = "/login";
 	public static final String ERROR_PARAMETER_NAME = "error";
+	// 登录url 如：/login
 	private String loginPageUrl;
+	// 退出登录url 如：/login?logout
 	private String logoutSuccessUrl;
+	// 登录失败url  如：/login?error
 	private String failureUrl;
 	private boolean formLoginEnabled;
 	private boolean openIdEnabled;
@@ -102,6 +105,7 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 		.emptyMap();
 
 
+	// 默认使用这个构造函数
 	public DefaultLoginPageGeneratingFilter() {
 	}
 
@@ -226,8 +230,11 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 
+		// 请求url是否为登录失败url
 		boolean loginError = isErrorPage(request);
+		// 请求url是否为退出成功url
 		boolean logoutSuccess = isLogoutSuccess(request);
+		// 请求url是否为登录url
 		if (isLoginUrlRequest(request) || loginError || logoutSuccess) {
 			String loginPageHtml = generateLoginPageHtml(request, loginError,
 					logoutSuccess);
@@ -275,6 +282,7 @@ public class DefaultLoginPageGeneratingFilter extends GenericFilterBean {
 				+ "     <div class=\"container\">\n");
 
 		String contextPath = request.getContextPath();
+		// 构造登录表单
 		if (this.formLoginEnabled) {
 			sb.append("      <form class=\"form-signin\" method=\"post\" action=\"" + contextPath + this.authenticationUrl + "\">\n"
 					+ "        <h2 class=\"form-signin-heading\">Please sign in</h2>\n"

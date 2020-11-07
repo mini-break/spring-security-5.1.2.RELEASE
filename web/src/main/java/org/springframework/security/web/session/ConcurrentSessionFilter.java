@@ -127,6 +127,10 @@ public class ConcurrentSessionFilter extends GenericFilterBean {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 
+		/**
+		 * request.getSession(true)：若存在会话则返回该会话，否则新建一个会话。
+		 * request.getSession(false)：若存在会话则返回该会话，否则返回NULL
+		 */
 		HttpSession session = request.getSession(false);
 
 		if (session != null) {

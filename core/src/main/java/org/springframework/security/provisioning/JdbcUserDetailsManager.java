@@ -45,6 +45,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * spring security提供的用户管理/授权 数据库模型
+ *
  * Jdbc user management service, based on the same table structure as its parent class,
  * <tt>JdbcDaoImpl</tt>.
  * <p>

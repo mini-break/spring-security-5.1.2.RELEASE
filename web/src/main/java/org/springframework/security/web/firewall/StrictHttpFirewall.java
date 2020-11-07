@@ -96,6 +96,9 @@ public class StrictHttpFirewall implements HttpFirewall {
 
 	private Set<String> decodedUrlBlacklist = new HashSet<String>();
 
+	/**
+	 * 默认允许的http方法集合
+	 */
 	private Set<String> allowedHttpMethods = createDefaultAllowedHttpMethods();
 
 	public StrictHttpFirewall() {
@@ -121,7 +124,7 @@ public class StrictHttpFirewall implements HttpFirewall {
 	}
 
 	/**
-	 * 通过本方法设置允许访问的http method
+	 * 通过本方法设置允许访问的http method 集合
 	 * <p>
 	 * Determines which HTTP methods should be allowed. The default is to allow "DELETE", "GET", "HEAD", "OPTIONS",
 	 * "PATCH", "POST", and "PUT".

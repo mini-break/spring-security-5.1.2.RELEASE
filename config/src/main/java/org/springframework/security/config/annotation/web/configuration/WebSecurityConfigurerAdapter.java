@@ -355,6 +355,8 @@ public abstract class WebSecurityConfigurerAdapter implements
 	 * 2. 如果开发人员没有覆盖实现 #configure(AuthenticationManagerBuilder) ,
 	 * 则会使用  authenticationConfiguration#getAuthenticationManager() 提供的
 	 * AuthenticationManager, 这是从IoC容器中根据类型查找得到的一个 AuthenticationManager
+	 * 3.直接重写该方法 使用  authenticationConfiguration#getAuthenticationManager() 提供的
+	 * AuthenticationManager, 这是从IoC容器中根据类型查找得到的一个 AuthenticationManager
 	 * 
 	 * Gets the {@link AuthenticationManager} to use. The default strategy is if
 	 * {@link #configure(AuthenticationManagerBuilder)} method is overridden to use the

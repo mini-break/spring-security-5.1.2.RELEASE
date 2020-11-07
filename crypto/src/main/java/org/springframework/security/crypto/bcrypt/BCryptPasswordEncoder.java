@@ -81,8 +81,8 @@ public class BCryptPasswordEncoder implements PasswordEncoder {
 	}
 
 	/**
-	 * @param rawPassword     ????
-	 * @param encodedPassword ??????
+	 * @param rawPassword     明码
+	 * @param encodedPassword 加密后的密码
 	 * @return
 	 */
 	public boolean matches(CharSequence rawPassword, String encodedPassword) {

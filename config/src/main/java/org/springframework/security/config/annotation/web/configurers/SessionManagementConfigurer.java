@@ -96,18 +96,40 @@ import org.springframework.util.Assert;
 public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		extends AbstractHttpConfigurer<SessionManagementConfigurer<H>, H> {
 	private final SessionAuthenticationStrategy DEFAULT_SESSION_FIXATION_STRATEGY = createDefaultSessionFixationProtectionStrategy();
+	/**
+	 * 会话认证策略
+	 */
 	private SessionAuthenticationStrategy sessionFixationAuthenticationStrategy = this.DEFAULT_SESSION_FIXATION_STRATEGY;
 	private SessionAuthenticationStrategy sessionAuthenticationStrategy;
 	private SessionAuthenticationStrategy providedSessionAuthenticationStrategy;
+	/**
+	 * session id无效时要应用的策略
+	 * #invalidSessionStrategy和#invalidSessionUrl都被调用时，#invalidSessionStrategy会生效
+	 */
 	private InvalidSessionStrategy invalidSessionStrategy;
+	/**
+	 * 会话超时处理策略
+	 */
 	private SessionInformationExpiredStrategy expiredSessionStrategy;
 	private List<SessionAuthenticationStrategy> sessionAuthenticationStrategies = new ArrayList<>();
 	private SessionRegistry sessionRegistry;
+	/**
+	 * 每个用户的最大并发会话数量, 缺省不设置，表示不限制
+	 */
 	private Integer maximumSessions;
+	/**
+	 * 用户会话超时时的跳转URL
+	 */
 	private String expiredUrl;
+	/**
+	 * 如果用户已登录，true 状态下用户再次登录，将抛出异常
+	 */
 	private boolean maxSessionsPreventsLogin;
 	private SessionCreationPolicy sessionPolicy;
 	private boolean enableSessionUrlRewriting;
+	/**
+	 * session id无效时的跳转URL
+	 */
 	private String invalidSessionUrl;
 	private String sessionAuthenticationErrorUrl;
 	private AuthenticationFailureHandler sessionAuthenticationFailureHandler;
@@ -253,6 +275,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 	}
 
 	/**
+	 * 控制一个用户的最大会话数（即一个用户最大可以登录多少台设备,就会自动踢掉前面的登录）
 	 * Controls the maximum number of sessions for a user. The default is to allow any
 	 * number of users.
 	 * @param maximumSessions the maximum number of sessions for a user
@@ -363,6 +386,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		}
 
 		/**
+		 * 设置为true时，如果用户已经登录，则禁止该用户再登录
 		 * If true, prevents a user from authenticating when the
 		 * {@link #maximumSessions(int)} has been reached. Otherwise (default), the user
 		 * who authenticates is allowed access and an existing user's session is expired.
@@ -414,6 +438,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		boolean stateless = isStateless();
 
 		if (securityContextRepository == null) {
+			// 如果是无状态
 			if (stateless) {
 				http.setSharedObject(SecurityContextRepository.class,
 						new NullSecurityContextRepository());
@@ -474,6 +499,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		sessionManagementFilter = postProcess(sessionManagementFilter);
 
 		http.addFilter(sessionManagementFilter);
+		//  如果设定了 maximumSessions,则创建 ConcurrentSessionFilter
 		if (isConcurrentSessionControlEnabled()) {
 			ConcurrentSessionFilter concurrentSessionFilter = createConccurencyFilter(http);
 
@@ -550,6 +576,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 	}
 
 	/**
+	 * 创建session的策略
 	 * Gets the {@link SessionCreationPolicy}. Can not be null.
 	 * @return the {@link SessionCreationPolicy}
 	 */
@@ -576,6 +603,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 	}
 
 	/**
+	 * 如果配置指定的会话创建策略为无状态 STATELESS，则返回 true
 	 * Returns true if the {@link SessionCreationPolicy} is stateless
 	 * @return
 	 */
@@ -631,6 +659,11 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		return this.sessionAuthenticationStrategy;
 	}
 
+	/**
+	 * 如果 this.sessionRegistry 尚未创建，则使用 SessionRegistryImpl 创建，
+	 * 并包装为一个事件监听器 GenericApplicationListenerAdapter 注册到 httpSecurity http
+	 * 共享对象应用上下文中的 DelegatingApplicationListener bean
+	 */
 	private SessionRegistry getSessionRegistry(H http) {
 		if (this.sessionRegistry == null) {
 			SessionRegistryImpl sessionRegistry = new SessionRegistryImpl();

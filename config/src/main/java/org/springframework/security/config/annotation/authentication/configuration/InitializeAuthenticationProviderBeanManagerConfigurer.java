@@ -73,7 +73,7 @@ class InitializeAuthenticationProviderBeanManagerConfigurer
 		 * @return
 		 */
 		private <T> T getBeanOrNull(Class<T> type) {
-			// ??????bean name
+			// 根据类型获取bean name
 			String[] userDetailsBeanNames = InitializeAuthenticationProviderBeanManagerConfigurer.this.context
 					.getBeanNamesForType(type);
 			if (userDetailsBeanNames.length != 1) {

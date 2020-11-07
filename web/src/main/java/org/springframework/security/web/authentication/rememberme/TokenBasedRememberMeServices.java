@@ -167,6 +167,7 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 	public void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication successfulAuthentication) {
 
+		// 从登录成功的 Authentication 中提取出用户名/密码
 		String username = retrieveUserName(successfulAuthentication);
 		String password = retrievePassword(successfulAuthentication);
 
@@ -178,6 +179,7 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 			return;
 		}
 
+		// 由于登录成功之后，密码可能被擦除了，所以，如果一开始没有拿到密码，就再从 UserDetailsService 中重新加载用户并重新获取密码
 		if (!StringUtils.hasLength(password)) {
 			UserDetails user = getUserDetailsService().loadUserByUsername(username);
 			password = user.getPassword();
@@ -188,13 +190,16 @@ public class TokenBasedRememberMeServices extends AbstractRememberMeServices {
 			}
 		}
 
+		// 获取令牌的有效期，令牌有效期默认是两周
 		int tokenLifetime = calculateLoginLifetime(request, successfulAuthentication);
 		long expiryTime = System.currentTimeMillis();
 		// SEC-949
 		expiryTime += 1000L * (tokenLifetime < 0 ? TWO_WEEKS_S : tokenLifetime);
 
+		// 计算散列值
 		String signatureValue = makeTokenSignature(expiryTime, username, password);
 
+		// 将用户名、令牌有效期以及计算得到的散列值放入 Cookie 中
 		setCookie(new String[] { username, Long.toString(expiryTime), signatureValue },
 				tokenLifetime, request, response);
 
