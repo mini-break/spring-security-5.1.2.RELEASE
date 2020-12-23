@@ -44,6 +44,9 @@ public class SessionInformation implements Serializable {
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 请求时间
+	 */
 	private Date lastRequest;
 	private final Object principal;
 	private final String sessionId;

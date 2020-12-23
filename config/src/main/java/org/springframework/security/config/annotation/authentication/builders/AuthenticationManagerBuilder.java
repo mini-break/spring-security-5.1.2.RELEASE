@@ -159,6 +159,7 @@ public class AuthenticationManagerBuilder
 	 */
 	public InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMemoryAuthentication()
 			throws Exception {
+		// InMemoryUserDetailsManagerConfigurer 加入 AuthenticationManagerBuilder 的父类 AbstractConfiguredSecurityBuilder
 		return apply(new InMemoryUserDetailsManagerConfigurer<>());
 	}
 

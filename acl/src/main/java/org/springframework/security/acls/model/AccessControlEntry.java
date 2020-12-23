@@ -18,6 +18,13 @@ package org.springframework.security.acls.model;
 import java.io.Serializable;
 
 /**
+ * AccessControlEntry 简写为 ACE，一个 AccessControlEntry 对象代表一条权限记录。
+ * 每一个 AccessControlEntry 都对应了一个 Acl，一个 Acl 对象对应多个 AccessControlEntry，有了这层对应关系，相当于就知道这个权限操作的是哪个对象。
+ *
+ * 然后 AccessControlEntry 中还包含一个 Sid 和一个 Permission 对象，表示某个 Sid 具备某种权限。
+ *
+ * 可以看到，Acl+ACE，就描述出来了某个 Sid 可以具备某个 ObjectIdentity 的某种 Permission
+ * 
  * Represents an individual permission assignment within an {@link Acl}.
  *
  * <p>

@@ -31,7 +31,7 @@ import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
- * 配置过滤器ExceptionTranslationFilter
+ * 配置过滤器ExceptionTranslationFilter (未认证等处理)
  *
  * Adds exception handling for Spring Security related exceptions to an application. All
  * properties have reasonable defaults, so no additional configuration is required other
@@ -195,11 +195,11 @@ public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>>
 
 	@Override
 	public void configure(H http) throws Exception {
-		// 获取认证入口点
+		// 获取认证入口点  用来处理认证异常
 		AuthenticationEntryPoint entryPoint = getAuthenticationEntryPoint(http);
 		ExceptionTranslationFilter exceptionTranslationFilter = new ExceptionTranslationFilter(
 				entryPoint, getRequestCache(http));
-		// 获取拒绝访问处理器
+		// 获取拒绝访问处理器 用来处理授权异常
 		AccessDeniedHandler deniedHandler = getAccessDeniedHandler(http);
 		exceptionTranslationFilter.setAccessDeniedHandler(deniedHandler);
 		exceptionTranslationFilter = postProcess(exceptionTranslationFilter);

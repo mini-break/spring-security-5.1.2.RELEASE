@@ -94,7 +94,13 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 	 * 是否隐藏用户未找到异常
 	 */
 	protected boolean hideUserNotFoundExceptions = true;
+	/**
+	 * 用户信息前置校验(密码校验前)
+	 */
 	private UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
+	/**
+	 * 用户信息后置校验(密码校验后)
+	 */
 	private UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();
 	private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -336,6 +342,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 
 	@Override
 	public boolean supports(Class<?> authentication) {
+		// 判断当前的 Authentication 是否是 UsernamePasswordAuthenticationToken
 		return (UsernamePasswordAuthenticationToken.class
 				.isAssignableFrom(authentication));
 	}
@@ -368,6 +375,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 
 	private class DefaultPreAuthenticationChecks implements UserDetailsChecker {
 		public void check(UserDetails user) {
+			// 账号是否锁定
 			if (!user.isAccountNonLocked()) {
 				logger.debug("User account is locked");
 
@@ -376,6 +384,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 						"User account is locked"));
 			}
 
+			// 账号是否被禁用
 			if (!user.isEnabled()) {
 				logger.debug("User account is disabled");
 
@@ -384,6 +393,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 						"User is disabled"));
 			}
 
+			// 账号是否过期
 			if (!user.isAccountNonExpired()) {
 				logger.debug("User account is expired");
 
@@ -396,6 +406,7 @@ public abstract class AbstractUserDetailsAuthenticationProvider implements
 
 	private class DefaultPostAuthenticationChecks implements UserDetailsChecker {
 		public void check(UserDetails user) {
+			// 检查密码是否过期
 			if (!user.isCredentialsNonExpired()) {
 				logger.debug("User account credentials have expired");
 

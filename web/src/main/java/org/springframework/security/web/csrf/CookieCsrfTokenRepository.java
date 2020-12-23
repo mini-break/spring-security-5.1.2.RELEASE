@@ -29,6 +29,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 前后端分离开发中使用
+ * 
  * A {@link CsrfTokenRepository} that persists the CSRF token in a cookie named
  * "XSRF-TOKEN" and reads from the header "X-XSRF-TOKEN" following the conventions of
  * AngularJS. When using with AngularJS be sure to use {@link #withHttpOnlyFalse()}.

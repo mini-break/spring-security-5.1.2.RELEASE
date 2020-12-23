@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 定义一些解析 Acl 对象的方法，通过 ObjectIdentity 对象解析出其对应的 Acl
+ *
  * Provides retrieval of {@link Acl} instances.
  *
  * @author Ben Alex

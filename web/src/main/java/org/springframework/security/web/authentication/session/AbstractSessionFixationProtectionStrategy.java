@@ -64,6 +64,10 @@ abstract class AbstractSessionFixationProtectionStrategy implements
 	 */
 	public void onAuthentication(Authentication authentication,
 			HttpServletRequest request, HttpServletResponse response) {
+		/**
+		 * request.getSession(true)：若存在会话则返回该会话，否则新建一个会话。等同于 HttpServletRequest.getSession()
+		 * request.getSession(false)：若存在会话则返回该会话，否则返回NULL
+		 */
 		boolean hadSessionAlready = request.getSession(false) != null;
 
 		if (!hadSessionAlready && !alwaysCreateSession) {

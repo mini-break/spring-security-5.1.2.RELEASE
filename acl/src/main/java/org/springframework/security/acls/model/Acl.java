@@ -19,6 +19,9 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * 整个系统的核心调度部分
+ * 一个 Acl 对象会关联一个 ObjectIdentity，一个 Acl 对象还拥有一个 Sid，这个 Sid 表示这个 Acl 是属于谁的？属于谁，谁就可以修改甚至删除这个 Acl 对象
+ * 
  * Represents an access control list (ACL) for a domain object.
  *
  * <p>

@@ -100,6 +100,7 @@ public class SecurityContextHolderAwareRequestWrapper extends HttpServletRequest
 	 * @return the authentication object or <code>null</code>
 	 */
 	private Authentication getAuthentication() {
+		// 通过安全上下文获取认证信息
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
 		if (!trustResolver.isAnonymous(auth)) {
@@ -132,6 +133,7 @@ public class SecurityContextHolderAwareRequestWrapper extends HttpServletRequest
 	}
 
 	/**
+	 * HttpServletRequest 接口实现方法 获取认证用户信息
 	 * Returns the <code>Authentication</code> (which is a subclass of
 	 * <code>Principal</code>), or <code>null</code> if unavailable.
 	 *

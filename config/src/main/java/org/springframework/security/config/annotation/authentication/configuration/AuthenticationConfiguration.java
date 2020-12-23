@@ -50,6 +50,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
 /**
+ * 1.这里首先构建了一个 AuthenticationManagerBuilder 实例，
+ * 这个实例就是用来构建全局 AuthenticationManager 的 AuthenticationManagerBuilder，
+ * 具体的构建过程在下面的 getAuthenticationManager 方法中。
+ * 不过这里的这个全局的 AuthenticationManagerBuilder 并非总是有用，为什么这么说呢？且看下面的的分析。
+ *
+ * 2.另外还有一些 initializeXXX 方法，用来构建全局的 UserDetailService 和 AuthenticationProvider，
+ * 这些方法小伙伴可以作为一个了解，因为正常情况下是不会用到这几个 Bean 的，
+ * 只有当 getAuthenticationManager 方法被调用时，这些默认的 Bean 才会被配置，
+ * 而 getAuthenticationManager 方法被调用，意味着我们要使用系统默认配置的 AuthenticationManager 作为 parent，
+ * 而在实际使用中，我们一般不会使用系统默认配置的 AuthenticationManager 作为 parent，我们自己多多少少都会重新定制一下。
+ *
  * Exports the authentication {@link Configuration}
  *
  * @author Rob Winch

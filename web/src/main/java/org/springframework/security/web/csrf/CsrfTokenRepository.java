@@ -33,6 +33,7 @@ import javax.servlet.http.HttpSession;
 public interface CsrfTokenRepository {
 
 	/**
+	 * 生成 csrfToken
 	 * Generates a {@link CsrfToken}
 	 *
 	 * @param request the {@link HttpServletRequest} to use
@@ -41,6 +42,7 @@ public interface CsrfTokenRepository {
 	CsrfToken generateToken(HttpServletRequest request);
 
 	/**
+	 * 保存 CsrfToken
 	 * Saves the {@link CsrfToken} using the {@link HttpServletRequest} and
 	 * {@link HttpServletResponse}. If the {@link CsrfToken} is null, it is the same as
 	 * deleting it.
@@ -53,6 +55,7 @@ public interface CsrfTokenRepository {
 			HttpServletResponse response);
 
 	/**
+	 * 加载 CsrfToken
 	 * Loads the expected {@link CsrfToken} from the {@link HttpServletRequest}
 	 *
 	 * @param request the {@link HttpServletRequest} to use

@@ -40,6 +40,10 @@ public abstract class AbstractHttpConfigurer<T extends AbstractHttpConfigurer<T,
 	 */
 	@SuppressWarnings("unchecked")
 	public B disable() {
+		/**
+		 * 从 getBuilder 中移除相关的 xxxConfigurer，getBuilder 方法获取到的实际上就是 HttpSecurity，
+		 * 所以移除掉 xxxConfigurer 实际上就是从过滤器链中移除掉某一个过滤器，例如 .csrf().disable() 就是移除掉处理 csrf 的过滤器
+		 */
 		getBuilder().removeConfigurer(getClass());
 		return getBuilder();
 	}

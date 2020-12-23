@@ -63,6 +63,9 @@ public class MethodSecurityMetadataSourceAdvisor extends AbstractPointcutAdvisor
 	 */
 	private final Pointcut pointcut = new MethodSecurityMetadataSourcePointcut();
 	private BeanFactory beanFactory;
+	/**
+	 * 指向的就是GlobalMethodSecurityConfiguration#methodSecurityInterceptor
+	 */
 	private final String adviceBeanName;
 	private final String metadataSourceBeanName;
 	private transient volatile Object adviceMonitor = new Object();
@@ -137,6 +140,7 @@ public class MethodSecurityMetadataSourceAdvisor extends AbstractPointcutAdvisor
 			implements Serializable {
 		@SuppressWarnings("unchecked")
 		public boolean matches(Method m, Class targetClass) {
+			// attributeSource是 MethodSecurityMetadataSourceAdvisor 构造方法传入的 MethodSecurityMetadataSource 实例
 			Collection attributes = attributeSource.getAttributes(m, targetClass);
 			return attributes != null && !attributes.isEmpty();
 		}

@@ -564,6 +564,9 @@ public class User implements UserDetails, CredentialsContainer {
 			return this;
 		}
 
+		/**
+		 * 构建User对象
+		 */
 		public UserDetails build() {
 			String encodedPassword = this.passwordEncoder.apply(password);
 			return new User(username, encodedPassword, !disabled, !accountExpired,

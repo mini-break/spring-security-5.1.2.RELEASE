@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 该过滤器的作用是处理过滤器链中发生的 AccessDeniedException 和 AuthenticationException 异常，将它们转换成相应的HTTP响应
+ * 该过滤器的作用是处理过滤器链中发生的 AccessDeniedException(授权) 和 AuthenticationException(认证) 异常，将它们转换成相应的HTTP响应
  * 
  * Handles any <code>AccessDeniedException</code> and <code>AuthenticationException</code>
  * thrown within the filter chain.

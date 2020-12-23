@@ -40,6 +40,9 @@ import org.springframework.util.Assert;
 final class AutowireBeanFactoryObjectPostProcessor
 		implements ObjectPostProcessor<Object>, DisposableBean, SmartInitializingSingleton {
 	private final Log logger = LogFactory.getLog(getClass());
+	/**
+	 * AutowireCapableBeanFactory 可以帮助我们手动的将一个实例注册到 Spring 容器中
+	 */
 	private final AutowireCapableBeanFactory autowireBeanFactory;
 	private final List<DisposableBean> disposableBeans = new ArrayList<>();
 	private final List<SmartInitializingSingleton> smartSingletons = new ArrayList<>();

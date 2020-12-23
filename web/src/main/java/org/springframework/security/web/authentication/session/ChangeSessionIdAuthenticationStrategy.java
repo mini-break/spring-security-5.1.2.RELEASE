@@ -23,6 +23,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * 为了防止固定session攻击，changeSessionId 表示 session 不变，但是会修改 sessionid，这实际上用到了 Servlet 容器提供的防御会话固定攻击
+ *
  * Uses {@code HttpServletRequest.changeSessionId()} to protect against session fixation
  * attacks. This is the default implementation for Servlet 3.1+.
  *
@@ -52,6 +54,10 @@ public final class ChangeSessionIdAuthenticationStrategy
 	 */
 	@Override
 	HttpSession applySessionFixation(HttpServletRequest request) {
+		/**
+		 * 调用 request.changeSessionId()方法 更新sessionId
+		 * 更改与此关联的当前会话的会话id请求 并返回新的会话id
+		 */
 		ReflectionUtils.invokeMethod(this.changeSessionIdMethod, request);
 		return request.getSession();
 	}

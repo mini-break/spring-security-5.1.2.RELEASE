@@ -23,6 +23,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 	 @PostFilter： 在执行方法后过滤返回的集合或数组（筛选出当前用户具有 READ 权限的数据），returnObject 就表示方法的返回值。有一个和它对应的注解
+ * 	 
+ *   @PostFilter("hasPermission(filterObject, 'READ')")
+ *   public List<NoticeMessage> findAll() {
+ *         List<NoticeMessage> all = noticeMessageMapper.findAll();
+ *         return all;
+ *     }
+ *
+ *     
  * Annotation for specifying a method filtering expression which will be evaluated after a
  * method has been invoked.
  *

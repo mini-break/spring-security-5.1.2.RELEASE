@@ -89,6 +89,9 @@ public class InMemoryUserDetailsManager implements UserDetailsManager,
 		}
 	}
 
+	/**
+	 * 将 user 加入缓存中
+	 */
 	@Override
 	public void createUser(UserDetails user) {
 		Assert.isTrue(!userExists(user.getUsername()), "user should not exist");

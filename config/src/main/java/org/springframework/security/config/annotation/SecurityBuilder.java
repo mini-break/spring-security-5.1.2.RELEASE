@@ -16,7 +16,7 @@
 package org.springframework.security.config.annotation;
 
 /**
- * 安全构建器接口
+ * 用来构建过滤器链(DefaultSecurityFilterChain)
  * 
  * Interface for building an Object
  *

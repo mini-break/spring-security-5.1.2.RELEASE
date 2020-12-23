@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
+ * SecurityFilterChain 其实就是我们平时所说的 Spring Security 中的过滤器链
+ * 
  * 通过build()获取到实例后，存入FilterChainProxy的属性List<SecurityFilterChain> filterChains中,
  * FilterChainProxy.doFilterInternal()中执行getFilters(HttpServletRequest request)
  * 找出对应request的SecurityFilterChain并返回Filters

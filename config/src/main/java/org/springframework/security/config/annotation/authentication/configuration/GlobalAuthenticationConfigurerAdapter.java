@@ -22,6 +22,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 /**
+ * 一个跟全局配置有关的东西，它本身实现了 SecurityConfigurerAdapter 接口，但是并未对方法做具体的实现，只是将泛型具体化了
+ * 
  * A {@link SecurityConfigurer} that can be exposed as a bean to configure the global
  * {@link AuthenticationManagerBuilder}. Beans of this type are automatically used by
  * {@link AuthenticationConfiguration} to configure the global

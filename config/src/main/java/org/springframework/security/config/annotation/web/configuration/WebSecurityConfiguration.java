@@ -110,7 +110,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 	}
 
 	/**
-	 * 创建过滤器链(FilterChainProxy)的方法
+	 * 该方法目的是为了获取过滤器链(FilterChainProxy)
 	 * Creates the Spring Security Filter Chain
 	 * @return the {@link Filter} that represents the security filter chain
 	 * @throws Exception
@@ -154,8 +154,7 @@ public class WebSecurityConfiguration implements ImportAware, BeanClassLoaderAwa
 	}
 
 	/**
-	 * 用于创建web configuration的SecurityConfigurer实例，
-	 * 注意该参数通过@Value(...)方式注入
+	 * 这个方法是为了收集配置类并创建 WebSecurity
 	 *
 	 * 这个方法里面设置和排序 webSecurityConfigurers
 	 * WebSecurityConfigurerAdapter 继承 WebSecurityConfigurer<WebSecurity>,

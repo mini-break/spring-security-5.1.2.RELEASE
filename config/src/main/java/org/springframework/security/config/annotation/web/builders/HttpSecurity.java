@@ -1213,6 +1213,7 @@ public final class HttpSecurity extends
 	@Override
 	public HttpSecurity addFilter(Filter filter) {
 		Class<? extends Filter> filterClass = filter.getClass();
+		// 控制过滤器的范围
 		if (!comparator.isRegistered(filterClass)) {
 			throw new IllegalArgumentException(
 					"The Filter class "

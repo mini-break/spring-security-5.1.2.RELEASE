@@ -15,6 +15,7 @@
  */
 package org.springframework.security.crypto.keygen;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
@@ -63,5 +64,6 @@ public class KeyGeneratorsTests {
 		String hexStringKey2 = keyGenerator.generateKey();
 		assertThat(hexStringKey.equals(hexStringKey2)).isFalse();
 	}
+
 
 }

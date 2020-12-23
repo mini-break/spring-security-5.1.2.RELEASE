@@ -53,6 +53,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 		SecurityBuilder<DefaultSecurityFilterChain> {
 
 	/**
+	 * 获取一个配置对象，Spring Security 过滤器链中的所有过滤器对象都是由 xxxConfigure 来进行配置的，这里就是获取这个 xxxConfigure 对象。
+	 *
 	 * Gets the {@link SecurityConfigurer} by its class name or <code>null</code> if not
 	 * found. Note that object hierarchies are not considered.
 	 *
@@ -62,6 +64,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 			Class<C> clazz);
 
 	/**
+	 * 移除一个配置对象
+	 *
 	 * Removes the {@link SecurityConfigurer} by its class name or <code>null</code> if
 	 * not found. Note that object hierarchies are not considered.
 	 *
@@ -72,6 +76,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 			Class<C> clazz);
 
 	/**
+	 * 配置 SecurityConfigurer 共享的对象
+	 *
 	 * Sets an object that is shared by multiple {@link SecurityConfigurer}.
 	 *
 	 * @param sharedType the Class to key the shared object by.
@@ -80,6 +86,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 	<C> void setSharedObject(Class<C> sharedType, C object);
 
 	/**
+	 * 获取 SecurityConfigurer 共享的对象
+	 *
 	 * Gets a shared Object. Note that object heirarchies are not considered.
 	 *
 	 * @param sharedType the type of the shared Object
@@ -88,6 +96,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 	<C> C getSharedObject(Class<C> sharedType);
 
 	/**
+	 * 配置验证器
+	 *
 	 * Allows adding an additional {@link AuthenticationProvider} to be used
 	 *
 	 * @param authenticationProvider the {@link AuthenticationProvider} to be added
@@ -96,6 +106,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 	H authenticationProvider(AuthenticationProvider authenticationProvider);
 
 	/**
+	 * 配置数据源接口
+	 *
 	 * Allows adding an additional {@link UserDetailsService} to be used
 	 *
 	 * @param userDetailsService the {@link UserDetailsService} to be added
@@ -104,6 +116,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 	H userDetailsService(UserDetailsService userDetailsService) throws Exception;
 
 	/**
+	 * 在某一个过滤器之前添加过滤器
+	 *
 	 * Allows adding a {@link Filter} after one of the known {@link Filter} classes. The
 	 * known {@link Filter} instances are either a {@link Filter} listed in
 	 * {@link #addFilter(Filter)} or a {@link Filter} that has already been added using
@@ -116,6 +130,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 	H addFilterAfter(Filter filter, Class<? extends Filter> afterFilter);
 
 	/**
+	 * 在某一个过滤器之后添加过滤器
+	 *
 	 * Allows adding a {@link Filter} before one of the known {@link Filter} classes. The
 	 * known {@link Filter} instances are either a {@link Filter} listed in
 	 * {@link #addFilter(Filter)} or a {@link Filter} that has already been added using
@@ -128,6 +144,8 @@ public interface HttpSecurityBuilder<H extends HttpSecurityBuilder<H>> extends
 	H addFilterBefore(Filter filter, Class<? extends Filter> beforeFilter);
 
 	/**
+	 * 添加一个过滤器，该过滤器必须是现有过滤器链中某一个过滤器或者其扩展
+	 *
 	 * Adds a {@link Filter} that must be an instance of or extend one of the Filters
 	 * provided within the Security framework. The method ensures that the ordering of the
 	 * Filters is automatically taken care of.

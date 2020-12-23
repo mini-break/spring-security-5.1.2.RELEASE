@@ -23,6 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 允许方法调用，但是如果表达式计算结果为false，将抛出一个安全性异常。
+ *
+ * 
  * Annotation for specifying a method access-control expression which will be evaluated
  * after a method has been invoked.
  *

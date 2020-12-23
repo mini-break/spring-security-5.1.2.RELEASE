@@ -69,6 +69,7 @@ public class ConcurrentSessionControlAuthenticationStrategy implements
 		MessageSourceAware, SessionAuthenticationStrategy {
 	protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
 	private final SessionRegistry sessionRegistry;
+	// 超过最大并发数是否抛出异常
 	private boolean exceptionIfMaximumExceeded = false;
 	private int maximumSessions = 1;
 
@@ -168,6 +169,7 @@ public class ConcurrentSessionControlAuthenticationStrategy implements
 		// Determine least recently used session, and mark it for invalidation
 		SessionInformation leastRecentlyUsed = null;
 
+		// sessions 按照请求时间进行排序，然后再使多余的 session 过期
 		for (SessionInformation session : sessions) {
 			if ((leastRecentlyUsed == null)
 					|| session.getLastRequest()

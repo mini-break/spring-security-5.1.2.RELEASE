@@ -208,6 +208,7 @@ public class ProviderManager implements AuthenticationManager, MessageSourceAwar
 
 		// 遍历认证提供者，如果有一个认证成功则返回
 		for (AuthenticationProvider provider : getProviders()) {
+			// 是否支持当前访问者主体
 			if (!provider.supports(toTest)) {
 				continue;
 			}

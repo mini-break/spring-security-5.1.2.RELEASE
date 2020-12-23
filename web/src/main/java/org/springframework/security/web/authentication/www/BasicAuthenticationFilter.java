@@ -88,12 +88,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * remember-me mechanism.
  *
  * @author Ben Alex
+ *
+ * 处理HTTP请求中的BASIC authorization头部，把认证结果写入SecurityContextHolder
+ *
+ * 当一个HTTP请求中包含一个名字为Authorization的头部，并且其值格式是Basic xxx时，该Filter会认为这是一个BASIC authorization头部，
+ * 其中xxx部分应该是一个base64编码的 username:password 字符串。比如用户名/密码分别为 admin/secret, 则对应的该头部是 : Basic YWRtaW46c2VjcmV0 。
+ * 该过滤器会从 HTTP BASIC authorization头部解析出相应的用户名和密码然后调用AuthenticationManager进行认证，
+ * 成功的话会把认证了的结果写入到SecurityContextHolder中SecurityContext的属性authentication上面。同时还会做其他一些处理，比如Remember Me相关处理等等。
+ * 如果头部分析失败，该过滤器会抛出异常BadCredentialsException。
+ * 如果认证失败，则会清除SecurityContextHolder中的SecurityContext。并且不再继续filter chain的执行
  */
 public class BasicAuthenticationFilter extends OncePerRequestFilter {
 
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 创建Authentication对象时设置details属性所使用的详情来源
+	 */
 	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
 	private AuthenticationEntryPoint authenticationEntryPoint;
 	private AuthenticationManager authenticationManager;
@@ -152,17 +164,21 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 					throws IOException, ServletException {
 		final boolean debug = this.logger.isDebugEnabled();
 
+		// 获取请求头部 Authorization
 		String header = request.getHeader("Authorization");
 
+		// 如果头部 Authorization 未设置或者不是 basic 认证头部，则当前请求不是该过滤器关注的对象，直接放行，继续filter chain 的执行
 		if (header == null || !header.toLowerCase().startsWith("basic ")) {
 			chain.doFilter(request, response);
 			return;
 		}
 
 		try {
+			// 分析头部 Authorization 获取用户名和密码
 			String[] tokens = extractAndDecodeHeader(header, request);
 			assert tokens.length == 2;
 
+			// 现在 tokens[0] 表示用户名， tokens[1] 表示密码
 			String username = tokens[0];
 
 			if (debug) {
@@ -172,10 +188,12 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 			}
 
 			if (authenticationIsRequired(username)) {
+				// 使用所获取到的用户名/密码构建一个 UsernamePasswordAuthenticationToken
 				UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
 						username, tokens[1]);
 				authRequest.setDetails(
 						this.authenticationDetailsSource.buildDetails(request));
+				// 执行认证
 				Authentication authResult = this.authenticationManager
 						.authenticate(authRequest);
 
@@ -183,10 +201,13 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 					this.logger.debug("Authentication success: " + authResult);
 				}
 
+				// 证成功，将完全认证的Authentication authRequest设置到 SecurityContextHolder 中的 SecurityContext 上
 				SecurityContextHolder.getContext().setAuthentication(authResult);
 
+				// 认证成功时 RememberMe 相关处理 
 				this.rememberMeServices.loginSuccess(request, response, authResult);
 
+				// 认证成功时的其他处理: 其实这个个空方法，什么都没做
 				onSuccessfulAuthentication(request, response, authResult);
 			}
 
@@ -251,6 +272,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		Authentication existingAuth = SecurityContextHolder.getContext()
 				.getAuthentication();
 
+		// 1.安全上下文中不存在认证信息或未认证过
 		if (existingAuth == null || !existingAuth.isAuthenticated()) {
 			return true;
 		}
@@ -259,6 +281,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		// UsernamePasswordAuthenticationToken)
 		// (see SEC-348)
 
+		// 2.安全上下文中获取的用户名与当前登录的用户名不一致
 		if (existingAuth instanceof UsernamePasswordAuthenticationToken
 				&& !existingAuth.getName().equals(username)) {
 			return true;
@@ -277,6 +300,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 		// both of which force re-authentication if the respective header is detected (and
 		// in doing so replace
 		// any existing AnonymousAuthenticationToken). See SEC-610.
+		// 安全上下文中获取的用户为匿名登录
 		if (existingAuth instanceof AnonymousAuthenticationToken) {
 			return true;
 		}

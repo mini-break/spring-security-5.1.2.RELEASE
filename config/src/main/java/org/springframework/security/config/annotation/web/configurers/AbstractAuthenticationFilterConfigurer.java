@@ -142,6 +142,16 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 	}
 
 	/**
+	 * alwaysUse: false 存在重定向功能
+	 * 1.未登录情况下
+	 * 浏览器输入http://ip:port/abc ----> 登录页面---->输入用户名/密码登录成功后----> http://ip:port/abc
+	 * 2.登录情况下
+	 * 浏览器输入http://ip:port/abc ----> http://ip:port/abc
+	 *
+	 * alwaysUse: true
+	 * 假设defaultSuccessUrl: http://ip:port/aaa
+	 * 浏览器输入http://ip:port/abc ----> 登录页面---->输入用户名/密码登录成功后----> http://ip:port/aaa
+	 *
 	 * Specifies where users will go after authenticating successfully if they have not
 	 * visited a secured page prior to authenticating or {@code alwaysUse} is true. This
 	 * is a shortcut for calling {@link #successHandler(AuthenticationSuccessHandler)}.
@@ -333,6 +343,7 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 		if (authenticationDetailsSource != null) {
 			authFilter.setAuthenticationDetailsSource(authenticationDetailsSource);
 		}
+		// 加入Session认证策略
 		SessionAuthenticationStrategy sessionAuthenticationStrategy = http
 				.getSharedObject(SessionAuthenticationStrategy.class);
 		if (sessionAuthenticationStrategy != null) {

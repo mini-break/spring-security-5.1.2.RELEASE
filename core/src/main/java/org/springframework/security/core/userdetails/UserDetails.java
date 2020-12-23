@@ -70,7 +70,7 @@ public interface UserDetails extends Serializable {
 	String getUsername();
 
 	/**
-	 * 账户是否过期
+	 * 账户是否没有过期
 	 * Indicates whether the user's account has expired. An expired account cannot be
 	 * authenticated.
 	 *
@@ -80,7 +80,7 @@ public interface UserDetails extends Serializable {
 	boolean isAccountNonExpired();
 
 	/**
-	 * 账户是否锁定
+	 * 账户是否没有被锁定
 	 * Indicates whether the user is locked or unlocked. A locked user cannot be
 	 * authenticated.
 	 *
@@ -89,7 +89,7 @@ public interface UserDetails extends Serializable {
 	boolean isAccountNonLocked();
 
 	/**
-	 * 凭证是否过期
+	 * 密码是否没有过期
 	 * Indicates whether the user's credentials (password) has expired. Expired
 	 * credentials prevent authentication.
 	 *
@@ -99,7 +99,7 @@ public interface UserDetails extends Serializable {
 	boolean isCredentialsNonExpired();
 
 	/**
-	 * 用户是否可用
+	 * 账户是否可用
 	 * Indicates whether the user is enabled or disabled. A disabled user cannot be
 	 * authenticated.
 	 *

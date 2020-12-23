@@ -54,6 +54,11 @@ public class SidRetrievalStrategyImpl implements SidRetrievalStrategy {
 	// ~ Methods
 	// ========================================================================================================
 
+	/**
+	 * Sid 代表了用户和角色，它有两种：GrantedAuthoritySid 和 PrincipalSid，前者代表角色，后者代表用户。
+	 * 在 Spring Security 中，用户和角色信息都是保存在 Authentication 对象中的，即 Sid 是从 Authentication 对象中提取出来的，
+	 * 提取出来的值是 GrantedAuthoritySid+PrincipalSid，而不是其中某一项
+	 */
 	public List<Sid> getSids(Authentication authentication) {
 		Collection<? extends GrantedAuthority> authorities = roleHierarchy
 				.getReachableGrantedAuthorities(authentication.getAuthorities());

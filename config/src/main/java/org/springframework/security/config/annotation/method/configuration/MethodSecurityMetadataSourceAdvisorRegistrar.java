@@ -50,8 +50,8 @@ class MethodSecurityMetadataSourceAdvisorRegistrar implements
 				.rootBeanDefinition(MethodSecurityMetadataSourceAdvisor.class);
 		advisor.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		// 定义3个构建函数参数
-		advisor.addConstructorArgValue("methodSecurityInterceptor");
-		advisor.addConstructorArgReference("methodSecurityMetadataSource");
+		advisor.addConstructorArgValue("methodSecurityInterceptor");// 一个拦截器的bean name
+		advisor.addConstructorArgReference("methodSecurityMetadataSource");// Spring容器定义的bean
 		advisor.addConstructorArgValue("methodSecurityMetadataSource");
 
 		/**

@@ -22,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 
 /**
+ * ???token
  * {@link org.springframework.security.core.Authentication} implementation for
  * pre-authenticated authentication.
  *

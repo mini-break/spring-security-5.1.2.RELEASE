@@ -129,6 +129,9 @@ public class RoleVoter implements AccessDecisionVoter<Object> {
 		return result;
 	}
 
+	/**
+	 * 从当前登录主体 authentication 中抽取出角色信息
+	 */
 	Collection<? extends GrantedAuthority> extractAuthorities(
 			Authentication authentication) {
 		return authentication.getAuthorities();

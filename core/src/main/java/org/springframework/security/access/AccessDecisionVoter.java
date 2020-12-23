@@ -98,9 +98,9 @@ public interface AccessDecisionVoter<S> {
 	 * classes should not modify it or cause the represented invocation to take place (for
 	 * example, by calling {@code MethodInvocation.proceed()}).
 	 *
-	 * @param authentication the caller making the invocation
-	 * @param object the secured object being invoked
-	 * @param attributes the configuration attributes associated with the secured object
+	 * @param authentication the caller making the invocation  表示当前登录主体
+	 * @param object the secured object being invoked  里边封装了当前请求
+	 * @param attributes the configuration attributes associated with the secured object  表示当前所访问的接口所需要的角色集合
 	 *
 	 * @return either {@link #ACCESS_GRANTED}, {@link #ACCESS_ABSTAIN} or
 	 * {@link #ACCESS_DENIED}

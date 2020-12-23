@@ -56,6 +56,9 @@ final class SecureRandomBytesKeyGenerator implements BytesKeyGenerator {
 		return bytes;
 	}
 
+	/**
+	 * 默认生成8位
+	 */
 	private static final int DEFAULT_KEY_LENGTH = 8;
 
 }

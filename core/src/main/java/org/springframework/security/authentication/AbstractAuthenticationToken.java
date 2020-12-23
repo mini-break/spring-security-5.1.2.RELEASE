@@ -44,7 +44,7 @@ public abstract class AbstractAuthenticationToken implements Authentication,
 	// ================================================================================================
 
 	/**
-	 * 权限
+	 * 权限(角色/资源)
 	 */
 	private final Collection<GrantedAuthority> authorities;
 	/**

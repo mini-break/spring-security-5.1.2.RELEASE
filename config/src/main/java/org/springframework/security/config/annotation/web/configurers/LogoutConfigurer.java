@@ -131,6 +131,8 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends
 	}
 
 	/**
+	 * 表示清除认证信息
+	 * 
 	 * Specifies if {@link SecurityContextLogoutHandler} should clear the {@link Authentication} at the time of logout.
 	 * @param clearAuthentication true {@link SecurityContextLogoutHandler} should clear the {@link Authentication} (default), or false otherwise.
 	 * @return the {@link LogoutConfigurer} for further customization
@@ -142,6 +144,8 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends
 
 
 	/**
+	 * 使 HttpSession 失效
+	 * 
 	 * Configures {@link SecurityContextLogoutHandler} to invalidate the
 	 * {@link HttpSession} at the time of logout.
 	 * @param invalidateHttpSession true if the {@link HttpSession} should be invalidated
@@ -154,6 +158,8 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends
 	}
 
 	/**
+	 * 是一个 GET 请求,通过 logoutUrl 方法来修改默认的注销 URL
+	 * 
 	 * The URL that triggers log out to occur (default is "/logout"). If CSRF protection
 	 * is enabled (default), then the request must also be a POST. This means that by
 	 * default POST "/logout" is required to trigger a log out. If CSRF protection is
@@ -180,6 +186,8 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends
 	}
 
 	/**
+	 * logoutRequestMatcher 方法不仅可以修改注销 URL，还可以修改请求方式，实际项目中，这个方法和 logoutUrl 任意设置一个即可
+	 * 
 	 * The RequestMatcher that triggers log out to occur. In most circumstances users will
 	 * use {@link #logoutUrl(String)} which helps enforce good practices.
 	 *
@@ -195,7 +203,8 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends
 	}
 
 	/**
-	 * 自定义退出成功时跳转的页面
+	 * 注销成功后要跳转的页面
+	 * 
 	 * The URL to redirect to after logout has occurred. The default is "/login?logout".
 	 * This is a shortcut for invoking {@link #logoutSuccessHandler(LogoutSuccessHandler)}
 	 * with a {@link SimpleUrlLogoutSuccessHandler}.
@@ -218,6 +227,8 @@ public final class LogoutConfigurer<H extends HttpSecurityBuilder<H>> extends
 	}
 
 	/**
+	 * 清除 cookie
+	 * 
 	 * Allows specifying the names of cookies to be removed on logout success. This is a
 	 * shortcut to easily invoke {@link #addLogoutHandler(LogoutHandler)} with a
 	 * {@link CookieClearingLogoutHandler}.

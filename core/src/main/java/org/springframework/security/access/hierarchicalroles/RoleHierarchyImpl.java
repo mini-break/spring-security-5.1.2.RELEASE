@@ -33,6 +33,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
+ * 角色继承
  * <p>
  * This class defines a role hierarchy for use with the UserDetailsServiceWrapper.
  *

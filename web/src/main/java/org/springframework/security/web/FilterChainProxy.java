@@ -196,8 +196,9 @@ public class FilterChainProxy extends GenericFilterBean {
 				doFilterInternal(request, response, chain);
 			}
 			finally {
-				// 当前请求已经被处理完，清除安全上下文
+				// 当前请求已经被处理完，清除 SecurityContextHolder 中保存的用户信息
 				SecurityContextHolder.clearContext();
+				// 移除 request 中的标记
 				request.removeAttribute(FILTER_APPLIED);
 			}
 		}
@@ -220,9 +221,10 @@ public class FilterChainProxy extends GenericFilterBean {
 		HttpServletResponse fwResponse = firewall
 				.getFirewalledResponse((HttpServletResponse) response);
 
-		// 获取跟该请求匹配的所有安全过滤器
+		// 获取跟该请求匹配的所有安全过滤器(过滤器链)
 		List<Filter> filters = getFilters(fwRequest);
 
+		// 如果找出来的 filters 为 null，或者集合中没有元素，那就是说明当前请求不需要经过过滤器。直接执行 chain.doFilter
 		if (filters == null || filters.size() == 0) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(UrlUtils.buildRequestUrl(fwRequest)
@@ -238,7 +240,7 @@ public class FilterChainProxy extends GenericFilterBean {
 			return;
 		}
 
-		// 构造并调用安全过滤器链
+		// 构造出一个虚拟的过滤器链
 		VirtualFilterChain vfc = new VirtualFilterChain(fwRequest, chain, filters);
 		vfc.doFilter(fwRequest, fwResponse);
 	}
@@ -323,10 +325,25 @@ public class FilterChainProxy extends GenericFilterBean {
 	 * the additional internal list of filters which match the request.
 	 */
 	private static class VirtualFilterChain implements FilterChain {
+		/**
+		 * 原生的过滤器链,也就是 Web Filter
+		 */
 		private final FilterChain originalChain;
+		/**
+		 * Spring Security 中的过滤器链
+		 */
 		private final List<Filter> additionalFilters;
+		/**
+		 * 当前请求
+		 */
 		private final FirewalledRequest firewalledRequest;
+		/**
+		 * Spring Security 中的过滤器链中过滤器的个数
+		 */
 		private final int size;
+		/**
+		 *Spring Security 中的过滤器链遍历时候的下标
+		 */
 		private int currentPosition = 0;
 
 		private VirtualFilterChain(FirewalledRequest firewalledRequest,
@@ -340,6 +357,7 @@ public class FilterChainProxy extends GenericFilterBean {
 		@Override
 		public void doFilter(ServletRequest request, ServletResponse response)
 				throws IOException, ServletException {
+			// Spring Security 中的过滤器链已经执行完毕
 			if (currentPosition == size) {
 				if (logger.isDebugEnabled()) {
 					logger.debug(UrlUtils.buildRequestUrl(firewalledRequest)
@@ -349,6 +367,7 @@ public class FilterChainProxy extends GenericFilterBean {
 				// Deactivate path stripping as we exit the security filter chain
 				this.firewalledRequest.reset();
 
+				// 调用原生过滤链
 				originalChain.doFilter(request, response);
 			}
 			else { // 遍历additionalFilters中的filter,顺序为FilterChainProxy——>各Filter——>FilterChainProxy

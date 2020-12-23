@@ -18,6 +18,8 @@ package org.springframework.security.config.annotation;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * AbstractSecurityBuilder 类实现了 SecurityBuilder 接口，该类中主要做了一件事，就是确保整个构建只被构建一次
+ * 
  * 该抽象基类约定了使用此类构建器对象构建目标对象时,目标对象被构建最多一次(实际作用可以看出来就是返回一个 O 类型的`单例`对象)。
  * 该行为是通过使用一个AtomicBoolean building标志位来控制的。
  * 只有在该标志为false时,调用构建器的#build方法才会触发执行目标对象的构建逻辑。

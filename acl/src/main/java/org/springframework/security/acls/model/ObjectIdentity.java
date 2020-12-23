@@ -61,6 +61,8 @@ public interface ObjectIdentity extends Serializable {
 	Serializable getIdentifier();
 
 	/**
+	 * 返回真实对象类的全路径，例如 org.xxx.xxx.model.User
+	 *
 	 * Obtains the "type" metadata for the domain object. This will often be a Java type
 	 * name (an interface or a class) &ndash; traditionally it is the name of the domain
 	 * object implementation class.

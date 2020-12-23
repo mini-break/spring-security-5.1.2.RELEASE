@@ -422,8 +422,8 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 		/**
 		 * this指:
 		 * 1.WebSecurity
-		 * 2.
-		 * 3.
+		 * 2.DefaultPasswordEncoderAuthenticationManagerBuilder
+		 * 3.HttpSecurity
 		 */
 		for (SecurityConfigurer<O, B> configurer : configurers) {
 			configurer.init((B) this);

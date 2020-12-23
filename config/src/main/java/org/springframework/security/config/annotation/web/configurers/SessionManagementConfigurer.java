@@ -304,6 +304,8 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 	 */
 	public final class SessionFixationConfigurer {
 		/**
+		 * newSession 表示登录后创建一个新的 session
+		 * 
 		 * Specifies that a new session should be created, but the session attributes from
 		 * the original {@link HttpSession} should not be retained.
 		 *
@@ -317,6 +319,8 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		}
 
 		/**
+		 * migrateSession 表示在登录成功之后，创建一个新的会话，然后将旧的 session 中的信息复制到新的 session 中
+		 *
 		 * Specifies that a new session should be created and the session attributes from
 		 * the original {@link HttpSession} should be retained.
 		 *
@@ -329,6 +333,8 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		}
 
 		/**
+		 * changeSessionId 表示 session 不变，但是会修改 sessionid，这实际上用到了 Servlet 容器提供的防御会话固定攻击
+		 *
 		 * Specifies that the Servlet container-provided session fixation protection
 		 * should be used. When a session authenticates, the Servlet 3.1 method
 		 * {@code HttpServletRequest#changeSessionId()} is called to change the session ID
@@ -345,6 +351,8 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		}
 
 		/**
+		 * none 表示不做任何事情，继续使用旧的 session
+		 * 
 		 * Specifies that no session fixation protection should be enabled. This may be
 		 * useful when utilizing other mechanisms for protecting against session fixation.
 		 * For example, if application container session fixation protection is already in
@@ -626,6 +634,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		List<SessionAuthenticationStrategy> delegateStrategies = this.sessionAuthenticationStrategies;
 		SessionAuthenticationStrategy defaultSessionAuthenticationStrategy;
 		if (this.providedSessionAuthenticationStrategy == null) {
+			// 加入防止固定session攻击策略
 			// If the user did not provide a SessionAuthenticationStrategy
 			// then default to sessionFixationAuthenticationStrategy
 			defaultSessionAuthenticationStrategy = postProcess(
@@ -634,6 +643,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		else {
 			defaultSessionAuthenticationStrategy = this.providedSessionAuthenticationStrategy;
 		}
+		// 开户并发session控制
 		if (isConcurrentSessionControlEnabled()) {
 			SessionRegistry sessionRegistry = getSessionRegistry(http);
 			ConcurrentSessionControlAuthenticationStrategy concurrentSessionControlStrategy = new ConcurrentSessionControlAuthenticationStrategy(
@@ -654,6 +664,7 @@ public final class SessionManagementConfigurer<H extends HttpSecurityBuilder<H>>
 		else {
 			delegateStrategies.add(defaultSessionAuthenticationStrategy);
 		}
+		// 这里只是加入 ChangeSessionIdAuthenticationStrategy，还会在CsrfConfigurer中加入CsrfAuthenticationStrategy
 		this.sessionAuthenticationStrategy = postProcess(
 				new CompositeSessionAuthenticationStrategy(delegateStrategies));
 		return this.sessionAuthenticationStrategy;

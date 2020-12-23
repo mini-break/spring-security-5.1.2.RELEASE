@@ -23,6 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 这个注解允许方法调用，但必须在进入方法之前对参数进行过滤
+ * 
  * Annotation for specifying a method filtering expression which will be evaluated before
  * a method has been invoked. The name of the argument to be filtered is specified using
  * the <tt>filterTarget</tt> attribute. This must be a Java Collection implementation
