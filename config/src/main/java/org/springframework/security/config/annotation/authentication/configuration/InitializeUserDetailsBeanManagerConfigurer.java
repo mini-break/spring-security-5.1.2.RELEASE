@@ -62,7 +62,7 @@ class InitializeUserDetailsBeanManagerConfigurer
 				return;
 			}
 			/**
-			 * 容器中获取用户详情服务bean
+			 * 容器中获取用户详情服务bean（UserDetailsService 实例）
 			 * InMemoryUserDetailsManager 来自 UserDetailsServiceAutoConfiguration
 			 */
 			UserDetailsService userDetailsService = getBeanOrNull(

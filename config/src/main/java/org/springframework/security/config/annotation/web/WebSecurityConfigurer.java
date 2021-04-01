@@ -25,6 +25,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
+ * 1.SecurityBuilder 中的泛型 Filter，表示 SecurityBuilder 最终的目的是为了构建一个 Filter 对象出来。
+ * 2.SecurityConfigurer 中两个泛型，第一个表示的含义也是 SecurityBuilder 最终构建的对象。
+ *
  * Allows customization to the {@link WebSecurity}. In most instances users will use
  * {@link EnableWebSecurity} and a create {@link Configuration} that extends
  * {@link WebSecurityConfigurerAdapter} which will automatically be applied to the

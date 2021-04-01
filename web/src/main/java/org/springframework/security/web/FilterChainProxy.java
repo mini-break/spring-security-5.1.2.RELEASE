@@ -142,14 +142,21 @@ public class FilterChainProxy extends GenericFilterBean {
 	// ~ Instance fields
 	// ================================================================================================
 
+	/**
+	 * 一个标记，用来标记过滤器是否已经执行过了
+	 */
 	private final static String FILTER_APPLIED = FilterChainProxy.class.getName().concat(
 			".APPLIED");
 
 	/**
 	 * 由WebSecurity中的performBuild()方法传递值过来
+	 * 这个是过滤器链，而不是一个个的过滤器
 	 */
 	private List<SecurityFilterChain> filterChains;
 
+	/**
+	 * FilterChainProxy 配置完成后的校验方法，默认使用的 NullFilterChainValidator 实际上对应了一个空方法，也就是不做任何校验
+	 */
 	private FilterChainValidator filterChainValidator = new NullFilterChainValidator();
 
 	private HttpFirewall firewall = new StrictHttpFirewall();
@@ -342,7 +349,7 @@ public class FilterChainProxy extends GenericFilterBean {
 		 */
 		private final int size;
 		/**
-		 *Spring Security 中的过滤器链遍历时候的下标
+		 * Spring Security 中的过滤器链遍历时候的下标
 		 */
 		private int currentPosition = 0;
 

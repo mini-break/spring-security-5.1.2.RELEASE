@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
+ * 用来配置用户类(Aware接口为了能够感知到自身的一些属性)
  * 通过AuthenticationManagerBuilder获取UserDetailsService
  * 
  * Base class that allows access to the {@link UserDetailsService} for using as a default

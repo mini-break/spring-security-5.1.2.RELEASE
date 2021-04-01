@@ -68,9 +68,11 @@ public class UserDetailsManagerConfigurer<B extends ProviderManagerBuilder<B>, C
 	@Override
 	protected void initUserDetailsService() throws Exception {
 		for (UserDetailsBuilder userBuilder : userBuilders) {
+			// 将 UserDetailsBuilder 所构建出来的 UserDetails 存储到 UserDetailsService 中
 			getUserDetailsService().createUser(userBuilder.build());
 		}
 		for (UserDetails userDetails : this.users) {
+			// 将提前准备好的 UserDetails 中的用户存储到 UserDetailsService 中
 			getUserDetailsService().createUser(userDetails);
 		}
 	}

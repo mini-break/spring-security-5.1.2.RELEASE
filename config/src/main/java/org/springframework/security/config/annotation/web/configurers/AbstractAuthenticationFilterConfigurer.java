@@ -274,11 +274,11 @@ public abstract class AbstractAuthenticationFilterConfigurer<B extends HttpSecur
 
 	@Override
 	public void init(B http) throws Exception {
-		// 修改登录认证默认路径（/login）
+		// 修改登录认证默认路径(登录处理地址，失败跳转地址，注销成功跳转地址)
 		updateAuthenticationDefaults();
-		// 修改默认访问权限
+		// 修改默认访问权限，对 loginPage、loginProcessingUrl、failureUrl 进行 permitAll 设置（如果用户配置了 permitAll 的话）
 		updateAccessDefaults(http);
-		// 注册认证入口点
+		// 注册认证入口点 （注册异常的处理器）
 		registerDefaultAuthenticationEntryPoint(http);
 	}
 

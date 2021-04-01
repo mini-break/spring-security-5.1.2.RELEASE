@@ -118,6 +118,7 @@ final class FilterComparator implements Comparator<Filter>, Serializable {
 	}
 
 	/**
+	 * Filter 是否已经注册
 	 * Determines if a particular {@link Filter} is registered to be sorted
 	 *
 	 * @param filter

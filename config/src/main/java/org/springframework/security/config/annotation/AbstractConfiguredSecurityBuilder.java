@@ -505,11 +505,15 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 			this.order = order;
 		}
 
+		/**
+		 * 判断是否正在初始化
+		 */
 		public boolean isInitializing() {
 			return INITIALIZING.order == order;
 		}
 
 		/**
+		 * 判断是否已经配置完毕
 		 * Determines if the state is CONFIGURING or later
 		 * @return
 		 */

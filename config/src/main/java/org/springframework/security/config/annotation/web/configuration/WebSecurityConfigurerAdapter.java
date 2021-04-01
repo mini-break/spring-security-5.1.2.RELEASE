@@ -123,12 +123,14 @@ public abstract class WebSecurityConfigurerAdapter implements
 	 */
 	private AuthenticationConfiguration authenticationConfiguration;
 	/**
+	 * 一个局部的 AuthenticationManagerBuilder，将来会传入 HttpSecurity 中去构建局部的 AuthenticationManager
 	 * 通过setApplicationContext 方法进行初始化
 	 * AuthenticationManager 构建器，缺省使用 : DefaultPasswordEncoderAuthenticationManagerBuilder
 	 * 所有构建的 AuthenticationManager 会是目标 WebSecurity/HttpSecurity 所要直接使用的 AuthenticationManager
 	 */
 	private AuthenticationManagerBuilder authenticationBuilder;
 	/**
+	 * 一个用来构建全局 AuthenticationManager 的 AuthenticationManagerBuilder
 	 * 通过setApplicationContext 方法进行初始化
 	 * AuthenticationManager 构建器，缺省使用 : DefaultPasswordEncoderAuthenticationManagerBuilder
 	 * 所要构建的 AuthenticationManagerBuilder 会是目标 WebSecurity/HttpSecurity 所要直接使用的
@@ -271,7 +273,7 @@ public abstract class WebSecurityConfigurerAdapter implements
 		localConfigureAuthenticationBldr.authenticationEventPublisher(eventPublisher);
 
 		/**
-		 * 获取认证管理器
+		 * 获取父级认证管理器
 		 * 会调用 configure(AuthenticationManagerBuilder auth)
  		 */
 		AuthenticationManager authenticationManager = authenticationManager();
@@ -283,7 +285,11 @@ public abstract class WebSecurityConfigurerAdapter implements
 		// 创建共享对象
 		Map<Class<? extends Object>, Object> sharedObjects = createSharedObjects();
 
-		// 创建了一个 http 实例
+		/**
+		 * 创建了一个 HttpSecurity 实例，传入一个局部的 AuthenticationManagerBuilder
+		 * 这个局部 AuthenticationManagerBuilder 什么时候构建 AuthenticationManager？
+		 * 在调用 HttpSecurity.beforeConfigure() 时构建
+		 */
 		http = new HttpSecurity(objectPostProcessor, authenticationBuilder,
 				sharedObjects);
 		// 这就是默认被配置的过滤器链, 配置的顺序在别的地方有排序
@@ -514,6 +520,10 @@ public abstract class WebSecurityConfigurerAdapter implements
 	public void setApplicationContext(ApplicationContext context) {
 		this.context = context;
 
+		/**
+		 * IOC容器中获取ObjectPostProcessor（其实就是AutowireBeanFactoryObjectPostProcessor）
+		 * 参考 @EnableWebSecurity => @EnableGlobalAuthentication=> AuthenticationConfiguration => ObjectPostProcessorConfiguration
+ 		 */
 		ObjectPostProcessor<Object> objectPostProcessor = context.getBean(ObjectPostProcessor.class);
 		
 		// 密码加密器，口令加密器，使用当前  WebSecurityConfigurerAdapter 的内部嵌套类 LazyPasswordEncoder

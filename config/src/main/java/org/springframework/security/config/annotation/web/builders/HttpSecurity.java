@@ -81,6 +81,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * HttpSecurity 做的事情，就是进行各种各样的 xxxConfigurer 配置
+ * 每一个 HttpSecurity 都要绑定一个 AuthenticationManager
  * HttpSecurity是Spring Security Config用于配置http请求安全控制的安全构建器(类似于Spring Security XML配置中的http命名空间配置部分)，
  * 它的构建目标是一个SecurityFilterChain,实现类使用DefaultSecurityFilterChain。
  * 该目标SecurityFilterChain最终会被Spring Security的安全过滤器FilterChainProxy所持有和应用于相应的http请求的安全控制
@@ -122,7 +124,7 @@ import java.util.Map;
  */
 public final class HttpSecurity extends
 		AbstractConfiguredSecurityBuilder<DefaultSecurityFilterChain, HttpSecurity>
-		implements SecurityBuilder<DefaultSecurityFilterChain>,
+		implements SecurityBuilder<DefaultSecurityFilterChain>,// 从泛型参数中看出，用来构建过滤器链
 		HttpSecurityBuilder<HttpSecurity> {
 	/**
 	 * 请求匹配过滤的配置信息
@@ -1151,6 +1153,7 @@ public final class HttpSecurity extends
 	 * org.springframework.security.config.annotation.web.HttpSecurityBuilder#authenticationProvider
 	 * (org.springframework.security.authentication.AuthenticationProvider)
 	 */
+	@Override
 	public HttpSecurity authenticationProvider(
 			AuthenticationProvider authenticationProvider) {
 		getAuthenticationRegistry().authenticationProvider(authenticationProvider);
@@ -1165,12 +1168,16 @@ public final class HttpSecurity extends
 	 * org.springframework.security.config.annotation.web.HttpSecurityBuilder#userDetailsService
 	 * (org.springframework.security.core.userdetails.UserDetailsService)
 	 */
+	@Override
 	public HttpSecurity userDetailsService(UserDetailsService userDetailsService)
 			throws Exception {
 		getAuthenticationRegistry().userDetailsService(userDetailsService);
 		return this;
 	}
 
+	/**
+	 * 凡是涉及到 AuthenticationManager 配置的，都会调用到 getAuthenticationRegistry 方法
+	 */
 	private AuthenticationManagerBuilder getAuthenticationRegistry() {
 		return getSharedObject(AuthenticationManagerBuilder.class);
 	}
@@ -1182,10 +1189,11 @@ public final class HttpSecurity extends
 	 * org.springframework.security.config.annotation.web.HttpSecurityBuilder#addFilterAfter(javax
 	 * .servlet.Filter, java.lang.Class)
 	 */
+	@Override
 	public HttpSecurity addFilterAfter(Filter filter, Class<? extends Filter> afterFilter) {
 		// 先注册到过滤器比较器里面，因为要排序
 		comparator.registerAfter(filter.getClass(), afterFilter);
-		// 然以后添加到过滤器列表中
+		// 然后添加到过滤器列表中
 		return addFilter(filter);
 	}
 
@@ -1196,6 +1204,7 @@ public final class HttpSecurity extends
 	 * org.springframework.security.config.annotation.web.HttpSecurityBuilder#addFilterBefore(
 	 * javax.servlet.Filter, java.lang.Class)
 	 */
+	@Override
 	public HttpSecurity addFilterBefore(Filter filter,
 			Class<? extends Filter> beforeFilter) {
 		comparator.registerBefore(filter.getClass(), beforeFilter);
@@ -1213,7 +1222,7 @@ public final class HttpSecurity extends
 	@Override
 	public HttpSecurity addFilter(Filter filter) {
 		Class<? extends Filter> filterClass = filter.getClass();
-		// 控制过滤器的范围
+		// 控制过滤器的范围（需要为已注册Filter类型）
 		if (!comparator.isRegistered(filterClass)) {
 			throw new IllegalArgumentException(
 					"The Filter class "

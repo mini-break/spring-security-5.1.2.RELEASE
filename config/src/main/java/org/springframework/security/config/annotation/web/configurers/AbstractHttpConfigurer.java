@@ -48,6 +48,9 @@ public abstract class AbstractHttpConfigurer<T extends AbstractHttpConfigurer<T,
 		return getBuilder();
 	}
 
+	/**
+	 * 为配置类手动添加后置处理器
+	 */
 	@SuppressWarnings("unchecked")
 	public T withObjectPostProcessor(ObjectPostProcessor<?> objectPostProcessor) {
 		addObjectPostProcessor(objectPostProcessor);
