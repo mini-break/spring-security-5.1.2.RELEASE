@@ -67,6 +67,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 public final class ExceptionHandlingConfigurer<H extends HttpSecurityBuilder<H>> extends
 		AbstractHttpConfigurer<ExceptionHandlingConfigurer<H>, H> {
 
+	/**
+	 * 默认 LoginUrlAuthenticationEntryPoint
+	 */
 	private AuthenticationEntryPoint authenticationEntryPoint;
 
 	private AccessDeniedHandler accessDeniedHandler;
