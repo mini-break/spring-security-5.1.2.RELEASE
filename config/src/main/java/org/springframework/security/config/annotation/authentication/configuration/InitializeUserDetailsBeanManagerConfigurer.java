@@ -93,7 +93,6 @@ class InitializeUserDetailsBeanManagerConfigurer
 
 		/**
 		 * 从容器中获取实例对象
-		 * @return
 		 */
 		private <T> T getBeanOrNull(Class<T> type) {
 			String[] userDetailsBeanNames = InitializeUserDetailsBeanManagerConfigurer.this.context
