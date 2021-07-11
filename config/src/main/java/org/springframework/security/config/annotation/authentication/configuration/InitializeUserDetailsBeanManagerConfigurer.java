@@ -95,6 +95,7 @@ class InitializeUserDetailsBeanManagerConfigurer
 		 * 从容器中获取实例对象
 		 */
 		private <T> T getBeanOrNull(Class<T> type) {
+			// 容器中获取指定类型的bean name
 			String[] userDetailsBeanNames = InitializeUserDetailsBeanManagerConfigurer.this.context
 					.getBeanNamesForType(type);
 			if (userDetailsBeanNames.length != 1) {
